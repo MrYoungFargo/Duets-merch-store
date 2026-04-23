@@ -15,9 +15,10 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #000000;
+      background: linear-gradient(135deg, #0a0f1a 0%, #1a0a2e 50%, #2a0a4e 100%);
       color: #f0f0f0;
       line-height: 1.5;
+      min-height: 100vh;
     }
 
     :root {
@@ -25,7 +26,9 @@
       --red: #e11d2c;
       --green: #10b981;
       --blue: #3b82f6;
-      --card-bg: #111111;
+      --purple: #7f2aeb;
+      --card-bg: #111111cc;
+      --card-bg-solid: #111111;
     }
 
     .container {
@@ -35,12 +38,12 @@
     }
 
     .site-header {
-      background-color: var(--black);
-      border-bottom: 1px solid #222;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(127,42,235,0.3);
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(0,0,0,0.95);
     }
 
     .header-inner {
@@ -48,12 +51,16 @@
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      padding: 20px 0;
+      padding: 15px 0;
       gap: 20px;
     }
 
+    .logo {
+      flex: 1;
+      text-align: center;
+    }
     .logo img {
-      max-height: 80px;
+      max-height: 140px;
       width: auto;
     }
 
@@ -66,14 +73,14 @@
       text-decoration: none;
       font-weight: 600;
       cursor: pointer;
-      font-size: 1.1rem;
+      font-size: 0.9rem;
     }
-    .nav-links a:hover { color: var(--red); }
+    .nav-links a:hover { color: var(--purple); }
 
     .cart-icon {
       position: relative;
       cursor: pointer;
-      font-size: 1.6rem;
+      font-size: 1.4rem;
     }
     .cart-count {
       position: absolute;
@@ -87,53 +94,59 @@
     }
 
     .hero {
-      background: radial-gradient(circle at 10% 30%, #0a0f1a, #000000);
-      padding: 60px 0;
+      background: radial-gradient(circle at 20% 30%, rgba(127,42,235,0.2), rgba(0,0,0,0.8));
+      padding: 50px 0;
       text-align: center;
     }
     .hero h2 {
-      font-size: 3rem;
-      font-weight: 800;
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff, var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
     .hero p {
       color: #aaa;
-      margin-top: 16px;
+      margin-top: 12px;
+      font-size: 0.9rem;
     }
 
     .category-title {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 60px 0 32px 0;
-      border-left: 5px solid var(--red);
-      padding-left: 20px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin: 50px 0 25px 0;
+      border-left: 4px solid var(--purple);
+      padding-left: 16px;
     }
     .category-title i {
-      margin-right: 12px;
-      color: var(--green);
+      margin-right: 10px;
+      color: var(--purple);
     }
 
     .products-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 32px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 28px;
       margin-bottom: 40px;
     }
 
     .product-card {
-      background: var(--card-bg);
+      background: var(--card-bg-solid);
       border-radius: 20px;
       overflow: hidden;
-      border: 1px solid #2a2a2a;
-      transition: transform 0.2s;
+      border: 1px solid rgba(127,42,235,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
     .product-card:hover {
       transform: translateY(-5px);
-      border-color: var(--red);
+      border-color: var(--purple);
+      box-shadow: 0 10px 25px -8px rgba(127,42,235,0.3);
     }
 
     .product-img {
-      background: #1a1a1a;
-      height: 250px;
+      background: #1a1a2a;
+      height: 230px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -150,62 +163,62 @@
     }
 
     .product-info {
-      padding: 20px;
+      padding: 18px;
     }
 
     .product-title {
-      font-size: 1.2rem;
+      font-size: 1rem;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       color: white;
     }
 
     .product-price {
-      font-size: 1.6rem;
+      font-size: 1.3rem;
       font-weight: 800;
       color: var(--green);
-      margin: 10px 0;
+      margin: 8px 0;
     }
 
     .product-details {
-      margin: 12px 0;
+      margin: 10px 0;
     }
     .detail-label {
       color: #888;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .size-row {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
-      margin: 10px 0;
+      margin: 8px 0;
     }
     .size-btn {
       background: #1f1f1f;
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: 30px;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       font-weight: 600;
       cursor: pointer;
       transition: 0.2s;
       border: 1px solid #333;
     }
     .size-btn:hover, .size-btn.selected {
-      background: var(--red);
-      border-color: var(--red);
+      background: var(--purple);
+      border-color: var(--purple);
     }
     .color-row {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
-      margin: 10px 0;
+      margin: 8px 0;
     }
     .color-btn {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid transparent;
@@ -219,38 +232,42 @@
     .color-black { background-color: #1a1a1a; border: 1px solid #555; }
     .color-green { background-color: #10b981; }
     .color-blue { background-color: #3b82f6; }
-    .color-white { background-color: #f0f0f0; }
 
     .add-to-cart {
-      background: var(--red);
+      background: var(--purple);
       border: none;
       color: white;
-      padding: 12px 0;
+      padding: 10px 0;
       width: 100%;
       border-radius: 40px;
       font-weight: 700;
       cursor: pointer;
-      margin-top: 15px;
+      margin-top: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      font-size: 0.85rem;
+      transition: 0.2s;
     }
     .add-to-cart:hover {
-      background: #b91c2c;
+      background: #5e1ca8;
+      transform: scale(0.98);
     }
 
     footer {
       text-align: center;
-      padding: 40px;
-      border-top: 1px solid #222;
-      margin-top: 60px;
+      padding: 30px;
+      border-top: 1px solid rgba(127,42,235,0.2);
+      margin-top: 50px;
+      font-size: 0.8rem;
     }
 
     @media (max-width: 768px) {
-      .hero h2 { font-size: 2rem; }
-      .header-inner { flex-direction: column; }
-      .logo img { max-height: 60px; }
+      .hero h2 { font-size: 1.5rem; }
+      .header-inner { flex-direction: column; text-align: center; }
+      .logo img { max-height: 100px; }
+      .nav-links { justify-content: center; }
     }
 
     .cart-overlay {
@@ -260,28 +277,28 @@
       width: 380px;
       max-width: 90vw;
       height: 100%;
-      background: #0b0b0b;
+      background: #0b0b1a;
       z-index: 1000;
       transition: right 0.3s;
       padding: 24px;
-      border-left: 3px solid var(--green);
+      border-left: 3px solid var(--purple);
       overflow-y: auto;
     }
     .cart-overlay.open { right: 0; }
     .close-cart {
       float: right;
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       cursor: pointer;
       background: none;
       border: none;
       color: white;
     }
     .cart-items { max-height: 55vh; overflow-y: auto; margin: 20px 0; }
-    .cart-total { font-size: 1.5rem; font-weight: bold; border-top: 1px solid #333; padding-top: 16px; }
+    .cart-total { font-size: 1.3rem; font-weight: bold; border-top: 1px solid #333; padding-top: 16px; }
     .checkout-btn {
       background: var(--green);
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       border-radius: 40px;
       font-weight: bold;
       margin-top: 20px;
@@ -292,14 +309,15 @@
       background: var(--red);
       border: none;
       color: white;
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 20px;
       cursor: pointer;
+      font-size: 0.7rem;
     }
     .paypal-note {
       text-align: center;
-      margin-top: 15px;
-      font-size: 0.75rem;
+      margin-top: 12px;
+      font-size: 0.7rem;
       color: #666;
     }
   </style>
@@ -309,7 +327,7 @@
 <div class="site-header">
   <div class="container header-inner">
     <div class="logo">
-      <img src="fargo1.png" alt="MrYoungFargo" onerror="this.src='https://placehold.co/200x80?text=MrYoungFargo'">
+      <img src="fargo1.png" alt="MrYoungFargo" onerror="this.src='https://placehold.co/300x140?text=MrYoungFargo'">
     </div>
     <div class="nav-links">
       <a href="#" class="nav-tshirts">T-SHIRTS</a>
@@ -378,9 +396,9 @@
     { id: 5, name: "Monalisa Sbabaring T-Shirt", price: 179.99, image: "t-shirt5.png", type: "T-Shirt", sizes: ["XS","S","M","L","XL","XXL"] }
   ];
 
-  // SWEATERS (6 items now: sweater1,2,3,4)
+  // SWEATERS - Fixed sweater1 name to "Sbabaring Sweater"
   const sweaters = [
-    { id: 6, name: "Monalisa Sweater", price: 329.99, image: "sweater1.png", type: "Sweater", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 6, name: "Sbabaring Sweater", price: 329.99, image: "sweater1.png", type: "Sweater", sizes: ["XS","S","M","L","XL","XXL"] },
     { id: 7, name: "Neon Duets Sweater", price: 329.99, image: "sweater2.png", type: "Sweater", sizes: ["XS","S","M","L","XL","XXL"] },
     { id: 8, name: "Duets Lover Sweater", price: 329.99, image: "sweater3.png", type: "Sweater", sizes: ["XS","S","M","L","XL","XXL"] },
     { id: 9, name: "Duets Glitch Sweater", price: 329.99, image: "sweater4.png", type: "Sweater", sizes: ["XS","S","M","L","XL","XXL"] }
@@ -423,7 +441,7 @@
       total += itemTotal;
       html += `<div style="border-bottom:1px solid #333; padding:12px 0; display:flex; justify-content:space-between; align-items:center;">
         <div><strong>${item.name}</strong><br>Size: ${item.size}<br>Color: ${item.color}<br>R${item.price.toFixed(2)} x ${item.qty}</div>
-        <button class="remove-item" data-id="${item.id}" data-size="${item.size}" data-color="${item.color}" style="background:var(--red); border:none; color:white; padding:6px 12px; border-radius:20px;">Remove</button>
+        <button class="remove-item" data-id="${item.id}" data-size="${item.size}" data-color="${item.color}" style="background:var(--red); border:none; color:white; padding:5px 10px; border-radius:20px;">Remove</button>
       </div>`;
     });
     container.innerHTML = html;
@@ -450,28 +468,6 @@
     return true;
   }
 
-  function renderColorOptions(productId, container) {
-    let colorHtml = `<div class="detail-label">AVAILABLE COLORS</div><div class="color-row" data-color-for="${productId}">`;
-    availableColors.forEach(color => {
-      colorHtml += `<div class="color-btn ${color.class}" data-color="${color.value}" title="${color.name}"></div>`;
-    });
-    colorHtml += `</div>`;
-    container.innerHTML += colorHtml;
-    
-    // Add color selection listeners after DOM is updated
-    setTimeout(() => {
-      const colorRow = document.querySelector(`.color-row[data-color-for="${productId}"]`);
-      if (colorRow) {
-        colorRow.querySelectorAll(".color-btn").forEach(btn => {
-          btn.addEventListener("click", (e) => {
-            colorRow.querySelectorAll(".color-btn").forEach(b => b.classList.remove("selected"));
-            btn.classList.add("selected");
-          });
-        });
-      }
-    }, 0);
-  }
-
   function renderProductGrid(productsArray, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -491,23 +487,15 @@
             <div class="size-row" data-id="${prod.id}">
               ${prod.sizes.map(s => `<span class="size-btn" data-size="${s}">${s}</span>`).join('')}
             </div>
-            <div id="color-container-${prod.id}"></div>
+            <div class="detail-label">AVAILABLE COLORS</div>
+            <div class="color-row" data-color-for="${prod.id}">
+              ${availableColors.map(color => `<div class="color-btn ${color.class}" data-color="${color.value}" title="${color.name}"></div>`).join('')}
+            </div>
           </div>
           <button class="add-to-cart" data-id="${prod.id}"><i class="fas fa-cart-plus"></i> ADD TO CART</button>
         </div>
       `;
       container.appendChild(card);
-      
-      // Add color options
-      const colorContainer = document.getElementById(`color-container-${prod.id}`);
-      if (colorContainer) {
-        let colorHtml = `<div class="detail-label">AVAILABLE COLORS</div><div class="color-row" data-color-for="${prod.id}">`;
-        availableColors.forEach(color => {
-          colorHtml += `<div class="color-btn ${color.class}" data-color="${color.value}" title="${color.name}"></div>`;
-        });
-        colorHtml += `</div>`;
-        colorContainer.innerHTML = colorHtml;
-      }
     });
 
     // Add size selection listeners
