@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DUETS | Official Merch Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>DUETS | Official Merch Store - T-Shirts, Hoodies, Sweaters</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -52,13 +52,9 @@
       gap: 20px;
     }
 
-    .logo h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--red), var(--blue), var(--green));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+    .logo img {
+      max-height: 60px;
+      width: auto;
     }
 
     .nav-links {
@@ -69,6 +65,7 @@
       color: #ddd;
       text-decoration: none;
       font-weight: 600;
+      cursor: pointer;
     }
     .nav-links a:hover { color: var(--red); }
 
@@ -102,19 +99,23 @@
       margin-top: 16px;
     }
 
-    .section-title {
+    .category-title {
       font-size: 2rem;
       font-weight: 700;
       margin: 60px 0 32px 0;
       border-left: 5px solid var(--red);
       padding-left: 20px;
     }
+    .category-title i {
+      margin-right: 12px;
+      color: var(--green);
+    }
 
     .products-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 32px;
-      margin-bottom: 60px;
+      margin-bottom: 40px;
     }
 
     .product-card {
@@ -145,11 +146,20 @@
 
     .product-img {
       background: #1a1a1a;
-      height: 220px;
+      height: 250px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 3.5rem;
+      overflow: hidden;
+    }
+    .product-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .product-img .no-img {
+      font-size: 3rem;
+      color: #555;
     }
 
     .product-info {
@@ -240,6 +250,7 @@
     @media (max-width: 768px) {
       .hero h2 { font-size: 2rem; }
       .header-inner { flex-direction: column; }
+      .logo img { max-height: 50px; }
     }
 
     .cart-overlay {
@@ -254,6 +265,7 @@
       transition: right 0.3s;
       padding: 24px;
       border-left: 3px solid var(--green);
+      overflow-y: auto;
     }
     .cart-overlay.open { right: 0; }
     .close-cart {
@@ -264,7 +276,7 @@
       border: none;
       color: white;
     }
-    .cart-items { max-height: 60vh; overflow-y: auto; margin: 20px 0; }
+    .cart-items { max-height: 55vh; overflow-y: auto; margin: 20px 0; }
     .cart-total { font-size: 1.5rem; font-weight: bold; border-top: 1px solid #333; padding-top: 16px; }
     .checkout-btn {
       background: var(--green);
@@ -273,6 +285,23 @@
       border-radius: 40px;
       font-weight: bold;
       margin-top: 20px;
+      border: none;
+      cursor: pointer;
+    }
+    .remove-item {
+      background: var(--red);
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .paypal-note {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.75rem;
+      color: #666;
     }
   </style>
 </head>
@@ -280,11 +309,13 @@
 
 <div class="site-header">
   <div class="container header-inner">
-    <div class="logo"><h1>DUETS</h1></div>
+    <div class="logo">
+      <img src="duets1.png" alt="DUETS Logo" onerror="this.src='https://placehold.co/200x60?text=DUETS'">
+    </div>
     <div class="nav-links">
-      <a href="#">SHOP</a>
-      <a href="#">SIZE GUIDE</a>
-      <a href="#">COLLECTION</a>
+      <a href="#" class="nav-tshirts">T-SHIRTS</a>
+      <a href="#" class="nav-sweaters">SWEATERS</a>
+      <a href="#" class="nav-hoodies">HOODIES</a>
     </div>
     <div class="cart-icon" id="cartIcon">
       <i class="fas fa-bag-shopping"></i>
@@ -301,8 +332,20 @@
 </section>
 
 <div class="container">
-  <div class="section-title"><i class="fas fa-tshirt"></i> NEW ARRIVALS</div>
-  <div class="products-grid" id="productGrid"></div>
+  <div id="tshirts-section">
+    <div class="category-title"><i class="fas fa-tshirt"></i> T-SHIRTS — R179.99 each</div>
+    <div class="products-grid" id="tshirtsGrid"></div>
+  </div>
+
+  <div id="sweaters-section">
+    <div class="category-title"><i class="fas fa-vest"></i> SWEATERS — R329.99</div>
+    <div class="products-grid" id="sweatersGrid"></div>
+  </div>
+
+  <div id="hoodies-section">
+    <div class="category-title"><i class="fas fa-hoodie"></i> HOODIES — R379.99</div>
+    <div class="products-grid" id="hoodiesGrid"></div>
+  </div>
 </div>
 
 <div class="container">
@@ -321,18 +364,29 @@
   <h2><i class="fas fa-shopping-cart"></i> CART</h2>
   <div id="cartItemsList" class="cart-items"></div>
   <div class="cart-total" id="cartTotalPrice">R0.00</div>
-  <button class="checkout-btn" id="checkoutBtn">CHECKOUT →</button>
+  <button class="checkout-btn" id="checkoutBtn">PROCEED TO CHECKOUT →</button>
+  <div class="paypal-note">Payment options available at checkout</div>
 </div>
 
 <script>
-  const products = [
-    { id: 1, name: "CLASSIC T-SHIRT", price: 299, type: "T-Shirt", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 2, name: "OVERSIZED HOODIE", price: 599, type: "Hoodie", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 3, name: "COMFORT SWEATER", price: 449, type: "Sweater", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 4, name: "GOLF SHIRT", price: 399, type: "Golf Shirt", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 5, name: "PREMIUM TEE", price: 349, type: "T-Shirt", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 6, name: "ZIP HOODIE", price: 649, type: "Hoodie", sizes: ["XS","S","M","L","XL","XXL"] }
+  // Product definitions with your exact images and prices
+  const tshirts = [
+    { id: 1, name: "T-SHIRT 1", price: 179.99, image: "t-shirt1.png", type: "T-Shirt", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 2, name: "T-SHIRT 2", price: 179.99, image: "t-shirt2.png", type: "T-Shirt", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 3, name: "T-SHIRT 3", price: 179.99, image: "t-shirt3.png", type: "T-Shirt", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 4, name: "T-SHIRT 4", price: 179.99, image: "t-shirt4.png", type: "T-Shirt", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 5, name: "T-SHIRT 5", price: 179.99, image: "t-shirt5.png", type: "T-Shirt", sizes: ["XS","S","M","L","XL","XXL"] }
   ];
+
+  const sweaters = [
+    { id: 6, name: "SWEATER 1", price: 329.99, image: "sweater1.png", type: "Sweater", sizes: ["XS","S","M","L","XL","XXL"] }
+  ];
+
+  const hoodies = [
+    { id: 7, name: "HOODIE 1", price: 379.99, image: "hoodie1.png", type: "Hoodie", sizes: ["XS","S","M","L","XL","XXL"] }
+  ];
+
+  const allProducts = [...tshirts, ...sweaters, ...hoodies];
 
   let cart = [];
 
@@ -358,11 +412,11 @@
       return;
     }
     let html = "";
-    cart.forEach((item, idx) => {
+    cart.forEach((item) => {
       const itemTotal = item.price * item.qty;
       total += itemTotal;
-      html += `<div style="border-bottom:1px solid #333; padding:12px 0; display:flex; justify-content:space-between;">
-        <div><strong>${item.name}</strong><br>Size: ${item.size}<br>R${item.price} x ${item.qty}</div>
+      html += `<div style="border-bottom:1px solid #333; padding:12px 0; display:flex; justify-content:space-between; align-items:center;">
+        <div><strong>${item.name}</strong><br>Size: ${item.size}<br>R${item.price.toFixed(2)} x ${item.qty}</div>
         <button class="remove-item" data-id="${item.id}" data-size="${item.size}" style="background:var(--red); border:none; color:white; padding:6px 12px; border-radius:20px;">Remove</button>
       </div>`;
     });
@@ -382,47 +436,48 @@
     if (!size) { alert("Please select a size!"); return false; }
     const existing = cart.find(i => i.id === product.id && i.size === size);
     if (existing) existing.qty++;
-    else cart.push({ ...product, size: size, qty: 1 });
+    else cart.push({ id: product.id, name: product.name, price: product.price, size: size, qty: 1 });
     saveCart();
     document.getElementById("cartSidebar").classList.add("open");
     return true;
   }
 
-  function renderProducts() {
-    const grid = document.getElementById("productGrid");
-    grid.innerHTML = "";
-    products.forEach(prod => {
+  function renderProductGrid(productsArray, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+    productsArray.forEach(prod => {
       const card = document.createElement("div");
       card.className = "product-card";
-      let icon = "👕";
-      if (prod.type === "Hoodie") icon = "🧥";
-      if (prod.type === "Sweater") icon = "🧶";
-      if (prod.type === "Golf Shirt") icon = "⛳";
       card.innerHTML = `
         <div class="discount-badge">20% OFF on 3+</div>
-        <div class="product-img"><i class="fas fa-tshirt" style="font-size:3rem;"></i> ${icon}</div>
+        <div class="product-img">
+          <img src="${prod.image}" alt="${prod.name}" onerror="this.parentElement.innerHTML='<div class=\\'no-img\\'><i class=\\'fas fa-tshirt\\'></i></div>'">
+        </div>
         <div class="product-info">
           <div class="product-title">${prod.name}</div>
-          <div class="product-price">R${prod.price}<small>.00</small></div>
+          <div class="product-price">R${prod.price.toFixed(2)}</div>
           <div class="size-row" data-id="${prod.id}">
             ${prod.sizes.map(s => `<span class="size-btn" data-size="${s}">${s}</span>`).join('')}
           </div>
           <button class="add-to-cart" data-id="${prod.id}"><i class="fas fa-cart-plus"></i> ADD TO CART</button>
         </div>
       `;
-      grid.appendChild(card);
+      container.appendChild(card);
     });
-    document.querySelectorAll(".size-btn").forEach(btn => {
+
+    // Add size selection and add-to-cart listeners
+    container.querySelectorAll(".size-btn").forEach(btn => {
       btn.addEventListener("click", (e) => {
         const parent = btn.closest(".size-row");
         parent.querySelectorAll(".size-btn").forEach(b => b.classList.remove("selected"));
         btn.classList.add("selected");
       });
     });
-    document.querySelectorAll(".add-to-cart").forEach(btn => {
+    container.querySelectorAll(".add-to-cart").forEach(btn => {
       btn.addEventListener("click", (e) => {
         const id = parseInt(btn.dataset.id);
-        const product = products.find(p => p.id === id);
+        const product = allProducts.find(p => p.id === id);
         const sizeRow = btn.closest(".product-info").querySelector(".size-row");
         const selected = sizeRow.querySelector(".size-btn.selected");
         const size = selected ? selected.dataset.size : null;
@@ -431,15 +486,43 @@
     });
   }
 
+  // Navigation scroll
+  document.querySelector(".nav-tshirts")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("tshirts-section").scrollIntoView({ behavior: "smooth" });
+  });
+  document.querySelector(".nav-sweaters")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("sweaters-section").scrollIntoView({ behavior: "smooth" });
+  });
+  document.querySelector(".nav-hoodies")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("hoodies-section").scrollIntoView({ behavior: "smooth" });
+  });
+
   document.getElementById("cartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
   document.getElementById("closeCartBtn")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.remove("open"));
   document.getElementById("checkoutBtn")?.addEventListener("click", () => {
-    if (cart.length === 0) alert("Cart is empty");
-    else alert(`✅ Checkout: Total ${document.getElementById("cartTotalPrice").innerText}\n(20% discount applied automatically for 3+ items in real store)`);
+    if (cart.length === 0) alert("Your cart is empty!");
+    else {
+      let total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+      let discount = 0;
+      let totalItems = cart.reduce((sum, i) => sum + i.qty, 0);
+      if (totalItems >= 3) {
+        discount = total * 0.2;
+        total = total - discount;
+        alert(`✅ Checkout Total: R${total.toFixed(2)}\n🎉 20% discount applied for buying 3+ items!\n\nPayment options will be available. Contact us for bank transfer or PayFast.`);
+      } else {
+        alert(`✅ Checkout Total: R${total.toFixed(2)}\n\nAdd 3+ items for 20% off! Payment options available.`);
+      }
+    }
   });
 
-  renderProducts();
+  // Render all sections
+  renderProductGrid(tshirts, "tshirtsGrid");
+  renderProductGrid(sweaters, "sweatersGrid");
+  renderProductGrid(hoodies, "hoodiesGrid");
   loadCart();
 </script>
 </body>
-</html>
+</html> 
