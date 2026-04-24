@@ -249,64 +249,6 @@
       margin: 6px 0;
     }
 
-    .product-details {
-      margin: 8px 0;
-      display: none;
-    }
-    .product-details.show {
-      display: block;
-    }
-
-    .detail-label {
-      color: #888;
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 5px;
-    }
-    .size-row {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin: 6px 0;
-    }
-    .size-btn {
-      background: #1f1f1f;
-      padding: 4px 10px;
-      border-radius: 30px;
-      font-size: 0.65rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-      border: 1px solid #333;
-    }
-    .size-btn:hover, .size-btn.selected {
-      background: var(--purple);
-      border-color: var(--purple);
-    }
-    .color-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin: 6px 0;
-    }
-    .color-btn {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: 0.2s;
-    }
-    .color-btn:hover, .color-btn.selected {
-      border-color: white;
-      transform: scale(1.1);
-    }
-    .color-red { background-color: #e11d2c; }
-    .color-black { background-color: #1a1a1a; border: 1px solid #555; }
-    .color-green { background-color: #10b981; }
-    .color-blue { background-color: #3b82f6; }
-
     .add-to-cart {
       background: var(--purple);
       border: none;
@@ -404,9 +346,146 @@
       font-size: 0.7rem;
       color: #666;
     }
+
+    /* WHITE POPUP MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.show {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 28px;
+      width: 90%;
+      max-width: 360px;
+      padding: 24px 20px;
+      text-align: center;
+      animation: modalFadeIn 0.3s ease;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    .modal-content h3 {
+      color: #1a1a2e;
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .modal-content .modal-price {
+      color: #10b981;
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+    .modal-section-title {
+      color: #666;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 15px 0 10px;
+      text-align: left;
+    }
+    .modal-sizes {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .modal-size-btn {
+      background: #f0f0f0;
+      padding: 8px 16px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #1a1a2e;
+      border: 1px solid #ddd;
+    }
+    .modal-size-btn:hover, .modal-size-btn.selected {
+      background: #7f2aeb;
+      color: white;
+      border-color: #7f2aeb;
+    }
+    .modal-colors {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .modal-color-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: 0.2s;
+    }
+    .modal-color-btn:hover, .modal-color-btn.selected {
+      border-color: #7f2aeb;
+      transform: scale(1.1);
+    }
+    .modal-confirm {
+      background: #7f2aeb;
+      color: white;
+      border: none;
+      padding: 14px 0;
+      width: 100%;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: 0.2s;
+    }
+    .modal-confirm:hover {
+      background: #5e1ca8;
+    }
+    .modal-close {
+      margin-top: 12px;
+      background: none;
+      border: none;
+      color: #999;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+
+<!-- White Popup Modal -->
+<div id="sizeColorModal" class="modal">
+  <div class="modal-content">
+    <h3 id="modalProductName">Product Name</h3>
+    <div class="modal-price" id="modalProductPrice">R0.00</div>
+    <div class="modal-section-title">SELECT SIZE</div>
+    <div class="modal-sizes" id="modalSizes"></div>
+    <div class="modal-section-title">SELECT COLOR</div>
+    <div class="modal-colors" id="modalColors"></div>
+    <button class="modal-confirm" id="modalConfirmBtn">ADD TO CART</button>
+    <button class="modal-close" id="modalCloseBtn">CANCEL</button>
+  </div>
+</div>
 
 <!-- Sticky Navigation Bar (appears on scroll) -->
 <div class="sticky-nav" id="stickyNav">
@@ -479,10 +558,10 @@
 <script>
   // Colors available for all products
   const availableColors = [
-    { name: "Red", class: "color-red", value: "Red" },
-    { name: "Black", class: "color-black", value: "Black" },
-    { name: "Green", class: "color-green", value: "Green" },
-    { name: "Blue", class: "color-blue", value: "Blue" }
+    { name: "Red", class: "color-red", value: "Red", bg: "#e11d2c" },
+    { name: "Black", class: "color-black", value: "Black", bg: "#1a1a1a" },
+    { name: "Green", class: "color-green", value: "Green", bg: "#10b981" },
+    { name: "Blue", class: "color-blue", value: "Blue", bg: "#3b82f6" }
   ];
 
   // T-SHIRTS
@@ -511,6 +590,9 @@
   const allProducts = [...tshirts, ...sweaters, ...hoodies];
 
   let cart = [];
+  let currentSelectedProduct = null;
+  let currentSelectedSize = null;
+  let currentSelectedColor = null;
 
   function saveCart() {
     localStorage.setItem("mryoungfargo_cart", JSON.stringify(cart));
@@ -567,13 +649,66 @@
     return true;
   }
 
-  function toggleDetails(card, show) {
-    const detailsDiv = card.querySelector(".product-details");
-    if (show) {
-      detailsDiv.classList.add("show");
-    } else {
-      detailsDiv.classList.remove("show");
+  function showModal(product) {
+    currentSelectedProduct = product;
+    currentSelectedSize = null;
+    currentSelectedColor = null;
+    
+    document.getElementById("modalProductName").innerText = product.name;
+    document.getElementById("modalProductPrice").innerText = `R${product.price.toFixed(2)}`;
+    
+    // Render sizes
+    const sizesContainer = document.getElementById("modalSizes");
+    sizesContainer.innerHTML = "";
+    product.sizes.forEach(size => {
+      const sizeBtn = document.createElement("div");
+      sizeBtn.className = "modal-size-btn";
+      sizeBtn.innerText = size;
+      sizeBtn.addEventListener("click", () => {
+        document.querySelectorAll(".modal-size-btn").forEach(btn => btn.classList.remove("selected"));
+        sizeBtn.classList.add("selected");
+        currentSelectedSize = size;
+      });
+      sizesContainer.appendChild(sizeBtn);
+    });
+    
+    // Render colors
+    const colorsContainer = document.getElementById("modalColors");
+    colorsContainer.innerHTML = "";
+    availableColors.forEach(color => {
+      const colorBtn = document.createElement("div");
+      colorBtn.className = "modal-color-btn";
+      colorBtn.style.backgroundColor = color.bg;
+      colorBtn.title = color.name;
+      colorBtn.addEventListener("click", () => {
+        document.querySelectorAll(".modal-color-btn").forEach(btn => btn.classList.remove("selected"));
+        colorBtn.classList.add("selected");
+        currentSelectedColor = color.value;
+      });
+      colorsContainer.appendChild(colorBtn);
+    });
+    
+    document.getElementById("sizeColorModal").classList.add("show");
+  }
+
+  function closeModal() {
+    document.getElementById("sizeColorModal").classList.remove("show");
+    currentSelectedProduct = null;
+    currentSelectedSize = null;
+    currentSelectedColor = null;
+  }
+
+  function confirmAddToCart() {
+    if (!currentSelectedSize) {
+      alert("Please select a size!");
+      return;
     }
+    if (!currentSelectedColor) {
+      alert("Please select a color!");
+      return;
+    }
+    addToCart(currentSelectedProduct, currentSelectedSize, currentSelectedColor);
+    closeModal();
   }
 
   function renderProductGrid(productsArray, containerId) {
@@ -590,55 +725,10 @@
         <div class="product-info">
           <div class="product-title">${prod.name}</div>
           <div class="product-price">R${prod.price.toFixed(2)}</div>
-          <div class="product-details">
-            <div class="detail-label">AVAILABLE SIZES</div>
-            <div class="size-row" data-id="${prod.id}">
-              ${prod.sizes.map(s => `<span class="size-btn" data-size="${s}">${s}</span>`).join('')}
-            </div>
-            <div class="detail-label">AVAILABLE COLORS</div>
-            <div class="color-row" data-color-for="${prod.id}">
-              ${availableColors.map(color => `<div class="color-btn ${color.class}" data-color="${color.value}" title="${color.name}"></div>`).join('')}
-            </div>
-          </div>
           <button class="add-to-cart" data-id="${prod.id}"><i class="fas fa-cart-plus"></i> ADD TO CART</button>
         </div>
       `;
       container.appendChild(card);
-
-      // Hide details initially
-      const detailsDiv = card.querySelector(".product-details");
-      detailsDiv.classList.remove("show");
-
-      // Click on product card to show details
-      card.addEventListener("click", (e) => {
-        // Don't trigger if clicking on button or size/color
-        if (e.target.classList.contains("add-to-cart") || 
-            e.target.classList.contains("size-btn") || 
-            e.target.classList.contains("color-btn")) {
-          return;
-        }
-        toggleDetails(card, true);
-      });
-    });
-
-    // Size selection listeners
-    container.querySelectorAll(".size-btn").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const parent = btn.closest(".size-row");
-        parent.querySelectorAll(".size-btn").forEach(b => b.classList.remove("selected"));
-        btn.classList.add("selected");
-      });
-    });
-    
-    // Color selection listeners
-    container.querySelectorAll(".color-btn").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const parent = btn.closest(".color-row");
-        parent.querySelectorAll(".color-btn").forEach(b => b.classList.remove("selected"));
-        btn.classList.add("selected");
-      });
     });
     
     // Add to cart listeners
@@ -647,27 +737,20 @@
         e.stopPropagation();
         const id = parseInt(btn.dataset.id);
         const product = allProducts.find(p => p.id === id);
-        const productCard = btn.closest(".product-card");
-        
-        // Show details if not shown yet
-        toggleDetails(productCard, true);
-        
-        const sizeRow = productCard.querySelector(".size-row");
-        const colorRow = productCard.querySelector(".color-row");
-        const selectedSize = sizeRow ? sizeRow.querySelector(".size-btn.selected") : null;
-        const selectedColor = colorRow ? colorRow.querySelector(".color-btn.selected") : null;
-        const size = selectedSize ? selectedSize.dataset.size : null;
-        const color = selectedColor ? selectedColor.dataset.color : null;
-        
-        if (!size) {
-          alert("Please select a size first!");
-          return;
+        showModal(product);
+      });
+    });
+    
+    // Click on card also shows modal
+    container.querySelectorAll(".product-card").forEach(card => {
+      card.addEventListener("click", (e) => {
+        if (e.target.classList.contains("add-to-cart")) return;
+        const btn = card.querySelector(".add-to-cart");
+        if (btn) {
+          const id = parseInt(btn.dataset.id);
+          const product = allProducts.find(p => p.id === id);
+          showModal(product);
         }
-        if (!color) {
-          alert("Please select a color first!");
-          return;
-        }
-        addToCart(product, size, color);
       });
     });
   }
@@ -712,6 +795,13 @@
       alert(`✅ Checkout Total: R${total.toFixed(2)}\n\nPayment options available. Contact us for bank transfer or PayFast.`);
     }
   });
+  
+  document.getElementById("modalConfirmBtn")?.addEventListener("click", confirmAddToCart);
+  document.getElementById("modalCloseBtn")?.addEventListener("click", closeModal);
+  window.addEventListener("click", (e) => {
+    const modal = document.getElementById("sizeColorModal");
+    if (e.target === modal) closeModal();
+  });
 
   renderProductGrid(tshirts, "tshirtsGrid");
   renderProductGrid(sweaters, "sweatersGrid");
@@ -720,4 +810,4 @@
   loadCart();
 </script>
 </body>
-</html> 
+</html>
