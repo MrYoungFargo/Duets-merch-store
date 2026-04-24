@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>MrYoungFargo Merch | Static Waves Background</title>
+  <title>MrYoungFargo Merch | Thin White Wavy Lines</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -18,7 +18,7 @@
       overflow-x: hidden;
     }
 
-    /* CANVAS BACKGROUND – static wavy purple-blue lines */
+    /* CANVAS BACKGROUND – thin white wavy lines */
     #bg-canvas {
       position: fixed;
       top: 0;
@@ -153,25 +153,25 @@
     }
     .no-img { font-size: 1rem; color: #888; }
 
-    /* SMALLER FONTS for product descriptions and button */
-    .product-info { padding: 12px 8px 10px; }
+    /* EXTRA SMALL FONTS for product descriptions */
+    .product-info { padding: 10px 8px 8px; }
     .product-title {
-      font-size: 0.7rem;
+      font-size: 0.6rem;
       font-weight: 700;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       color: white;
     }
     .product-price { 
-      font-size: 0.8rem; 
+      font-size: 0.7rem; 
       font-weight: 800; 
       color: var(--green); 
-      margin: 4px 0; 
+      margin: 3px 0; 
     }
     
-    /* BLUE ADD TO CART BUTTON - smaller font inside */
+    /* BLUE ADD TO CART BUTTON - smaller font */
     .add-to-cart-btn {
       background: var(--blue);
       border: none;
@@ -180,7 +180,7 @@
       width: 100%;
       border-radius: 30px;
       font-weight: 600;
-      font-size: 0.55rem;
+      font-size: 0.5rem;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -194,7 +194,7 @@
       transform: scale(0.98);
     }
     .add-to-cart-btn i {
-      font-size: 0.5rem;
+      font-size: 0.45rem;
     }
 
     footer { text-align: center; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; font-size: 0.5rem; color: rgba(255,255,255,0.6); }
@@ -263,7 +263,7 @@
 </head>
 <body>
 
-<!-- CANVAS BACKGROUND (static wavy purple-blue lines) -->
+<!-- CANVAS BACKGROUND (thin white wavy lines) -->
 <canvas id="bg-canvas"></canvas>
 
 <!-- Modal -->
@@ -326,7 +326,7 @@
 
 <script>
   // ==============================================================
-  // STATIC WAVY LINES BACKGROUND (purple to blue)
+  // THIN WHITE WAVY LINES BACKGROUND (static, many lines)
   // ==============================================================
   (function() {
     const canvas = document.getElementById('bg-canvas');
@@ -335,18 +335,38 @@
     let waves = [];
 
     function generateWaves(w, h) {
-      return [
-        { yBase: h * 0.18, amplitude: 22, frequency: 0.0045, phase: 0.2, color: 'rgba(180, 130, 255, 0.35)', lineWidth: 1.4 },
-        { yBase: h * 0.35, amplitude: 32, frequency: 0.0032, phase: 1.1, color: 'rgba(150, 100, 240, 0.4)', lineWidth: 1.6 },
-        { yBase: h * 0.52, amplitude: 28, frequency: 0.0038, phase: 2.5, color: 'rgba(130, 90, 230, 0.45)', lineWidth: 1.8 },
-        { yBase: h * 0.68, amplitude: 35, frequency: 0.0029, phase: 0.7, color: 'rgba(110, 70, 210, 0.4)', lineWidth: 1.5 },
-        { yBase: h * 0.82, amplitude: 20, frequency: 0.0042, phase: 1.8, color: 'rgba(90, 60, 190, 0.35)', lineWidth: 1.3 },
-        { yBase: h * 0.60, amplitude: 18, frequency: 0.0051, phase: 3.0, color: 'rgba(140, 100, 245, 0.3)', lineWidth: 1.2 },
-        { yBase: h * 0.08, amplitude: 15, frequency: 0.0055, phase: 4.2, color: 'rgba(200, 160, 255, 0.3)', lineWidth: 1.1 },
-        { yBase: h * 0.93, amplitude: 14, frequency: 0.0048, phase: 2.9, color: 'rgba(100, 65, 200, 0.35)', lineWidth: 1.2 },
-        { yBase: h * 0.25, amplitude: 24, frequency: 0.0060, phase: 5.0, color: 'rgba(170, 120, 250, 0.32)', lineWidth: 1.3 },
-        { yBase: h * 0.75, amplitude: 26, frequency: 0.0035, phase: 3.7, color: 'rgba(120, 80, 220, 0.38)', lineWidth: 1.4 }
-      ];
+      const wavesArray = [];
+      // Create 25 thin white wavy lines across the canvas
+      for (let i = 0; i < 28; i++) {
+        const yPosition = (i / 27) * h; // spread evenly from top to bottom
+        // Randomize amplitude and frequency for organic feel
+        const amplitude = 8 + (i % 7) * 3;
+        const frequency = 0.0025 + (i * 0.0003);
+        const phase = i * 0.5;
+        // Vary opacity - thinner lines = lower opacity
+        const opacity = 0.15 + (i % 5) * 0.05;
+        wavesArray.push({
+          yBase: yPosition,
+          amplitude: amplitude,
+          frequency: frequency,
+          phase: phase,
+          color: `rgba(255, 255, 255, ${opacity})`,
+          lineWidth: 0.6
+        });
+      }
+      // Add a few extra wavy lines with slightly different characteristics
+      for (let i = 0; i < 15; i++) {
+        const yPosition = (i / 14) * h;
+        wavesArray.push({
+          yBase: yPosition + (Math.sin(i) * 15),
+          amplitude: 12 + (i % 8),
+          frequency: 0.0035 + (i * 0.0002),
+          phase: i * 0.8,
+          color: `rgba(255, 255, 255, 0.12)`,
+          lineWidth: 0.5
+        });
+      }
+      return wavesArray;
     }
 
     function drawGradientBackground(ctx, w, h) {
@@ -363,13 +383,39 @@
       for (let wave of wavesData) {
         ctx.beginPath();
         let firstPoint = true;
-        for (let x = 0; x <= w; x += 8) {
-          const y = wave.yBase + Math.sin(x * wave.frequency + wave.phase) * wave.amplitude;
-          if (firstPoint) { ctx.moveTo(x, y); firstPoint = false; }
-          else { ctx.lineTo(x, y); }
+        // Draw smooth wavy lines across the canvas
+        for (let x = 0; x <= w; x += 10) {
+          // Combination of sine and cosine for more organic wavy shape
+          const yOffset = Math.sin(x * wave.frequency + wave.phase) * wave.amplitude
+                       + Math.sin(x * wave.frequency * 0.5 + wave.phase * 1.5) * (wave.amplitude * 0.3);
+          const y = wave.yBase + yOffset;
+          if (firstPoint) {
+            ctx.moveTo(x, y);
+            firstPoint = false;
+          } else {
+            ctx.lineTo(x, y);
+          }
         }
         ctx.strokeStyle = wave.color;
         ctx.lineWidth = wave.lineWidth;
+        ctx.stroke();
+      }
+    }
+
+    // Add some extra delicate curved lines that flow across
+    function drawExtraCurves(ctx, w, h) {
+      for (let i = 0; i < 12; i++) {
+        const startY = h * (0.1 + i * 0.07);
+        const endY = h * (0.15 + i * 0.07);
+        ctx.beginPath();
+        let first = true;
+        for (let x = 0; x <= w; x += 15) {
+          const y = startY + Math.sin(x * 0.002 + i) * 18 + Math.cos(x * 0.0015) * 8;
+          if (first) { ctx.moveTo(x, y); first = false; }
+          else { ctx.lineTo(x, y); }
+        }
+        ctx.strokeStyle = `rgba(255, 255, 255, 0.08)`;
+        ctx.lineWidth = 0.5;
         ctx.stroke();
       }
     }
@@ -379,9 +425,11 @@
       const w = width, h = height;
       drawGradientBackground(ctx, w, h);
       drawWavyLines(ctx, w, h, waves);
+      drawExtraCurves(ctx, w, h);
+      // Very subtle vignette
       const vignette = ctx.createRadialGradient(w/2, h/2, w*0.3, w/2, h/2, w*0.9);
       vignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      vignette.addColorStop(1, 'rgba(5, 0, 15, 0.25)');
+      vignette.addColorStop(1, 'rgba(5, 0, 15, 0.2)');
       ctx.fillStyle = vignette;
       ctx.fillRect(0, 0, w, h);
     }
@@ -400,7 +448,7 @@
   })();
 
   // ==============================================================
-  // STORE JAVASCRIPT (unchanged except blue buttons)
+  // STORE JAVASCRIPT (unchanged)
   // ==============================================================
   const colors = [
     { name: "Red", value: "Red", bg: "#e11d2c" },
