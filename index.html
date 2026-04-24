@@ -153,34 +153,34 @@
     }
     .no-img { font-size: 1rem; color: #888; }
 
-    /* BIGGER TEXT */
+    /* SMALLER FONTS for product descriptions and button */
     .product-info { padding: 12px 8px 10px; }
     .product-title {
-      font-size: 0.85rem;
+      font-size: 0.7rem;
       font-weight: 700;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       color: white;
     }
     .product-price { 
-      font-size: 0.95rem; 
+      font-size: 0.8rem; 
       font-weight: 800; 
       color: var(--green); 
-      margin: 5px 0; 
+      margin: 4px 0; 
     }
     
-    /* BLUE ADD TO CART BUTTON - kept as original */
+    /* BLUE ADD TO CART BUTTON - smaller font inside */
     .add-to-cart-btn {
       background: var(--blue);
       border: none;
       color: white;
-      padding: 6px 0;
+      padding: 5px 0;
       width: 100%;
       border-radius: 30px;
       font-weight: 600;
-      font-size: 0.65rem;
+      font-size: 0.55rem;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -193,6 +193,9 @@
       background: #2563eb;
       transform: scale(0.98);
     }
+    .add-to-cart-btn i {
+      font-size: 0.5rem;
+    }
 
     footer { text-align: center; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; font-size: 0.5rem; color: rgba(255,255,255,0.6); }
 
@@ -204,23 +207,23 @@
     }
     .cart-overlay.open { right: 0; }
     .close-cart { float: right; font-size: 1rem; cursor: pointer; background: none; border: none; color: white; }
-    .cart-items { max-height: 55vh; overflow-y: auto; margin: 8px 0; font-size: 0.6rem; }
-    .cart-total { font-size: 0.75rem; font-weight: bold; border-top: 1px solid #333; padding-top: 6px; }
+    .cart-items { max-height: 55vh; overflow-y: auto; margin: 8px 0; font-size: 0.55rem; }
+    .cart-total { font-size: 0.7rem; font-weight: bold; border-top: 1px solid #333; padding-top: 6px; }
     .checkout-btn {
       background: var(--blue);
       width: 100%;
-      padding: 6px;
+      padding: 5px;
       border-radius: 30px;
       font-weight: 600;
       margin-top: 8px;
       border: none;
       cursor: pointer;
-      font-size: 0.6rem;
+      font-size: 0.55rem;
       color: white;
       transition: all 0.2s;
     }
     .checkout-btn:hover { background: #2563eb; transform: scale(0.98); }
-    .remove-item { background: var(--red); border: none; color: white; padding: 2px 5px; border-radius: 20px; font-size: 0.5rem; cursor: pointer; }
+    .remove-item { background: var(--red); border: none; color: white; padding: 2px 5px; border-radius: 20px; font-size: 0.45rem; cursor: pointer; }
 
     /* modal */
     .modal {
@@ -231,12 +234,12 @@
     .modal-content {
       background: white; border-radius: 14px; width: 85%; max-width: 260px; padding: 12px; text-align: center;
     }
-    .modal-content h3 { font-size: 0.8rem; color: #111; margin-bottom: 2px; }
-    .modal-price { font-size: 0.7rem; color: #10b981; font-weight: 800; margin-bottom: 6px; }
-    .modal-section-title { font-size: 0.5rem; text-align: left; margin: 6px 0 3px; color: #555; }
+    .modal-content h3 { font-size: 0.75rem; color: #111; margin-bottom: 2px; }
+    .modal-price { font-size: 0.65rem; color: #10b981; font-weight: 800; margin-bottom: 6px; }
+    .modal-section-title { font-size: 0.45rem; text-align: left; margin: 6px 0 3px; color: #555; }
     .modal-sizes, .modal-colors { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
     .modal-size-btn {
-      background: #f0f0f0; padding: 3px 7px; border-radius: 30px; font-size: 0.6rem; font-weight: 600; cursor: pointer;
+      background: #f0f0f0; padding: 3px 7px; border-radius: 30px; font-size: 0.55rem; font-weight: 600; cursor: pointer;
     }
     .modal-size-btn.selected, .modal-size-btn:hover { background: var(--blue); color: white; }
     .modal-color-btn { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
@@ -250,12 +253,12 @@
       font-weight: 600;
       margin-top: 8px;
       cursor: pointer;
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       border: none;
       transition: all 0.2s;
     }
     .modal-confirm:hover { background: #2563eb; transform: scale(0.98); }
-    .modal-close { background: none; border: none; color: #999; margin-top: 5px; cursor: pointer; font-size: 0.55rem; }
+    .modal-close { background: none; border: none; color: #999; margin-top: 5px; cursor: pointer; font-size: 0.5rem; }
   </style>
 </head>
 <body>
