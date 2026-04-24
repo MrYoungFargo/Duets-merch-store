@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>MrYoungFargo Merch | Official Store</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     * {
@@ -18,24 +18,21 @@
       background: linear-gradient(135deg, #0a0f1a 0%, #1a0a2e 50%, #2a0a4e 100%);
       color: #f0f0f0;
       line-height: 1.5;
-      min-height: 100vh;
     }
 
     :root {
-      --black: #000000;
       --red: #e11d2c;
       --green: #10b981;
-      --blue: #3b82f6;
       --purple: #7f2aeb;
     }
 
     .container {
-      max-width: 800px;
+      max-width: 700px;
       margin: 0 auto;
       padding: 0 20px;
     }
 
-    /* Full header with gradient background - NO BOX around logo */
+    /* Header with black+blue gradient, no box around logo */
     .site-header {
       background: linear-gradient(135deg, #000000, #0a2a5a, #000000, #0a2a5a);
       background-size: 300% 300%;
@@ -74,7 +71,7 @@
       100% { transform: rotateY(360deg); }
     }
 
-    /* Sticky nav bar */
+    /* Sticky navigation */
     .sticky-nav {
       position: fixed;
       top: -100px;
@@ -91,14 +88,11 @@
       justify-content: center;
       gap: 40px;
     }
-    .sticky-nav.show {
-      top: 0;
-    }
+    .sticky-nav.show { top: 0; }
     .sticky-nav a {
       color: #ddd;
       text-decoration: none;
       font-weight: 600;
-      cursor: pointer;
       font-size: 0.9rem;
     }
     .sticky-nav a:hover { color: var(--purple); }
@@ -122,7 +116,6 @@
     .sticky-nav-links {
       display: flex;
       gap: 40px;
-      align-items: center;
     }
 
     .nav-links {
@@ -133,7 +126,6 @@
       color: #ddd;
       text-decoration: none;
       font-weight: 600;
-      cursor: pointer;
       font-size: 0.9rem;
     }
     .nav-links a:hover { color: var(--purple); }
@@ -168,13 +160,14 @@
     }
     .hero p {
       color: #aaa;
-      margin-top: 10px;
+      margin-top: 8px;
       font-size: 0.85rem;
     }
 
+    /* Category title */
     .category-title {
-      font-size: 1.3rem;
-      font-weight: 600;
+      font-size: 1.4rem;
+      font-weight: 700;
       margin: 40px 0 20px 0;
       border-left: 4px solid var(--purple);
       padding-left: 16px;
@@ -184,57 +177,49 @@
       color: var(--purple);
     }
 
-    /* LIST VIEW - like desktop mode */
-    .products-list {
+    /* Product list - exactly like screenshot: vertical, simple */
+    .product-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
       margin-bottom: 40px;
     }
-
-    .product-item {
+    .product-card {
       background: linear-gradient(135deg, #0a0a1a, #0a1a3a);
-      border-radius: 16px;
+      border-radius: 20px;
       border: 1px solid rgba(127,42,235,0.3);
-      padding: 16px 20px;
+      padding: 20px;
       cursor: pointer;
       transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
     }
-    .product-item:hover {
+    .product-card:hover {
       border-color: var(--purple);
-      transform: translateX(5px);
+      transform: translateX(6px);
     }
-    .product-info-left {
-      flex: 2;
-      min-width: 150px;
-    }
-    .product-title {
-      font-size: 1rem;
+    .product-name {
+      font-size: 1.1rem;
       font-weight: 700;
       color: white;
+      margin-bottom: 6px;
     }
     .product-price {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       font-weight: 800;
       color: var(--green);
-      margin-top: 4px;
+      margin-bottom: 14px;
     }
     .add-to-cart-btn {
       background: var(--purple);
       border: none;
       color: white;
-      padding: 10px 24px;
+      padding: 10px 20px;
       border-radius: 40px;
       font-weight: 700;
+      font-size: 0.85rem;
       cursor: pointer;
-      font-size: 0.8rem;
       transition: 0.2s;
-      white-space: nowrap;
+      width: auto;
+      display: inline-block;
     }
     .add-to-cart-btn:hover {
       background: #5e1ca8;
@@ -249,18 +234,17 @@
       font-size: 0.75rem;
     }
 
+    /* Mobile fine-tuning */
     @media (max-width: 500px) {
-      .product-item {
-        flex-direction: column;
-        text-align: center;
-      }
-      .add-to-cart-btn {
-        width: 100%;
-      }
+      .container { padding: 0 16px; }
       .logo img { max-height: 120px; }
       .hero h2 { font-size: 1.4rem; }
+      .product-name { font-size: 1rem; }
+      .product-price { font-size: 1.1rem; }
+      .add-to-cart-btn { width: 100%; text-align: center; }
     }
 
+    /* Cart sidebar */
     .cart-overlay {
       position: fixed;
       top: 0;
@@ -305,14 +289,8 @@
       cursor: pointer;
       font-size: 0.7rem;
     }
-    .paypal-note {
-      text-align: center;
-      margin-top: 12px;
-      font-size: 0.7rem;
-      color: #666;
-    }
 
-    /* WHITE POPUP MODAL */
+    /* White popup modal */
     .modal {
       display: none;
       position: fixed;
@@ -325,9 +303,7 @@
       align-items: center;
       justify-content: center;
     }
-    .modal.show {
-      display: flex;
-    }
+    .modal.show { display: flex; }
     .modal-content {
       background: white;
       border-radius: 28px;
@@ -335,99 +311,34 @@
       max-width: 360px;
       padding: 24px 20px;
       text-align: center;
-      animation: modalFadeIn 0.3s ease;
+      animation: fadeIn 0.3s;
     }
-    @keyframes modalFadeIn {
+    @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.9); }
       to { opacity: 1; transform: scale(1); }
     }
-    .modal-content h3 {
-      color: #1a1a2e;
-      font-size: 1.3rem;
-      margin-bottom: 8px;
-      font-weight: 700;
-    }
-    .modal-content .modal-price {
-      color: #10b981;
-      font-size: 1.2rem;
-      font-weight: 800;
-      margin-bottom: 20px;
-    }
-    .modal-section-title {
-      color: #666;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin: 15px 0 10px;
-      text-align: left;
-    }
-    .modal-sizes {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
+    .modal-content h3 { color: #1a1a2e; font-size: 1.3rem; margin-bottom: 8px; }
+    .modal-content .modal-price { color: #10b981; font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; }
+    .modal-section-title { color: #666; font-size: 0.7rem; text-transform: uppercase; text-align: left; margin: 15px 0 10px; }
+    .modal-sizes { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
     .modal-size-btn {
-      background: #f0f0f0;
-      padding: 8px 16px;
-      border-radius: 40px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      color: #1a1a2e;
-      border: 1px solid #ddd;
+      background: #f0f0f0; padding: 8px 16px; border-radius: 40px; font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; color: #1a1a2e; border: 1px solid #ddd;
     }
-    .modal-size-btn:hover, .modal-size-btn.selected {
-      background: #7f2aeb;
-      color: white;
-    }
-    .modal-colors {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-    .modal-color-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 3px solid transparent;
-    }
-    .modal-color-btn:hover, .modal-color-btn.selected {
-      border-color: #7f2aeb;
-      transform: scale(1.1);
-    }
-    .modal-confirm {
-      background: #7f2aeb;
-      color: white;
-      border: none;
-      padding: 14px 0;
-      width: 100%;
-      border-radius: 50px;
-      font-weight: 700;
-      font-size: 1rem;
-      cursor: pointer;
-      margin-top: 15px;
-    }
-    .modal-close {
-      margin-top: 12px;
-      background: none;
-      border: none;
-      color: #999;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
+    .modal-size-btn:hover, .modal-size-btn.selected { background: #7f2aeb; color: white; }
+    .modal-colors { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+    .modal-color-btn { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
+    .modal-color-btn:hover, .modal-color-btn.selected { border-color: #7f2aeb; transform: scale(1.1); }
+    .modal-confirm { background: #7f2aeb; color: white; border: none; padding: 14px 0; width: 100%; border-radius: 50px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 15px; }
+    .modal-close { margin-top: 12px; background: none; border: none; color: #999; font-size: 0.85rem; cursor: pointer; }
   </style>
 </head>
 <body>
 
-<!-- White Popup Modal -->
+<!-- Popup Modal -->
 <div id="sizeColorModal" class="modal">
   <div class="modal-content">
-    <h3 id="modalProductName">Product Name</h3>
+    <h3 id="modalProductName">Product</h3>
     <div class="modal-price" id="modalProductPrice">R0.00</div>
     <div class="modal-section-title">SELECT SIZE</div>
     <div class="modal-sizes" id="modalSizes"></div>
@@ -438,7 +349,7 @@
   </div>
 </div>
 
-<!-- Sticky Navigation Bar -->
+<!-- Sticky Nav -->
 <div class="sticky-nav" id="stickyNav">
   <div class="sticky-nav-links">
     <a href="#" class="sticky-tshirts">T-SHIRTS</a>
@@ -451,8 +362,8 @@
   </div>
 </div>
 
-<!-- Full Header -->
-<div class="site-header" id="mainHeader">
+<!-- Main Header -->
+<div class="site-header">
   <div class="container header-inner">
     <div class="logo">
       <img src="fargo1.png" alt="MrYoungFargo" onerror="this.src='https://placehold.co/400x180?text=MrYoungFargo'">
@@ -479,17 +390,15 @@
 <div class="container">
   <div id="tshirts-section">
     <div class="category-title"><i class="fas fa-tshirt"></i> T-SHIRTS</div>
-    <div class="products-list" id="tshirtsList"></div>
+    <div class="product-list" id="tshirtsList"></div>
   </div>
-
   <div id="sweaters-section">
     <div class="category-title"><i class="fas fa-vest"></i> SWEATERS</div>
-    <div class="products-list" id="sweatersList"></div>
+    <div class="product-list" id="sweatersList"></div>
   </div>
-
   <div id="hoodies-section">
     <div class="category-title"><i class="fas fa-hoodie"></i> HOODIES</div>
-    <div class="products-list" id="hoodiesList"></div>
+    <div class="product-list" id="hoodiesList"></div>
   </div>
 </div>
 
@@ -503,7 +412,6 @@
   <div id="cartItemsList" class="cart-items"></div>
   <div class="cart-total" id="cartTotalPrice">R0.00</div>
   <button class="checkout-btn" id="checkoutBtn">PROCEED TO CHECKOUT →</button>
-  <div class="paypal-note">Payment options available at checkout</div>
 </div>
 
 <script>
@@ -514,6 +422,7 @@
     { name: "Blue", value: "Blue", bg: "#3b82f6" }
   ];
 
+  // Products exactly as in your screenshot (names match)
   const tshirts = [
     { id: 1, name: "Neon Duets T-Shirt", price: 179.99, image: "t-shirt1.png", sizes: ["XS","S","M","L","XL","XXL"] },
     { id: 2, name: "Duets Lover T-Shirt", price: 179.99, image: "t-shirt2.png", sizes: ["XS","S","M","L","XL","XXL"] },
@@ -537,23 +446,19 @@
 
   const allProducts = [...tshirts, ...sweaters, ...hoodies];
   let cart = [];
-  let currentProduct = null;
-  let currentSize = null;
-  let currentColor = null;
+  let currentProduct = null, currentSize = null, currentColor = null;
 
   function saveCart() {
     localStorage.setItem("mryoungfargo_cart", JSON.stringify(cart));
     updateCartUI();
   }
-
   function loadCart() {
     const saved = localStorage.getItem("mryoungfargo_cart");
     if (saved) cart = JSON.parse(saved);
     updateCartUI();
   }
-
   function updateCartUI() {
-    const count = cart.reduce((s, i) => s + i.qty, 0);
+    const count = cart.reduce((s,i) => s + i.qty, 0);
     document.getElementById("cartCount").innerText = count;
     document.getElementById("stickyCartCount").innerText = count;
     const container = document.getElementById("cartItemsList");
@@ -564,10 +469,10 @@
       return;
     }
     let html = "";
-    cart.forEach((item) => {
+    cart.forEach(item => {
       const itemTotal = item.price * item.qty;
       total += itemTotal;
-      html += `<div style="border-bottom:1px solid #333; padding:12px 0; display:flex; justify-content:space-between; align-items:center;">
+      html += `<div style="border-bottom:1px solid #333; padding:12px 0; display:flex; justify-content:space-between;">
         <div><strong>${item.name}</strong><br>Size: ${item.size}<br>Color: ${item.color}<br>R${item.price.toFixed(2)} x ${item.qty}</div>
         <button class="remove-item" data-id="${item.id}" data-size="${item.size}" data-color="${item.color}">Remove</button>
       </div>`;
@@ -576,70 +481,57 @@
     document.getElementById("cartTotalPrice").innerText = `R${total.toFixed(2)}`;
     document.querySelectorAll(".remove-item").forEach(btn => {
       btn.addEventListener("click", () => {
-        const id = parseInt(btn.dataset.id);
-        const size = btn.dataset.size;
-        const color = btn.dataset.color;
+        const id = parseInt(btn.dataset.id), size = btn.dataset.size, color = btn.dataset.color;
         cart = cart.filter(i => !(i.id === id && i.size === size && i.color === color));
         saveCart();
       });
     });
   }
-
   function addToCart(product, size, color) {
-    if (!size) { alert("Please select a size!"); return false; }
-    if (!color) { alert("Please select a color!"); return false; }
+    if (!size) { alert("Select a size!"); return false; }
+    if (!color) { alert("Select a color!"); return false; }
     const existing = cart.find(i => i.id === product.id && i.size === size && i.color === color);
     if (existing) existing.qty++;
-    else cart.push({ id: product.id, name: product.name, price: product.price, size: size, color: color, qty: 1 });
+    else cart.push({ id: product.id, name: product.name, price: product.price, size, color, qty: 1 });
     saveCart();
     document.getElementById("cartSidebar").classList.add("open");
     return true;
   }
-
   function showModal(product) {
     currentProduct = product;
-    currentSize = null;
-    currentColor = null;
-    
+    currentSize = currentColor = null;
     document.getElementById("modalProductName").innerText = product.name;
     document.getElementById("modalProductPrice").innerText = `R${product.price.toFixed(2)}`;
-    
-    const sizesContainer = document.getElementById("modalSizes");
-    sizesContainer.innerHTML = "";
-    product.sizes.forEach(size => {
+    const sizesDiv = document.getElementById("modalSizes");
+    sizesDiv.innerHTML = "";
+    product.sizes.forEach(s => {
       const btn = document.createElement("div");
       btn.className = "modal-size-btn";
-      btn.innerText = size;
+      btn.innerText = s;
       btn.onclick = () => {
         document.querySelectorAll(".modal-size-btn").forEach(b => b.classList.remove("selected"));
         btn.classList.add("selected");
-        currentSize = size;
+        currentSize = s;
       };
-      sizesContainer.appendChild(btn);
+      sizesDiv.appendChild(btn);
     });
-    
-    const colorsContainer = document.getElementById("modalColors");
-    colorsContainer.innerHTML = "";
-    availableColors.forEach(color => {
+    const colorsDiv = document.getElementById("modalColors");
+    colorsDiv.innerHTML = "";
+    availableColors.forEach(c => {
       const btn = document.createElement("div");
       btn.className = "modal-color-btn";
-      btn.style.backgroundColor = color.bg;
-      btn.title = color.name;
+      btn.style.backgroundColor = c.bg;
+      btn.title = c.name;
       btn.onclick = () => {
         document.querySelectorAll(".modal-color-btn").forEach(b => b.classList.remove("selected"));
         btn.classList.add("selected");
-        currentColor = color.value;
+        currentColor = c.value;
       };
-      colorsContainer.appendChild(btn);
+      colorsDiv.appendChild(btn);
     });
-    
     document.getElementById("sizeColorModal").classList.add("show");
   }
-
-  function closeModal() {
-    document.getElementById("sizeColorModal").classList.remove("show");
-  }
-
+  function closeModal() { document.getElementById("sizeColorModal").classList.remove("show"); }
   function confirmAdd() {
     if (!currentSize) { alert("Please select a size!"); return; }
     if (!currentColor) { alert("Please select a color!"); return; }
@@ -647,23 +539,20 @@
     closeModal();
   }
 
-  function renderList(productsArray, containerId) {
+  function renderProductList(products, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = "";
-    productsArray.forEach(prod => {
-      const item = document.createElement("div");
-      item.className = "product-item";
-      item.innerHTML = `
-        <div class="product-info-left">
-          <div class="product-title">${prod.name}</div>
-          <div class="product-price">R${prod.price.toFixed(2)}</div>
-        </div>
+    products.forEach(prod => {
+      const card = document.createElement("div");
+      card.className = "product-card";
+      card.innerHTML = `
+        <div class="product-name">${prod.name}</div>
+        <div class="product-price">R${prod.price.toFixed(2)}</div>
         <button class="add-to-cart-btn" data-id="${prod.id}">ADD TO CART</button>
       `;
-      container.appendChild(item);
+      container.appendChild(card);
     });
-    
     container.querySelectorAll(".add-to-cart-btn").forEach(btn => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -672,11 +561,10 @@
         showModal(product);
       });
     });
-    
-    container.querySelectorAll(".product-item").forEach(item => {
-      item.addEventListener("click", (e) => {
+    container.querySelectorAll(".product-card").forEach(card => {
+      card.addEventListener("click", (e) => {
         if (e.target.classList.contains("add-to-cart-btn")) return;
-        const btn = item.querySelector(".add-to-cart-btn");
+        const btn = card.querySelector(".add-to-cart-btn");
         if (btn) {
           const id = parseInt(btn.dataset.id);
           const product = allProducts.find(p => p.id === id);
@@ -694,7 +582,7 @@
   });
 
   function setupNav() {
-    const sections = [
+    const links = [
       { class: ".nav-tshirts", id: "tshirts-section" },
       { class: ".nav-sweaters", id: "sweaters-section" },
       { class: ".nav-hoodies", id: "hoodies-section" },
@@ -702,11 +590,11 @@
       { class: ".sticky-sweaters", id: "sweaters-section" },
       { class: ".sticky-hoodies", id: "hoodies-section" }
     ];
-    sections.forEach(s => {
-      document.querySelectorAll(s.class).forEach(el => {
+    links.forEach(l => {
+      document.querySelectorAll(l.class).forEach(el => {
         el.addEventListener("click", (e) => {
           e.preventDefault();
-          document.getElementById(s.id).scrollIntoView({ behavior: "smooth" });
+          document.getElementById(l.id).scrollIntoView({ behavior: "smooth" });
         });
       });
     });
@@ -716,24 +604,21 @@
   document.getElementById("stickyCartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
   document.getElementById("closeCartBtn")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.remove("open"));
   document.getElementById("checkoutBtn")?.addEventListener("click", () => {
-    if (cart.length === 0) alert("Your cart is empty!");
+    if (cart.length === 0) alert("Cart is empty");
     else {
-      let total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-      alert(`✅ Checkout Total: R${total.toFixed(2)}\n\nPayment options available.`);
+      let total = cart.reduce((s,i) => s + (i.price * i.qty), 0);
+      alert(`✅ Total: R${total.toFixed(2)}\nPayment options coming soon.`);
     }
   });
-  
   document.getElementById("modalConfirmBtn")?.addEventListener("click", confirmAdd);
   document.getElementById("modalCloseBtn")?.addEventListener("click", closeModal);
-  window.addEventListener("click", (e) => {
-    if (e.target === document.getElementById("sizeColorModal")) closeModal();
-  });
+  window.addEventListener("click", (e) => { if (e.target === document.getElementById("sizeColorModal")) closeModal(); });
 
-  renderList(tshirts, "tshirtsList");
-  renderList(sweaters, "sweatersList");
-  renderList(hoodies, "hoodiesList");
+  renderProductList(tshirts, "tshirtsList");
+  renderProductList(sweaters, "sweatersList");
+  renderProductList(hoodies, "hoodiesList");
   setupNav();
   loadCart();
 </script>
 </body>
-</html>
+</html> 
