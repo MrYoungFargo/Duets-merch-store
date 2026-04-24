@@ -18,7 +18,7 @@
       overflow-x: hidden;
     }
 
-    /* IMAGE BACKGROUND - background.png */
+    /* IMAGE BACKGROUND - background.png (NO DIM OVERLAY) */
     body::before {
       content: "";
       position: fixed;
@@ -34,19 +34,7 @@
       pointer-events: none;
     }
 
-    /* Fallback gradient */
-    body::after {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(26,10,46,0.6), rgba(10,26,58,0.6));
-      z-index: 1;
-      pointer-events: none;
-    }
-
+    /* NO DIM OVERLAY - removed completely */
     /* ALL CONTENT goes above the background */
     .site-header, .hero, .container, footer, .cart-overlay, .modal {
       position: relative;
@@ -90,6 +78,20 @@
       100% { transform: rotateY(360deg); }
     }
 
+    /* CATEGORIES AT THE TOP (like before) */
+    .nav-links {
+      display: flex;
+      gap: 32px;
+    }
+    .nav-links a {
+      color: #ccc;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .nav-links a:hover { color: white; }
+
     /* sticky nav */
     .sticky-nav {
       position: fixed;
@@ -108,7 +110,7 @@
       gap: 30px;
     }
     .sticky-nav.show { top: 0; }
-    .sticky-nav a { color: #ccc; text-decoration: none; font-weight: 500; font-size: 0.6rem; cursor: pointer; }
+    .sticky-nav a { color: #ccc; text-decoration: none; font-weight: 500; font-size: 0.7rem; cursor: pointer; }
     .sticky-nav a:hover { color: white; }
     .sticky-cart { position: relative; cursor: pointer; font-size: 0.9rem; color: white; margin-left: auto; }
     .sticky-cart .cart-count-sticky {
@@ -117,9 +119,6 @@
     }
     .sticky-nav-links { display: flex; gap: 30px; }
 
-    .nav-links { display: flex; gap: 20px; }
-    .nav-links a { color: #ccc; text-decoration: none; font-weight: 500; font-size: 0.6rem; cursor: pointer; }
-    .nav-links a:hover { color: white; }
     .cart-icon { position: relative; cursor: pointer; font-size: 0.9rem; }
     .cart-count {
       position: absolute; top: -5px; right: -8px;
@@ -212,15 +211,15 @@
 
     footer { text-align: center; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; font-size: 0.5rem; color: rgba(255,255,255,0.6); }
 
-    /* MUSIC BUTTON AT BOTTOM */
+    /* MUSIC BUTTON AT BOTTOM - BRIGHT, NO DIM */
     .music-footer-btn {
       text-align: center;
       margin: 30px 0 20px;
     }
     .listen-btn {
-      background: rgba(127,42,235,0.85);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.2);
+      background: #ff0000;
+      backdrop-filter: blur(0px);
+      border: none;
       padding: 12px 32px;
       font-size: 0.85rem;
       font-weight: 700;
@@ -232,13 +231,13 @@
       align-items: center;
       gap: 10px;
       text-decoration: none;
+      box-shadow: 0 4px 15px rgba(255,0,0,0.3);
     }
     .listen-btn i { font-size: 1rem; }
     .listen-btn:hover {
       transform: translateY(-3px);
-      background: var(--purple);
-      border-color: white;
-      box-shadow: 0 10px 30px rgba(127,42,235,0.4);
+      background: #cc0000;
+      box-shadow: 0 8px 25px rgba(255,0,0,0.4);
     }
 
     /* cart sidebar */
@@ -337,8 +336,9 @@
   <div class="container header-inner">
     <div class="logo"><img src="fargo1.png" alt="MrYoungFargo" onerror="this.src='https://placehold.co/250x70?text=MrYoungFargo'"></div>
     <div class="nav-links">
-      <a href="#" class="nav-home">HOME</a>
-      <a href="#" class="nav-store">STORE</a>
+      <a href="#" class="nav-tshirts">T-SHIRTS</a>
+      <a href="#" class="nav-sweaters">SWEATERS</a>
+      <a href="#" class="nav-hoodies">HOODIES</a>
     </div>
     <div class="cart-icon" id="cartIcon"><i class="fas fa-bag-shopping"></i><span class="cart-count" id="cartCount">0</span></div>
   </div>
@@ -353,9 +353,9 @@
   <div id="hoodies-section"><div class="category-title"><i class="fas fa-hoodie"></i> HOODIES</div><div class="products-grid" id="hoodiesGrid"></div></div>
 </div>
 
-<!-- MUSIC BUTTON AT BOTTOM - LINKS TO YOUTUBE -->
+<!-- MUSIC BUTTON AT BOTTOM - BRIGHT RED YOUTUBE BUTTON -->
 <div class="music-footer-btn">
-  <a href="https://m.youtube.com/@MrYoungFargoSA" target="_blank" class="listen-btn">
+  <a href="https://m.youtube.com/@MrYoungFargo_SA" target="_blank" class="listen-btn">
     <i class="fab fa-youtube"></i> LISTEN TO MY MUSIC
   </a>
 </div>
@@ -482,21 +482,18 @@
   window.addEventListener("scroll", () => { const sticky = document.getElementById("stickyNav"); if (window.scrollY > 70) sticky.classList.add("show"); else sticky.classList.remove("show"); });
   function setupNav() {
     const links = [
+      { class: ".nav-tshirts", id: "tshirts-section" },
+      { class: ".nav-sweaters", id: "sweaters-section" },
+      { class: ".nav-hoodies", id: "hoodies-section" },
       { class: ".sticky-tshirts", id: "tshirts-section" },
       { class: ".sticky-sweaters", id: "sweaters-section" },
-      { class: ".sticky-hoodies", id: "hoodies-section" },
-      { class: ".nav-home", id: "top" },
-      { class: ".nav-store", id: "top" }
+      { class: ".sticky-hoodies", id: "hoodies-section" }
     ];
     links.forEach(l => { 
       document.querySelectorAll(l.class).forEach(el => { 
         el.addEventListener("click", (e) => { 
           e.preventDefault(); 
-          if (l.id !== "top") {
-            document.getElementById(l.id).scrollIntoView({ behavior: "smooth" });
-          } else {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
+          document.getElementById(l.id).scrollIntoView({ behavior: "smooth" });
         }); 
       }); 
     });
@@ -516,4 +513,4 @@
   loadCart();
 </script>
 </body>
-</html>
+  </html>
