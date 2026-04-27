@@ -18,7 +18,7 @@
       overflow-x: hidden;
     }
 
-    /* IMAGE BACKGROUND - background.png (NO DIM OVERLAY, NO BLACK BACKGROUND) */
+    /* FIXED BACKGROUND - covers entire page, no white gaps */
     body::before {
       content: "";
       position: fixed;
@@ -30,11 +30,15 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
+      background-attachment: fixed;
       z-index: 0;
       pointer-events: none;
     }
 
-    /* NO EXTRA DARK OVERLAY — background stays clean */
+    /* Fallback gradient - in case image fails to load */
+    body {
+      background: linear-gradient(135deg, #1a0a2e, #0a1a3a);
+    }
 
     /* ALL CONTENT goes above the background */
     .site-header, .hero, .container, .mixtape-section, footer, .cart-overlay, .modal {
@@ -126,14 +130,14 @@
       background: var(--red); font-size: 0.4rem; padding: 1px 3px; border-radius: 20px;
     }
     .hero { padding: 12px 0 6px; text-align: center; }
-    .hero h2 { font-size: 0.7rem; font-weight: 700; color: white; text-shadow: 0 0 3px rgba(0,0,0,0.3); }
+    .hero h2 { font-size: 0.7rem; font-weight: 700; background: linear-gradient(135deg, #fff, #7f2aeb); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; }
     .hero p { color: rgba(255,255,255,0.7); font-size: 0.45rem; margin-top: 2px; }
     
-    /* MIXTAPE SECTION — compact, no black background, SHARP CORNERS */
+    /* MIXTAPE SECTION — sharp corners */
     .mixtape-section {
-      background: rgba(0,0,0,0.25);
+      background: rgba(0,0,0,0.4);
       backdrop-filter: blur(6px);
-      border-radius: 0px;   /* SHARP CORNERS */
+      border-radius: 0px;
       margin: 15px auto 25px;
       padding: 12px;
       max-width: 380px;
@@ -143,7 +147,7 @@
     .mixtape-cover {
       width: 100%;
       max-width: 140px;
-      border-radius: 0px;   /* SHARP CORNERS for image too */
+      border-radius: 0px;
       margin-bottom: 8px;
       box-shadow: 0 6px 14px rgba(0,0,0,0.25);
     }
@@ -469,7 +473,7 @@
 
 <script>
   // ==============================================================
-  // STORE DATA & FUNCTIONS (unchanged but fonts smaller)
+  // STORE DATA & FUNCTIONS
   // ==============================================================
   const colors = [
     { name: "Red", value: "Red", bg: "#e11d2c" },
@@ -603,7 +607,7 @@
     });
   }
 
-  // MIXTAPE PURCHASE + DOWNLOAD (sharp corners, functionality unchanged)
+  // MIXTAPE PURCHASE + DOWNLOAD
   function setupMixtape() {
     const buyBtn = document.getElementById('buyMixtapeBtn');
     const downloadMsg = document.getElementById('downloadMessage');
