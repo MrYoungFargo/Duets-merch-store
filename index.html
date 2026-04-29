@@ -727,4 +727,142 @@
   
   function showModal(product) {
     if (!currentUser) { openAuthModal(); return; }
-    currentProduct =
+    currentProduct = product; selectedSize = selectedColor = null;
+    document.getElementById("modalProductName").innerText = product.name;
+    document.getElementById("modalProductPrice").innerText = `R${product.price.toFixed(2)}`;
+    const sizesDiv = document.getElementById("modalSizes");
+    sizesDiv.innerHTML = "";
+    if (product.sizes) {
+      product.sizes.forEach(s => {
+        const btn = document.createElement("div"); btn.className = "modal-size-btn"; btn.innerText = s;
+        btn.onclick = () => { document.querySelectorAll(".modal-size-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedSize = s; };
+        sizesDiv.appendChild(btn);
+      });
+    }
+    const colorsDiv = document.getElementById("modalColors");
+    colorsDiv.innerHTML = "";
+    colors.forEach(c => {
+      const btn = document.createElement("div"); btn.className = "modal-color-btn"; btn.style.backgroundColor = c.bg; btn.title = c.name;
+      btn.onclick = () => { document.querySelectorAll(".modal-color-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedColor = c.value; };
+      colorsDiv.appendChild(btn);
+    });
+    document.getElementById("sizeColorModal").classList.add("show");
+  }
+  
+  function closeModal() { document.getElementById("sizeColorModal").classList.remove("show"); }
+  function confirmAdd() { 
+    if (!currentProduct) return;
+    if (currentProduct.id === 99) {
+      addToCart(currentProduct, null, null);
+      closeModal();
+    } else {
+      if (!selectedSize) { alert("Select size"); return; }
+      if (!selectedColor) { alert("Select color"); return; }
+      addToCart(currentProduct, selectedSize, selectedColor);
+      closeModal();
+    }
+  }
+
+  function renderGrid(products, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+    products.forEach(prod => {
+      const card = document.createElement("div"); card.className = "product-card";
+      card.innerHTML = `<div class="product-img"><img src="${prod.image}" alt="${prod.name}" onerror="this.parentElement.innerHTML='<div class=\\'no-img\\'><i class=\\'fas fa-tshirt\\'></i></div>'"></div><div class="product-info"><div class="product-title">${prod.name}</div><div class="product-price">R${prod.price.toFixed(2)}</div><button class="add-to-cart-btn" data-id="${prod.id}"><i class="fas fa-cart-plus"></i> ADD TO CART</button></div>`;
+      container.appendChild(card);
+    });
+    container.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); const product = allProducts.find(p => p.id === id); showModal(product); });
+    });
+    container.querySelectorAll(".product-card").forEach(card => {
+      card.addEventListener("click", (e) => { if (e.target.closest(".add-to-cart-btn")) return; const btn = card.querySelector(".add-to-cart-btn"); if (btn) { const id = parseInt(btn.dataset.id); const product = allProducts.find(p => p.id === id); showModal(product); } });
+    });
+  }
+
+  window.addEventListener("scroll", () => { const sticky = document.getElementById("stickyNav"); if (window.scrollY > 60) sticky.classList.add("show"); else sticky.classList.remove("show"); });
+  
+  function setupNav() {
+    const links = [
+      { class: ".nav-tshirts", id: "tshirts-section" },
+      { class: ".nav-sweaters", id: "sweaters-section" },
+      { class: ".nav-hoodies", id: "hoodies-section" },
+      { class: ".sticky-tshirts", id: "tshirts-section" },
+      { class: ".sticky-sweaters", id: "sweaters-section" },
+      { class: ".sticky-hoodies", id: "hoodies-section" }
+    ];
+    links.forEach(l => { 
+      document.querySelectorAll(l.class).forEach(el => { 
+        el.addEventListener("click", (e) => { 
+          e.preventDefault(); 
+          document.getElementById(l.id).scrollIntoView({ behavior: "smooth" });
+        }); 
+      }); 
+    });
+  }
+
+  // MIXTAPE as product (id: 99) – adds to cart
+  const mixtapeProduct = { id: 99, name: "DUETS · NEW MIXTAPE (Digital ZIP)", price: 50, image: "duetscover.png", sizes: null };
+  allProducts.push(mixtapeProduct);
+  
+  function setupMixtape() {
+    const buyBtn = document.getElementById('buyMixtapeBtn');
+    if (buyBtn) {
+      buyBtn.addEventListener('click', () => {
+        showModal(mixtapeProduct);
+      });
+    }
+  }
+
+  // CHECKOUT
+  document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
+    if (!currentUser) { openAuthModal(); return; }
+    if (cart.length === 0) { alert("Cart is empty"); return; }
+    let total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+    const checkoutBtn = document.getElementById("checkoutBtn");
+    const originalText = checkoutBtn.innerText;
+    checkoutBtn.innerText = "⏳ PROCESSING...";
+    checkoutBtn.disabled = true;
+    try {
+        const response = await fetch('https://mryoungfargo-payment.onrender.com/create-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: total, orderId: "ORDER_" + Date.now() })
+        });
+        const data = await response.json();
+        if (data.success && data.paymentUrl) {
+            window.location.href = data.paymentUrl;
+        } else {
+            alert("Payment error: " + (data.error || "Unknown error"));
+            checkoutBtn.innerText = originalText;
+            checkoutBtn.disabled = false;
+        }
+    } catch (error) {
+        alert("Connection error. Please try again.");
+        checkoutBtn.innerText = originalText;
+        checkoutBtn.disabled = false;
+    }
+  });
+
+  document.getElementById("cartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
+  document.getElementById("stickyCartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
+  document.getElementById("closeCartBtn")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.remove("open"));
+  document.getElementById("modalConfirmBtn")?.addEventListener("click", confirmAdd);
+  document.getElementById("modalCloseBtn")?.addEventListener("click", closeModal);
+  window.addEventListener("click", (e) => { if (e.target === document.getElementById("sizeColorModal")) closeModal(); });
+
+  renderGrid(tshirts, "tshirtsGrid");
+  renderGrid(sweaters, "sweatersGrid");
+  renderGrid(hoodies, "hoodiesGrid");
+  setupNav();
+  setupMixtape();
+  
+  if (!loadUserSession()) {
+    // No session, show auth modal after 1 second
+    setTimeout(() => { openAuthModal(); }, 500);
+  } else {
+    loadCartFromLocal();
+  }
+</script>
+</body>
+</html>
