@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Payment Backend</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <h1>Payment Backend Test</h1>
+    <button onclick="testBackend()">Test Backend Connection</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testBackend() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerText = 'Testing connection...';
+            
+            try {
+                // Test health endpoint
+                const healthResponse = await fetch('https://mryoungfargo-payment.onrender.com/health');
+                const healthData = await healthResponse.json();
+                resultDiv.innerText = '✅ Health check passed!\n' + JSON.stringify(healthData, null, 2);
+                
+                // Test create-payment endpoint
+                const paymentResponse = await fetch('https://mryoungfargo-payment.onrender.com/create-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: 10, orderId: 'TEST_123' })
+                });
+                const paymentData = await paymentResponse.json();
+                resultDiv.innerText += '\n\n✅ Payment endpoint response:\n' + JSON.stringify(paymentData, null, 2);
+                
+            } catch (error) {
+                resultDiv.innerText = '❌ Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html> 
