@@ -84,9 +84,15 @@
     .nav-links a:hover { color: white; }
     .auth-link {
       background: rgba(59,130,246,0.3);
-      padding: 4px 12px;
-      border-radius: 20px;
+      padding: 6px 10px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
     }
+    .auth-link i { font-size: 0.9rem; }
     .auth-link:hover { background: var(--blue); }
 
     .sticky-nav {
@@ -114,12 +120,6 @@
       background: var(--red); font-size: 0.4rem; padding: 1px 3px; border-radius: 20px;
     }
     .sticky-nav-links { display: flex; gap: 25px; }
-    .sticky-auth-link {
-      background: rgba(59,130,246,0.3);
-      padding: 2px 10px;
-      border-radius: 20px;
-      font-size: 0.55rem;
-    }
 
     .cart-icon { position: relative; cursor: pointer; font-size: 0.85rem; }
     .cart-count {
@@ -130,7 +130,6 @@
     .hero h2 { font-size: 0.7rem; font-weight: 700; background: linear-gradient(135deg, #fff, #7f2aeb); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .hero p { color: rgba(255,255,255,0.7); font-size: 0.45rem; margin-top: 2px; }
     
-    /* MIXTAPE SECTION - rounded corners on background, square image */
     .mixtape-section {
       background: rgba(0,0,0,0.4);
       backdrop-filter: blur(6px);
@@ -427,6 +426,12 @@
     .auth-btn:hover {
       background: #2563eb;
     }
+    .auth-divider {
+      margin: 15px 0;
+      color: #888;
+      font-size: 0.7rem;
+      position: relative;
+    }
     .auth-toggle {
       margin-top: 15px;
       font-size: 0.7rem;
@@ -446,22 +451,6 @@
       color: white;
       font-size: 1.5rem;
       cursor: pointer;
-    }
-    .user-greeting {
-      font-size: 0.6rem;
-      background: rgba(59,130,246,0.3);
-      padding: 4px 10px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .logout-btn {
-      background: none;
-      border: none;
-      color: #ff4444;
-      cursor: pointer;
-      font-size: 0.55rem;
     }
   </style>
 </head>
@@ -516,7 +505,7 @@
       <a href="#" class="nav-tshirts">T-SHIRTS</a>
       <a href="#" class="nav-sweaters">SWEATERS</a>
       <a href="#" class="nav-hoodies">HOODIES</a>
-      <a href="#" class="auth-link" id="showAuthBtn"><i class="fas fa-user"></i> <span id="userNameDisplay">ACCOUNT</span></a>
+      <a href="#" class="auth-link" id="showAuthBtn"><i class="fas fa-user"></i></a>
     </div>
     <div class="cart-icon" id="cartIcon"><i class="fas fa-bag-shopping"></i><span class="cart-count" id="cartCount">0</span></div>
   </div>
@@ -565,12 +554,10 @@
 
 <script>
   // ==============================================================
-  // USER AUTHENTICATION SYSTEM (LocalStorage with users)
+  // USER AUTHENTICATION SYSTEM
   // ==============================================================
   
   let currentUser = null;
-  
-  // Load users from localStorage or initialize
   let users = JSON.parse(localStorage.getItem('app_users')) || [];
   
   function saveUsers() {
@@ -589,23 +576,9 @@
     const saved = localStorage.getItem('current_user');
     if (saved) {
       currentUser = JSON.parse(saved);
-      updateUserDisplay();
-      loadCartForUser();
     }
   }
   
-  function updateUserDisplay() {
-    const userNameSpan = document.getElementById('userNameDisplay');
-    if (userNameSpan) {
-      if (currentUser) {
-        userNameSpan.innerText = currentUser.email.split('@')[0];
-      } else {
-        userNameSpan.innerText = 'ACCOUNT';
-      }
-    }
-  }
-  
-  // Save cart to current user
   function saveCartToUser() {
     if (currentUser) {
       currentUser.cart = cart;
@@ -618,7 +591,6 @@
     }
   }
   
-  // Load cart for current user
   function loadCartForUser() {
     if (currentUser && currentUser.cart) {
       cart = currentUser.cart;
@@ -628,20 +600,7 @@
     updateCartUI();
   }
   
-  // Override addToCart to save to user
-  const originalAddToCart = addToCart;
-  window.addToCart = function(product, size, color) {
-    if (!currentUser) {
-      alert("Please login or create an account to add items to cart");
-      showAuthModal();
-      return false;
-    }
-    const result = originalAddToCart(product, size, color);
-    saveCartToUser();
-    return result;
-  };
-  
-  // AUTH MODAL FUNCTIONS
+  // AUTH MODAL FUNCTIONS - NO ALERTS
   const authModal = document.getElementById('authModal');
   let isLoginMode = true;
   
@@ -669,20 +628,16 @@
     }
     
     if (isLoginMode) {
-      // LOGIN
       const user = users.find(u => u.email === email && u.password === password);
       if (user) {
         currentUser = { email: user.email, cart: user.cart || [] };
         saveCurrentUser();
-        updateUserDisplay();
         loadCartForUser();
         closeAuthModal();
-        alert(`Welcome back, ${email.split('@')[0]}!`);
       } else {
         alert('Invalid email or password');
       }
     } else {
-      // SIGNUP
       if (users.find(u => u.email === email)) {
         alert('Email already exists. Please login.');
         return;
@@ -692,11 +647,9 @@
       saveUsers();
       currentUser = { email, cart: [] };
       saveCurrentUser();
-      updateUserDisplay();
       cart = [];
       updateCartUI();
       closeAuthModal();
-      alert(`Account created! Welcome, ${email.split('@')[0]}!`);
     }
   }
   
@@ -713,15 +666,6 @@
     }
   }
   
-  function logout() {
-    currentUser = null;
-    saveCurrentUser();
-    cart = [];
-    updateCartUI();
-    updateUserDisplay();
-    alert('Logged out successfully');
-  }
-  
   // ==============================================================
   // STORE DATA & FUNCTIONS
   // ==============================================================
@@ -732,9 +676,6 @@
     { name: "Green", value: "Green", bg: "#10b981" },
     { name: "Blue", value: "Blue", bg: "#3b82f6" }
   ];
-  
-  // MIXTAPE item (adds to cart)
-  const mixtapeItem = { id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, image: "duetscover.png", sizes: ["Digital"], type: "Mixtape" };
   
   const tshirts = [
     { id: 1, name: "Neon Duets T-Shirt", price: 179.99, image: "t-shirt1.png", sizes: ["XS","S","M","L","XL","XXL"] },
@@ -805,6 +746,10 @@
   }
   
   function addToCart(product, size, color) {
+    if (!currentUser) {
+      showAuthModal();
+      return false;
+    }
     if (!size) { alert("Select size"); return false; }
     if (!color && product.id !== 99) { alert("Select color"); return false; }
     const existing = cart.find(i => i.id === product.id && i.size === size && i.color === color);
@@ -817,7 +762,6 @@
   
   function showModal(product) {
     if (!currentUser) {
-      alert("Please login or create an account first");
       showAuthModal();
       return;
     }
@@ -882,17 +826,15 @@
     });
   }
   
-  // MIXTAPE - adds to cart instead of direct payment
+  // MIXTAPE - adds to cart
   function setupMixtape() {
     const buyBtn = document.getElementById('buyMixtapeBtn');
     if (buyBtn) {
       buyBtn.addEventListener('click', () => {
         if (!currentUser) {
-          alert("Please login or create an account first");
           showAuthModal();
           return;
         }
-        // Add mixtape to cart
         const existing = cart.find(i => i.id === 99);
         if (existing) {
           existing.qty++;
@@ -901,15 +843,13 @@
         }
         saveCart();
         document.getElementById("cartSidebar").classList.add("open");
-        alert("✅ DUETS Mixtape added to cart! Complete checkout when ready.");
       });
     }
   }
   
-  // CHECKOUT BUTTON
+  // CHECKOUT BUTTON - shows login modal if not logged in (no alert)
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (!currentUser) {
-      alert("Please login or create an account to checkout");
       showAuthModal();
       return;
     }
@@ -949,8 +889,8 @@
   });
   
   // EVENT LISTENERS
-  document.getElementById("cartIcon")?.addEventListener("click", () => { if (currentUser) document.getElementById("cartSidebar").classList.add("open"); else { alert("Please login first"); showAuthModal(); } });
-  document.getElementById("stickyCartIcon")?.addEventListener("click", () => { if (currentUser) document.getElementById("cartSidebar").classList.add("open"); else { alert("Please login first"); showAuthModal(); } });
+  document.getElementById("cartIcon")?.addEventListener("click", () => { if (currentUser) document.getElementById("cartSidebar").classList.add("open"); else showAuthModal(); });
+  document.getElementById("stickyCartIcon")?.addEventListener("click", () => { if (currentUser) document.getElementById("cartSidebar").classList.add("open"); else showAuthModal(); });
   document.getElementById("closeCartBtn")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.remove("open"));
   document.getElementById("modalConfirmBtn")?.addEventListener("click", confirmAdd);
   document.getElementById("modalCloseBtn")?.addEventListener("click", closeModal);
@@ -961,17 +901,22 @@
   document.getElementById("authSubmitBtn")?.addEventListener("click", handleAuth);
   document.getElementById("authToggleText")?.addEventListener("click", toggleAuthMode);
   
-  // Add logout option to user greeting on click (double-click to logout)
-  document.getElementById("userNameDisplay")?.addEventListener("dblclick", () => {
+  // Double-click on user icon to logout
+  document.getElementById("showAuthBtn")?.addEventListener("dblclick", () => {
     if (currentUser) {
       if (confirm("Logout?")) {
-        logout();
+        currentUser = null;
+        saveCurrentUser();
+        cart = [];
+        updateCartUI();
+        closeAuthModal();
       }
     }
   });
   
   // INIT
   loadCurrentUser();
+  loadCart();
   renderGrid(tshirts, "tshirtsGrid");
   renderGrid(sweaters, "sweatersGrid");
   renderGrid(hoodies, "hoodiesGrid");
@@ -979,4 +924,4 @@
   setupMixtape();
 </script>
 </body>
-  </html> 
+</html> 
