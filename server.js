@@ -1,8 +1,10 @@
 require('dotenv').config();  // Add this at the very topconst express = require('express');
+const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
 const app = express();
 
+// Allow all origins for testing
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
@@ -10,33 +12,39 @@ app.use(cors({
 }));
 app.use(express.json());
 
-const IKHOKHA_APP_ID = process.env.IK46NDKL1J3S4VJWO7XXCRD4F8P3KQAN;
-const IKHOKHA_SECRET = process.env.pe09mzC6QwkaQGMA72CVq9SeAvtsXoxK;
+// Your iKhokha credentials – set these in Render dashboard
+const IKHOKHA_APP_ID = process.env.IKHOKHA_APP_ID;
+const IKHOKHA_SECRET = process.env.IKHOKHA_SECRET;
 
-console.log("🔑 App ID loaded:", IKHOKHA_APP_ID ? "✅ Yes" : "❌ Missing");
-console.log("🔑 Secret loaded:", IKHOKHA_SECRET ? "✅ Yes" : "❌ Missing");
-
+// Generate signature for iKhokha
 function generateSignature(payload, secret) {
     const stringToSign = JSON.stringify(payload) + secret;
     return crypto.createHash('sha256').update(stringToSign).digest('hex');
 }
 
+// ROOT ROUTE
 app.get('/', (req, res) => {
     res.json({
         status: '✅ Payment API is running!',
-        appIdLoaded: !!IKHOKHA_APP_ID,
-        secretLoaded: !!IKHOKHA_SECRET
+        message: 'MrYoungFargo store backend is active',
+        endpoints: {
+            health: 'GET /health',
+            createPayment: 'POST /create-payment',
+            webhook: 'POST /webhook'
+        }
     });
 });
 
+// HEALTH CHECK ENDPOINT – THIS FIXES THE 404!
 app.get('/health', (req, res) => {
     res.json({ 
         status: 'OK', 
         timestamp: new Date().toISOString(),
-        appIdLoaded: !!IKHOKHA_APP_ID
+        service: 'MrYoungFargo Payment Backend'
     });
 });
 
+// Create payment endpoint
 app.post('/create-payment', async (req, res) => {
     console.log("📦 Received request:", req.body);
     
@@ -46,15 +54,12 @@ app.post('/create-payment', async (req, res) => {
         return res.json({ success: false, error: "Invalid amount" });
     }
     
-    if (!IKHOKHA_APP_ID || !IKHOKHA_SECRET) {
-        return res.json({ success: false, error: "API keys not configured on server" });
-    }
-    
     const amountInCents = Math.round(amount * 100);
     
     const payload = {
         amount: amountInCents,
         currency: "ZAR",
+        mode: "TEST",
         transactionType: "SALE",
         merchantOrderID: orderId || "ORDER_" + Date.now(),
         customerEmail: customerEmail || "customer@example.com",
@@ -66,7 +71,6 @@ app.post('/create-payment', async (req, res) => {
     const signature = generateSignature(payload, IKHOKHA_SECRET);
     
     try {
-        console.log("📤 Sending to iKhokha...");
         const response = await fetch('https://sandbox.ikhokha.com/v1/payments', {
             method: 'POST',
             headers: {
@@ -91,6 +95,7 @@ app.post('/create-payment', async (req, res) => {
     }
 });
 
+// Webhook for payment confirmation
 app.post('/webhook', (req, res) => {
     console.log("💰 Webhook received:", req.body);
     res.status(200).send("OK");
