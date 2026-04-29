@@ -3,7 +3,7 @@ const cors = require('cors');
 const crypto = require('crypto');
 const app = express();
 
-// Allow all origins (for testing) - then restrict later
+// Allow all origins for testing
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
     });
 });
 
-// Health check endpoint
+// HEALTH CHECK ENDPOINT – THIS FIXES THE 404!
 app.get('/health', (req, res) => {
     res.json({ 
         status: 'OK', 
