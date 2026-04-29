@@ -1,5 +1,5 @@
 {
-  "name": "ikhokha-payment-backend",
+  "name": "mryoungfargo-payment",
   "version": "1.0.0",
   "description": "Payment backend for MrYoungFargo merch store",
   "main": "server.js",
@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "crypto": "^1.0.1"
+    "cors": "^2.8.5"
   }
 }
