@@ -23,7 +23,6 @@
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     body {
       font-family: 'Inter', sans-serif;
       color: #e0e0e0;
@@ -32,7 +31,6 @@
       position: relative;
       overflow-x: hidden;
     }
-
     body::before {
       content: "";
       position: fixed;
@@ -48,15 +46,9 @@
       z-index: 0;
       pointer-events: none;
     }
-
-    .site-header, .hero, .container, .mixtape-section, footer, .cart-overlay, .modal, .auth-modal, .reset-modal {
-      position: relative;
-      z-index: 10;
-    }
-
+    .site-header, .hero, .container, .mixtape-section, footer, .cart-overlay, .modal, .auth-modal, .reset-modal { position: relative; z-index: 10; }
     :root { --purple: #7f2aeb; --green: #10b981; --red: #e11d2c; --blue: #3b82f6; }
     .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
-
     .site-header {
       background: linear-gradient(135deg, #000000, #0a2a5a, #000000, #0a2a5a);
       background-size: 300% 300%;
@@ -89,7 +81,6 @@
       50% { transform: rotateY(180deg); }
       100% { transform: rotateY(360deg); }
     }
-
     .nav-links { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
     .nav-links a { color: #ccc; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 0.65rem; }
     .nav-links a:hover { color: white; }
@@ -100,46 +91,62 @@
       min-width: 14px;
       text-align: center;
     }
-    
-    /* User section styles */
+    /* User section - person icon only */
     .user-section {
+      background: rgba(59,130,246,0.3);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(59,130,246,0.2);
-      padding: 4px 12px;
-      border-radius: 30px;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .user-section:hover { background: var(--blue); }
+    .user-initials {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: white;
+      text-transform: uppercase;
+    }
+    .auth-icon {
+      background: rgba(59,130,246,0.3);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
       transition: all 0.2s;
     }
-    .user-section:hover {
-      background: rgba(59,130,246,0.4);
+    .auth-icon:hover { background: var(--blue); }
+    .auth-icon i { font-size: 0.9rem; color: white; }
+    
+    /* Dropdown menu for logout */
+    .user-dropdown {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 8px 0;
+      min-width: 120px;
+      display: none;
+      z-index: 100;
+      border: 1px solid rgba(255,255,255,0.1);
     }
-    .user-name {
-      font-size: 0.65rem;
-      font-weight: 600;
-      max-width: 100px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .logout-icon {
+    .user-dropdown.show { display: block; }
+    .user-dropdown div {
+      padding: 8px 16px;
       font-size: 0.7rem;
-      color: #ff8888;
-      margin-left: 5px;
+      cursor: pointer;
+      color: #ddd;
     }
-    .auth-link {
-      background: rgba(59,130,246,0.3);
-      padding: 6px 12px;
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.65rem;
-      font-weight: 600;
-    }
-    .auth-link i { font-size: 0.8rem; }
-    .auth-link:hover { background: var(--blue); }
+    .user-dropdown div:hover { background: rgba(59,130,246,0.3); }
+    .user-dropdown .logout-item { color: #ff8888; }
 
     .sticky-nav {
       position: fixed;
@@ -420,9 +427,7 @@
       align-items: center;
       justify-content: center;
     }
-    .auth-modal.show {
-      display: flex;
-    }
+    .auth-modal.show { display: flex; }
     .auth-modal-content {
       background: linear-gradient(135deg, #1a1a2e, #0a0a1a);
       border-radius: 20px;
@@ -433,11 +438,7 @@
       border: 1px solid rgba(255,255,255,0.2);
       box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     }
-    .auth-modal-content h2 {
-      color: white;
-      font-size: 1.2rem;
-      margin-bottom: 20px;
-    }
+    .auth-modal-content h2 { color: white; font-size: 1.2rem; margin-bottom: 20px; }
     .auth-modal-content input {
       width: 100%;
       padding: 12px;
@@ -449,9 +450,7 @@
       font-size: 0.8rem;
       outline: none;
     }
-    .auth-modal-content input:focus {
-      border-color: var(--blue);
-    }
+    .auth-modal-content input:focus { border-color: var(--blue); }
     .auth-btn {
       background: var(--blue);
       border: none;
@@ -464,39 +463,12 @@
       cursor: pointer;
       font-size: 0.85rem;
     }
-    .auth-btn:hover {
-      background: #2563eb;
-    }
-    .forgot-link {
-      text-align: right;
-      margin-top: 5px;
-      font-size: 0.6rem;
-    }
-    .forgot-link span {
-      color: var(--blue);
-      cursor: pointer;
-      text-decoration: underline;
-    }
-    .auth-toggle {
-      margin-top: 15px;
-      font-size: 0.7rem;
-      color: #aaa;
-    }
-    .auth-toggle span {
-      color: var(--blue);
-      cursor: pointer;
-      text-decoration: underline;
-    }
-    .close-auth {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
+    .auth-btn:hover { background: #2563eb; }
+    .forgot-link { text-align: right; margin-top: 5px; font-size: 0.6rem; }
+    .forgot-link span { color: var(--blue); cursor: pointer; text-decoration: underline; }
+    .auth-toggle { margin-top: 15px; font-size: 0.7rem; color: #aaa; }
+    .auth-toggle span { color: var(--blue); cursor: pointer; text-decoration: underline; }
+    .close-auth { position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
 
     /* RESET PASSWORD MODAL */
     .reset-modal {
@@ -511,9 +483,7 @@
       align-items: center;
       justify-content: center;
     }
-    .reset-modal.show {
-      display: flex;
-    }
+    .reset-modal.show { display: flex; }
     .reset-modal-content {
       background: linear-gradient(135deg, #1a1a2e, #0a0a1a);
       border-radius: 20px;
@@ -523,11 +493,7 @@
       text-align: center;
       border: 1px solid rgba(255,255,255,0.2);
     }
-    .reset-modal-content h2 {
-      color: white;
-      font-size: 1.2rem;
-      margin-bottom: 20px;
-    }
+    .reset-modal-content h2 { color: white; font-size: 1.2rem; margin-bottom: 20px; }
     .reset-modal-content input {
       width: 100%;
       padding: 12px;
@@ -551,9 +517,7 @@
     <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password">
     <button class="auth-btn" id="authSubmitBtn">LOGIN</button>
     <div class="forgot-link"><span id="forgotPasswordBtn">Forgot password?</span></div>
-    <div class="auth-toggle">
-      <span id="authToggleText">Create an account</span>
-    </div>
+    <div class="auth-toggle"><span id="authToggleText">Create an account</span></div>
   </div>
 </div>
 
@@ -561,7 +525,7 @@
 <div id="resetModal" class="reset-modal">
   <button class="close-auth" id="closeResetBtn">&times;</button>
   <div class="reset-modal-content">
-    <h2 id="resetTitle">RESET PASSWORD</h2>
+    <h2>RESET PASSWORD</h2>
     <input type="email" id="resetEmail" placeholder="Enter your email">
     <button class="auth-btn" id="sendResetBtn">SEND RESET LINK</button>
     <div id="resetMessage" style="font-size:0.7rem; margin-top:10px; color:#aaa;"></div>
@@ -653,10 +617,7 @@
   let currentUser = null;
   let users = JSON.parse(localStorage.getItem('app_users')) || [];
   
-  function saveUsers() {
-    localStorage.setItem('app_users', JSON.stringify(users));
-  }
-  
+  function saveUsers() { localStorage.setItem('app_users', JSON.stringify(users)); }
   function saveCurrentUser() {
     if (currentUser) {
       localStorage.setItem('current_user', JSON.stringify(currentUser));
@@ -671,46 +632,66 @@
       currentUser = JSON.parse(saved);
     }
     updateUserSection();
-    // Update Brevo chat with user info
     if (window.BrevoConversations && currentUser) {
       window.BrevoConversations('identify', { email: currentUser.email, name: currentUser.email.split('@')[0] });
     }
   }
+  
+  function getInitials(email) {
+    if (!email) return '?';
+    const name = email.split('@')[0];
+    return name.substring(0, 2).toUpperCase();
+  }
+  
+  let dropdownVisible = false;
+  let dropdownElement = null;
   
   function updateUserSection() {
     const userSection = document.getElementById('userSection');
     if (!userSection) return;
     
     if (currentUser) {
-      const displayName = currentUser.email.split('@')[0];
+      const initials = getInitials(currentUser.email);
       userSection.innerHTML = `
-        <div class="user-section" id="userMenuBtn">
-          <i class="fas fa-user-circle"></i>
-          <span class="user-name">${displayName}</span>
-          <i class="fas fa-chevron-down logout-icon"></i>
+        <div class="user-section" id="userIconBtn">
+          <span class="user-initials">${initials}</span>
+        </div>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="logout-item" id="logoutBtn">Logout</div>
         </div>
       `;
-      const userMenuBtn = document.getElementById('userMenuBtn');
-      if (userMenuBtn) {
-        userMenuBtn.addEventListener('click', (e) => {
+      const iconBtn = document.getElementById('userIconBtn');
+      dropdownElement = document.getElementById('userDropdown');
+      if (iconBtn) {
+        iconBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          if (confirm(`Logged in as ${currentUser.email}\n\nClick OK to logout`)) {
-            logout();
+          if (dropdownElement) {
+            dropdownElement.classList.toggle('show');
           }
         });
       }
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          logout();
+        });
+      }
     } else {
-      userSection.innerHTML = `
-        <div class="auth-link" id="showAuthBtnNav">
-          <i class="fas fa-user"></i> SIGN IN
-        </div>
-      `;
-      const authBtn = document.getElementById('showAuthBtnNav');
+      userSection.innerHTML = `<div class="auth-icon" id="authIconBtn"><i class="fas fa-user"></i></div>`;
+      const authBtn = document.getElementById('authIconBtn');
       if (authBtn) {
         authBtn.addEventListener('click', showAuthModal);
       }
     }
   }
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function() {
+    if (dropdownElement) {
+      dropdownElement.classList.remove('show');
+    }
+  });
   
   function saveCartToUser() {
     if (currentUser) {
@@ -747,19 +728,12 @@
     document.getElementById('authPassword').value = '';
   }
   
-  function closeAuthModal() {
-    authModal.classList.remove('show');
-  }
+  function closeAuthModal() { authModal.classList.remove('show'); }
   
   function handleAuth() {
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value.trim();
-    
-    if (!email || !password) {
-      alert('Please enter email and password');
-      return;
-    }
-    
+    if (!email || !password) { alert('Please enter email and password'); return; }
     if (isLoginMode) {
       const user = users.find(u => u.email === email && u.password === password);
       if (user) {
@@ -771,14 +745,9 @@
         if (window.BrevoConversations) {
           window.BrevoConversations('identify', { email: currentUser.email, name: currentUser.email.split('@')[0] });
         }
-      } else {
-        alert('Invalid email or password');
-      }
+      } else { alert('Invalid email or password'); }
     } else {
-      if (users.find(u => u.email === email)) {
-        alert('Email already exists. Please login.');
-        return;
-      }
+      if (users.find(u => u.email === email)) { alert('Email already exists. Please login.'); return; }
       const newUser = { email, password, cart: [] };
       users.push(newUser);
       saveUsers();
@@ -821,37 +790,25 @@
   
   // FORGOT PASSWORD FUNCTIONS
   const resetModal = document.getElementById('resetModal');
-  
   function showResetModal() {
     resetModal.classList.add('show');
     document.getElementById('resetEmail').value = '';
     document.getElementById('resetMessage').innerHTML = '';
   }
-  
-  function closeResetModal() {
-    resetModal.classList.remove('show');
-  }
+  function closeResetModal() { resetModal.classList.remove('show'); }
   
   async function sendResetLink() {
     const email = document.getElementById('resetEmail').value.trim();
     const messageDiv = document.getElementById('resetMessage');
-    
-    if (!email) {
-      messageDiv.innerHTML = '<span style="color:#ff8888;">Please enter your email</span>';
-      return;
-    }
-    
+    if (!email) { messageDiv.innerHTML = '<span style="color:#ff8888;">Please enter your email</span>'; return; }
     messageDiv.innerHTML = '<span style="color:#aaa;">Sending...</span>';
-    
     try {
       const response = await fetch('https://mryoungfargo-payment.onrender.com/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email })
       });
-      
       const data = await response.json();
-      
       if (data.success) {
         messageDiv.innerHTML = '<span style="color:#10b981;">✓ Reset link sent! Check your email.</span>';
         setTimeout(() => closeResetModal(), 3000);
@@ -902,21 +859,8 @@
   let cart = [];
   let currentProduct = null, selectedSize = null, selectedColor = null;
   
-  function saveCart() { 
-    if (currentUser) {
-      saveCartToUser();
-    }
-    updateCartUI(); 
-  }
-  
-  function loadCart() { 
-    if (currentUser) {
-      loadCartForUser();
-    } else {
-      cart = [];
-      updateCartUI();
-    }
-  }
+  function saveCart() { if (currentUser) saveCartToUser(); updateCartUI(); }
+  function loadCart() { if (currentUser) loadCartForUser(); else { cart = []; updateCartUI(); } }
   
   function updateCartUI() {
     const count = cart.reduce((s,i) => s + i.qty, 0);
@@ -943,6 +887,7 @@
   }
   
   function addToCart(product, size, color) {
+    if (!currentUser) { showAuthModal(); return false; }
     if (!size) { alert("Select size"); return false; }
     if (!color && product.id !== 99) { alert("Select color"); return false; }
     const existing = cart.find(i => i.id === product.id && i.size === size && i.color === color);
@@ -954,10 +899,7 @@
   }
   
   function showModal(product) {
-    if (!currentUser) {
-      showAuthModal();
-      return;
-    }
+    if (!currentUser) { showAuthModal(); return; }
     currentProduct = product; selectedSize = null; selectedColor = null;
     document.getElementById("modalProductName").innerText = product.name;
     document.getElementById("modalProductPrice").innerText = `R${product.price.toFixed(2)}`;
@@ -1002,37 +944,20 @@
   
   function setupNav() {
     const links = [
-      { class: ".nav-tshirts", id: "tshirts-section" },
-      { class: ".nav-sweaters", id: "sweaters-section" },
-      { class: ".nav-hoodies", id: "hoodies-section" },
-      { class: ".sticky-tshirts", id: "tshirts-section" },
-      { class: ".sticky-sweaters", id: "sweaters-section" },
-      { class: ".sticky-hoodies", id: "hoodies-section" }
+      { class: ".nav-tshirts", id: "tshirts-section" }, { class: ".nav-sweaters", id: "sweaters-section" }, { class: ".nav-hoodies", id: "hoodies-section" },
+      { class: ".sticky-tshirts", id: "tshirts-section" }, { class: ".sticky-sweaters", id: "sweaters-section" }, { class: ".sticky-hoodies", id: "hoodies-section" }
     ];
-    links.forEach(l => { 
-      document.querySelectorAll(l.class).forEach(el => { 
-        el.addEventListener("click", (e) => { 
-          e.preventDefault(); 
-          document.getElementById(l.id).scrollIntoView({ behavior: "smooth" });
-        }); 
-      }); 
-    });
+    links.forEach(l => { document.querySelectorAll(l.class).forEach(el => { el.addEventListener("click", (e) => { e.preventDefault(); document.getElementById(l.id).scrollIntoView({ behavior: "smooth" }); }); }); });
   }
   
   function setupMixtape() {
     const buyBtn = document.getElementById('buyMixtapeBtn');
     if (buyBtn) {
       buyBtn.addEventListener('click', () => {
-        if (!currentUser) {
-          showAuthModal();
-          return;
-        }
+        if (!currentUser) { showAuthModal(); return; }
         const existing = cart.find(i => i.id === 99);
-        if (existing) {
-          existing.qty++;
-        } else {
-          cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
-        }
+        if (existing) existing.qty++;
+        else cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
         saveCart();
         document.getElementById("cartSidebar").classList.add("open");
       });
@@ -1041,43 +966,23 @@
   
   // CHECKOUT BUTTON
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
-    if (!currentUser) {
-      showAuthModal();
-      return;
-    }
-    if (cart.length === 0) {
-        alert("Cart is empty");
-        return;
-    }
-    
+    if (!currentUser) { showAuthModal(); return; }
+    if (cart.length === 0) { alert("Cart is empty"); return; }
     let total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-    
     const checkoutBtn = document.getElementById("checkoutBtn");
     const originalText = checkoutBtn.innerText;
     checkoutBtn.innerText = "⏳ PROCESSING...";
     checkoutBtn.disabled = true;
-    
     try {
-        const response = await fetch('https://mryoungfargo-payment.onrender.com/create-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount: total, orderId: "ORDER_" + Date.now() })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success && data.paymentUrl) {
-            window.location.href = data.paymentUrl;
-        } else {
-            alert("Payment error: " + (data.error || "Unknown error"));
-            checkoutBtn.innerText = originalText;
-            checkoutBtn.disabled = false;
-        }
-    } catch (error) {
-        alert("Connection error. Please try again.");
-        checkoutBtn.innerText = originalText;
-        checkoutBtn.disabled = false;
-    }
+      const response = await fetch('https://mryoungfargo-payment.onrender.com/create-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total, orderId: "ORDER_" + Date.now() })
+      });
+      const data = await response.json();
+      if (data.success && data.paymentUrl) { window.location.href = data.paymentUrl; }
+      else { alert("Payment error: " + (data.error || "Unknown error")); checkoutBtn.innerText = originalText; checkoutBtn.disabled = false; }
+    } catch (error) { alert("Connection error. Please try again."); checkoutBtn.innerText = originalText; checkoutBtn.disabled = false; }
   });
   
   // EVENT LISTENERS
