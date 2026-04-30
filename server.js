@@ -52,14 +52,14 @@ app.post('/create-payment', async (req, res) => {
         entityID: IKHOKHA_APP_ID,
         amount: amountInCents,
         currency: "ZAR",
-        requesterUrl: "https://mryoungfargo.github.io/Duets-merch-store/",
+        requesterUrl: "https://mryoungfargo.github.io/MrYoungFargo/",
         mode: "TEST",
         externalTransactionID: orderId || "ORDER_" + Date.now(),
         urls: {
             callbackUrl: "https://mryoungfargo-payment.onrender.com/webhook",
-            successPageUrl: "https://mryoungfargo.github.io/Duets-merch-store/success.html",
-            failurePageUrl: "https://mryoungfargo.github.io/Duets-merch-store/failed.html",
-            cancelUrl: "https://mryoungfargo.github.io/Duets-merch-store/cancel.html"
+            successPageUrl: "https://mryoungfargo.github.io/MrYoungFargo/success.html",
+            failurePageUrl: "https://mryoungfargo.github.io/MrYoungFargo/failed.html",
+            cancelUrl: "https://mryoungfargo.github.io/MrYoungFargo/cancel.html"
         }
     };
     
@@ -113,8 +113,8 @@ app.post('/forgot-password', async (req, res) => {
     if (!global.resetTokens) global.resetTokens = {};
     global.resetTokens[email] = { token: resetToken, expires: resetExpires };
     
-    // Create reset link (this will redirect to your store with token)
-    const resetLink = `https://mryoungfargo.github.io/Duets-merch-store/reset-password.html?token=${resetToken}&email=${encodeURIComponent(email)}`;
+    // CORRECTED URL for your repository
+    const resetLink = `https://mryoungfargo.github.io/MrYoungFargo/reset-password.html?token=${resetToken}&email=${encodeURIComponent(email)}`;
     
     console.log("🔗 Reset link generated:", resetLink);
     
