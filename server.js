@@ -94,21 +94,29 @@ app.post('/create-payment', async (req, res) => {
 app.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
     
+    console.log("📧 Forgot password request for:", email);
+    
     if (!email) {
         return res.json({ success: false, error: "Email required" });
+    }
+    
+    if (!BREVO_API_KEY) {
+        console.error("❌ BREVO_API_KEY not set in environment variables");
+        return res.json({ success: false, error: "Email service not configured" });
     }
     
     // Generate a reset token (valid for 1 hour)
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetExpires = Date.now() + 3600000; // 1 hour
     
-    // Store reset token temporarily (in memory - for demo)
-    // In production, you'd use a database
+    // Store reset token temporarily
     if (!global.resetTokens) global.resetTokens = {};
     global.resetTokens[email] = { token: resetToken, expires: resetExpires };
     
-    // Create reset link
+    // Create reset link (this will redirect to your store with token)
     const resetLink = `https://mryoungfargo.github.io/Duets-merch-store/reset-password.html?token=${resetToken}&email=${encodeURIComponent(email)}`;
+    
+    console.log("🔗 Reset link generated:", resetLink);
     
     // Send email via Brevo
     try {
@@ -123,21 +131,28 @@ app.post('/forgot-password', async (req, res) => {
                 to: [{ email: email }],
                 subject: 'Reset your MrYoungFargo password',
                 htmlContent: `
-                    <h2>Password Reset Request</h2>
-                    <p>You requested to reset your password for your MrYoungFargo account.</p>
-                    <p>Click the link below to create a new password. This link expires in 1 hour.</p>
-                    <a href="${resetLink}" style="background:#3b82f6; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">Reset Password</a>
-                    <p>If you didn't request this, please ignore this email.</p>
+                    <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; background: #1a1a2e; color: #e0e0e0; border-radius: 10px;">
+                        <h2 style="color: #3b82f6;">Reset Your Password</h2>
+                        <p>You requested to reset your password for your MrYoungFargo account.</p>
+                        <p>Click the button below to create a new password. This link expires in 1 hour.</p>
+                        <a href="${resetLink}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 20px 0;">Reset Password</a>
+                        <p style="font-size: 12px; color: #888;">If you didn't request this, please ignore this email.</p>
+                        <p style="font-size: 12px; color: #888;">Or copy this link: ${resetLink}</p>
+                    </div>
                 `
             })
         });
         
+        const data = await response.json();
+        console.log("📧 Brevo response:", response.status, data);
+        
         if (response.ok) {
             res.json({ success: true, message: "Reset email sent" });
         } else {
-            res.json({ success: false, error: "Failed to send email" });
+            res.json({ success: false, error: data.message || "Failed to send email" });
         }
     } catch (error) {
+        console.error("❌ Email error:", error.message);
         res.json({ success: false, error: error.message });
     }
 });
@@ -169,4 +184,5 @@ app.post('/webhook', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📧 Brevo API Key configured: ${BREVO_API_KEY ? '✅ Yes' : '❌ No'}`);
 });
