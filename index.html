@@ -90,7 +90,7 @@
       100% { transform: rotateY(360deg); }
     }
 
-    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
     .nav-links a { color: #ccc; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 0.65rem; }
     .nav-links a:hover { color: white; }
     .cart-icon { position: relative; cursor: pointer; font-size: 0.9rem; margin-left: 0; margin-right: 5px; }
@@ -100,17 +100,45 @@
       min-width: 14px;
       text-align: center;
     }
-    .auth-link {
-      background: rgba(59,130,246,0.3);
-      padding: 6px 10px;
-      border-radius: 50%;
+    
+    /* User section styles */
+    .user-section {
       display: flex;
       align-items: center;
-      justify-content: center;
-      width: 30px;
-      height: 30px;
+      gap: 8px;
+      background: rgba(59,130,246,0.2);
+      padding: 4px 12px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    .auth-link i { font-size: 0.9rem; }
+    .user-section:hover {
+      background: rgba(59,130,246,0.4);
+    }
+    .user-name {
+      font-size: 0.65rem;
+      font-weight: 600;
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .logout-icon {
+      font-size: 0.7rem;
+      color: #ff8888;
+      margin-left: 5px;
+    }
+    .auth-link {
+      background: rgba(59,130,246,0.3);
+      padding: 6px 12px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.65rem;
+      font-weight: 600;
+    }
+    .auth-link i { font-size: 0.8rem; }
     .auth-link:hover { background: var(--blue); }
 
     .sticky-nav {
@@ -576,7 +604,7 @@
       <a href="#" class="nav-sweaters">SWEATERS</a>
       <a href="#" class="nav-hoodies">HOODIES</a>
       <div class="cart-icon" id="cartIcon"><i class="fas fa-bag-shopping"></i><span class="cart-count" id="cartCount">0</span></div>
-      <a href="#" class="auth-link" id="showAuthBtn"><i class="fas fa-user"></i></a>
+      <div id="userSection"></div>
     </div>
   </div>
 </div>
@@ -641,9 +669,45 @@
     const saved = localStorage.getItem('current_user');
     if (saved) {
       currentUser = JSON.parse(saved);
-      // Update Brevo chat with user info
-      if (window.BrevoConversations && currentUser) {
-        window.BrevoConversations('identify', { email: currentUser.email, name: currentUser.email.split('@')[0] });
+    }
+    updateUserSection();
+    // Update Brevo chat with user info
+    if (window.BrevoConversations && currentUser) {
+      window.BrevoConversations('identify', { email: currentUser.email, name: currentUser.email.split('@')[0] });
+    }
+  }
+  
+  function updateUserSection() {
+    const userSection = document.getElementById('userSection');
+    if (!userSection) return;
+    
+    if (currentUser) {
+      const displayName = currentUser.email.split('@')[0];
+      userSection.innerHTML = `
+        <div class="user-section" id="userMenuBtn">
+          <i class="fas fa-user-circle"></i>
+          <span class="user-name">${displayName}</span>
+          <i class="fas fa-chevron-down logout-icon"></i>
+        </div>
+      `;
+      const userMenuBtn = document.getElementById('userMenuBtn');
+      if (userMenuBtn) {
+        userMenuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (confirm(`Logged in as ${currentUser.email}\n\nClick OK to logout`)) {
+            logout();
+          }
+        });
+      }
+    } else {
+      userSection.innerHTML = `
+        <div class="auth-link" id="showAuthBtnNav">
+          <i class="fas fa-user"></i> SIGN IN
+        </div>
+      `;
+      const authBtn = document.getElementById('showAuthBtnNav');
+      if (authBtn) {
+        authBtn.addEventListener('click', showAuthModal);
       }
     }
   }
@@ -703,7 +767,7 @@
         saveCurrentUser();
         loadCartForUser();
         closeAuthModal();
-        // Update Brevo chat
+        updateUserSection();
         if (window.BrevoConversations) {
           window.BrevoConversations('identify', { email: currentUser.email, name: currentUser.email.split('@')[0] });
         }
@@ -723,6 +787,7 @@
       cart = [];
       updateCartUI();
       closeAuthModal();
+      updateUserSection();
       if (window.BrevoConversations) {
         window.BrevoConversations('identify', { email: currentUser.email, name: currentUser.email.split('@')[0] });
       }
@@ -740,6 +805,18 @@
       document.getElementById('authSubmitBtn').innerText = 'SIGN UP';
       document.getElementById('authToggleText').innerText = 'Back to login';
     }
+  }
+  
+  function logout() {
+    currentUser = null;
+    saveCurrentUser();
+    cart = [];
+    updateCartUI();
+    updateUserSection();
+    if (window.BrevoConversations) {
+      window.BrevoConversations('identify', { email: '', name: '' });
+    }
+    alert('Logged out successfully');
   }
   
   // FORGOT PASSWORD FUNCTIONS
@@ -877,6 +954,10 @@
   }
   
   function showModal(product) {
+    if (!currentUser) {
+      showAuthModal();
+      return;
+    }
     currentProduct = product; selectedSize = null; selectedColor = null;
     document.getElementById("modalProductName").innerText = product.name;
     document.getElementById("modalProductPrice").innerText = `R${product.price.toFixed(2)}`;
@@ -942,6 +1023,10 @@
     const buyBtn = document.getElementById('buyMixtapeBtn');
     if (buyBtn) {
       buyBtn.addEventListener('click', () => {
+        if (!currentUser) {
+          showAuthModal();
+          return;
+        }
         const existing = cart.find(i => i.id === 99);
         if (existing) {
           existing.qty++;
@@ -1003,29 +1088,11 @@
   document.getElementById("modalCloseBtn")?.addEventListener("click", closeModal);
   window.addEventListener("click", (e) => { if (e.target === document.getElementById("sizeColorModal")) closeModal(); });
   
-  document.getElementById("showAuthBtn")?.addEventListener("click", showAuthModal);
-  document.getElementById("closeAuthBtn")?.addEventListener("click", closeAuthModal);
   document.getElementById("authSubmitBtn")?.addEventListener("click", handleAuth);
   document.getElementById("authToggleText")?.addEventListener("click", toggleAuthMode);
   document.getElementById("forgotPasswordBtn")?.addEventListener("click", showResetModal);
   document.getElementById("closeResetBtn")?.addEventListener("click", closeResetModal);
   document.getElementById("sendResetBtn")?.addEventListener("click", sendResetLink);
-  
-  // Double-click on user icon to logout
-  document.getElementById("showAuthBtn")?.addEventListener("dblclick", () => {
-    if (currentUser) {
-      if (confirm("Logout?")) {
-        currentUser = null;
-        saveCurrentUser();
-        cart = [];
-        updateCartUI();
-        closeAuthModal();
-        if (window.BrevoConversations) {
-          window.BrevoConversations('identify', { email: '', name: '' });
-        }
-      }
-    }
-  });
   
   // INIT
   loadCurrentUser();
@@ -1035,11 +1102,6 @@
   renderGrid(hoodies, "hoodiesGrid");
   setupNav();
   setupMixtape();
-  
-  // Brevo Conversations - Identify user if logged in
-  if (window.BrevoConversations && currentUser) {
-    window.BrevoConversations('identify', { email: currentUser.email, name: currentUser.email.split('@')[0] });
-  }
 </script>
 </body>
 </html>
