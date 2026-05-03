@@ -7,6 +7,64 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   
+  <!-- Brevo Conversations Live Chat Widget -->
+  <script>
+    // Store user info for later use
+    window.pendingBrevoUser = null;
+    
+    // Function to identify user in Brevo chat
+    function identifyBrevoUser(email, name) {
+      if (window.BrevoConversations) {
+        console.log("Identifying Brevo user:", email);
+        window.BrevoConversations('updateUser', {
+          email: email,
+          name: name,
+          id: email
+        });
+        window.pendingBrevoUser = null;
+      } else {
+        // Widget not loaded yet, store for later
+        window.pendingBrevoUser = { email: email, name: name };
+      }
+    }
+    
+    // Function to clear user identity (logout)
+    function clearBrevoUser() {
+      if (window.BrevoConversations) {
+        console.log("Clearing Brevo user");
+        window.BrevoConversations('updateUser', {
+          email: '',
+          name: ''
+        });
+      }
+      window.pendingBrevoUser = null;
+    }
+    
+    // Load Brevo chat widget
+    (function(d, w, c) {
+        w.BrevoConversationsID = '69f2ce2c82bbf71d2f00b4e2';
+        w[c] = w[c] || function() {
+            (w[c].q = w[c].q || []).push(arguments);
+        };
+        var s = d.createElement('script');
+        s.async = true;
+        s.src = 'https://conversations-widget.brevo.com/brevo-conversations.js';
+        s.onload = function() {
+          console.log("Brevo chat widget loaded");
+          // If there's a pending user, identify them now
+          if (window.pendingBrevoUser && window.pendingBrevoUser.email) {
+            window.BrevoConversations('updateUser', {
+              email: window.pendingBrevoUser.email,
+              name: window.pendingBrevoUser.name,
+              id: window.pendingBrevoUser.email
+            });
+            window.pendingBrevoUser = null;
+          }
+        };
+        if (d.head) d.head.appendChild(s);
+    })(document, window, 'BrevoConversations');
+  </script>
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
@@ -542,43 +600,6 @@
 </head>
 <body>
 
-<!-- Brevo Conversations Live Chat Widget - Loaded AFTER page to allow identity setting -->
-<script>
-  // Function to initialize/update Brevo chat with user identity
-  function initBrevoChat(userEmail, userName) {
-    if (window.BrevoConversations) {
-      // Reset existing session
-      window.BrevoConversations('reset');
-      // Set user identity
-      window.BrevoConversations('identify', {
-        email: userEmail || '',
-        name: userName || '',
-        id: userEmail || ''
-      });
-      console.log("Brevo chat identified with email:", userEmail);
-    }
-  }
-  
-  // Load Brevo chat widget
-  (function(d, w, c) {
-      w.BrevoConversationsID = '69f2ce2c82bbf71d2f00b4e2';
-      w[c] = w[c] || function() {
-          (w[c].q = w[c].q || []).push(arguments);
-      };
-      var s = d.createElement('script');
-      s.async = true;
-      s.src = 'https://conversations-widget.brevo.com/brevo-conversations.js';
-      if (d.head) d.head.appendChild(s);
-      
-      // Wait for widget to load, then set identity if user is logged in
-      setTimeout(function() {
-        if (window.BrevoConversations && window.currentUserForChat && window.currentUserForChat.email) {
-          initBrevoChat(window.currentUserForChat.email, window.currentUserForChat.name);
-        }
-      }, 2000);
-  })(document, window, 'BrevoConversations');
-</script>
-
 <!-- AUTH MODAL -->
 <div id="authModal" class="auth-modal">
   <div class="auth-modal-content">
@@ -690,39 +711,13 @@
   let currentUser = null;
   let users = JSON.parse(localStorage.getItem('app_users')) || [];
   
-  // Global variable for chat widget
-  window.currentUserForChat = null;
-  
-  function updateBrevoChatIdentity() {
-    if (currentUser && currentUser.email) {
-      window.currentUserForChat = { email: currentUser.email, name: currentUser.email.split('@')[0] };
-      if (window.BrevoConversations) {
-        window.BrevoConversations('reset');
-        window.BrevoConversations('identify', {
-          email: currentUser.email,
-          name: currentUser.email.split('@')[0],
-          id: currentUser.email
-        });
-        console.log("Brevo chat identity set to:", currentUser.email);
-      }
-    } else {
-      window.currentUserForChat = null;
-      if (window.BrevoConversations) {
-        window.BrevoConversations('reset');
-        window.BrevoConversations('identify', { email: '', name: '' });
-        console.log("Brevo chat identity cleared");
-      }
-    }
-  }
-  
   function saveUsers() { localStorage.setItem('app_users', JSON.stringify(users)); }
+  
   function saveCurrentUser() {
     if (currentUser) {
       localStorage.setItem('current_user', JSON.stringify(currentUser));
-      updateBrevoChatIdentity();
     } else {
       localStorage.removeItem('current_user');
-      updateBrevoChatIdentity();
     }
   }
   
@@ -730,9 +725,12 @@
     const saved = localStorage.getItem('current_user');
     if (saved) {
       currentUser = JSON.parse(saved);
-      updateBrevoChatIdentity();
     }
     updateUserSection();
+    // Update Brevo chat with user identity AFTER loading
+    if (currentUser && currentUser.email) {
+      identifyBrevoUser(currentUser.email, currentUser.email.split('@')[0]);
+    }
   }
   
   function getInitials(email) {
@@ -878,7 +876,7 @@
         loadCartForUser();
         closeAuthModal();
         updateUserSection();
-        updateBrevoChatIdentity();
+        identifyBrevoUser(currentUser.email, currentUser.email.split('@')[0]);
       } else { alert('Invalid email or password'); }
     } else {
       if (users.find(u => u.email === email)) { alert('Email already exists. Please login.'); return; }
@@ -891,7 +889,7 @@
       updateCartUI();
       closeAuthModal();
       updateUserSection();
-      updateBrevoChatIdentity();
+      identifyBrevoUser(currentUser.email, currentUser.email.split('@')[0]);
     }
   }
   
@@ -914,11 +912,7 @@
     cart = [];
     updateCartUI();
     updateUserSection();
-    window.currentUserForChat = null;
-    if (window.BrevoConversations) {
-      window.BrevoConversations('reset');
-      window.BrevoConversations('identify', { email: '', name: '' });
-    }
+    clearBrevoUser();
   }
   
   // FORGOT PASSWORD FUNCTIONS
