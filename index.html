@@ -7,43 +7,33 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   
-  <!-- Brevo Conversations Live Chat Widget with Visitor ID Fix -->
+  <!-- Brevo Conversations Live Chat Widget -->
   <script>
-    // Generate a unique session ID for each login
-    function generateSessionId(prefix) {
-        return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    // Store user info to apply once widget loads
+    let pendingBrevoEmail = null;
+    let pendingBrevoName = null;
+    
+    // Function to set Brevo visitor identity (THIS IS THE KEY FIX)
+    function setBrevoIdentity(email, name) {
+      if (window.BrevoConversations) {
+        // First, update the visitor (this changes the "Anonym" to actual name)
+        window.BrevoConversations('updateVisitor', {
+          email: email || '',
+          name: name || ''
+        });
+        // Then identify the user for your records
+        window.BrevoConversations('identify', {
+          email: email,
+          name: name
+        });
+        console.log("Brevo identity set to:", email || "Anonymous");
+      } else {
+        // Widget not loaded yet, store for later
+        pendingBrevoEmail = email;
+        pendingBrevoName = name;
+      }
     }
-
-    // Function to update Brevo with current user (creates new visitor session)
-    function identifyBrevoUser(email, name) {
-        if (window.BrevoConversations) {
-            if (email && name) {
-                // Generate a brand new unique visitor ID for this login session
-                const uniqueVisitorId = generateSessionId('user');
-                // Force Brevo to treat this as a brand new visitor
-                window.BrevoConversations('updateVisitor', { id: uniqueVisitorId });
-                // Then identify the user
-                window.BrevoConversations('updateUser', {
-                    email: email,
-                    name: name,
-                    id: email
-                });
-                console.log("Brevo: New visitor session created for", email);
-                sessionStorage.setItem('brevo_session_id', uniqueVisitorId);
-            } else {
-                // Logout: generate new anonymous visitor ID
-                const anonymousId = generateSessionId('anon');
-                window.BrevoConversations('updateVisitor', { id: anonymousId });
-                window.BrevoConversations('updateUser', { email: '', name: '', id: '' });
-                console.log("Brevo: New anonymous session created");
-                sessionStorage.removeItem('brevo_session_id');
-            }
-        } else {
-            // Widget not loaded yet, store for later
-            window.pendingBrevoUser = email ? { email: email, name: name } : null;
-        }
-    }
-
+    
     // Load Brevo widget
     (function(d, w, c) {
         w.BrevoConversationsID = '69f2ce2c82bbf71d2f00b4e2';
@@ -54,13 +44,10 @@
         s.async = true;
         s.src = 'https://conversations-widget.brevo.com/brevo-conversations.js';
         s.onload = function() {
-            console.log("Brevo widget loaded");
-            if (window.pendingBrevoUser) {
-                identifyBrevoUser(window.pendingBrevoUser.email, window.pendingBrevoUser.name);
-                window.pendingBrevoUser = null;
-            } else if (window.currentUserForChat && window.currentUserForChat.email) {
-                identifyBrevoUser(window.currentUserForChat.email, window.currentUserForChat.name);
-            }
+          console.log("Brevo widget loaded");
+          if (pendingBrevoEmail) {
+            setBrevoIdentity(pendingBrevoEmail, pendingBrevoName);
+          }
         };
         if (d.head) d.head.appendChild(s);
     })(document, window, 'BrevoConversations');
@@ -483,6 +470,7 @@
     .modal-confirm:hover { background: #2563eb; transform: scale(0.98); }
     .modal-close { background: none; border: none; color: #999; margin-top: 4px; cursor: pointer; font-size: 0.45rem; }
 
+    /* AUTH MODAL with Eye Icon */
     .auth-modal {
       display: none;
       position: fixed;
@@ -508,10 +496,14 @@
       position: relative;
     }
     .auth-modal-content h2 { color: white; font-size: 1.2rem; margin-bottom: 20px; }
+    .input-group {
+      position: relative;
+      margin: 8px 0;
+    }
     .auth-modal-content input {
       width: 100%;
       padding: 12px;
-      margin: 8px 0;
+      padding-right: 40px;
       background: rgba(255,255,255,0.1);
       border: 1px solid rgba(255,255,255,0.2);
       border-radius: 12px;
@@ -520,6 +512,16 @@
       outline: none;
     }
     .auth-modal-content input:focus { border-color: var(--blue); }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #aaa;
+      font-size: 1rem;
+    }
+    .toggle-password:hover { color: white; }
     .auth-btn {
       background: var(--blue);
       border: none;
@@ -607,7 +609,12 @@
     <button class="close-auth" id="closeAuthBtn">&times;</button>
     <h2 id="authTitle">LOGIN</h2>
     <input type="text" id="authEmail" placeholder="Email" autocomplete="email">
-    <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password">
+    <div class="input-group">
+      <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password">
+      <span class="toggle-password" id="togglePasswordBtn">
+        <i class="fas fa-eye-slash" id="passwordIcon"></i>
+      </span>
+    </div>
     <button class="auth-btn" id="authSubmitBtn">LOGIN</button>
     <div class="forgot-link"><span id="forgotPasswordBtn">Forgot password?</span></div>
     <div class="auth-toggle"><span id="authToggleText">Create an account</span></div>
@@ -712,17 +719,27 @@
   let currentUser = null;
   let users = JSON.parse(localStorage.getItem('app_users')) || [];
   
-  window.currentUserForChat = null;
+  // Password visibility toggle
+  const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+  const passwordInput = document.getElementById('authPassword');
+  const passwordIcon = document.getElementById('passwordIcon');
+  
+  if (togglePasswordBtn) {
+    togglePasswordBtn.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      passwordIcon.classList.toggle('fa-eye');
+      passwordIcon.classList.toggle('fa-eye-slash');
+    });
+  }
   
   function saveUsers() { localStorage.setItem('app_users', JSON.stringify(users)); }
   
   function saveCurrentUser() {
     if (currentUser) {
       localStorage.setItem('current_user', JSON.stringify(currentUser));
-      window.currentUserForChat = { email: currentUser.email, name: currentUser.email.split('@')[0] };
     } else {
       localStorage.removeItem('current_user');
-      window.currentUserForChat = null;
     }
   }
   
@@ -730,12 +747,12 @@
     const saved = localStorage.getItem('current_user');
     if (saved) {
       currentUser = JSON.parse(saved);
-      window.currentUserForChat = { email: currentUser.email, name: currentUser.email.split('@')[0] };
+      // Update Brevo chat with user identity
+      if (currentUser && currentUser.email) {
+        setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
+      }
     }
     updateUserSection();
-    if (window.currentUserForChat && window.currentUserForChat.email) {
-      identifyBrevoUser(window.currentUserForChat.email, window.currentUserForChat.name);
-    }
   }
   
   function getInitials(email) {
@@ -786,6 +803,8 @@
       }
       const downloadArea = document.getElementById('mixtapeDownloadArea');
       if (downloadArea) downloadArea.innerHTML = '';
+      // Clear Brevo identity when logged out
+      setBrevoIdentity(null, null);
     }
   }
   
@@ -865,6 +884,11 @@
     isLoginMode = true;
     document.getElementById('authEmail').value = '';
     document.getElementById('authPassword').value = '';
+    if (passwordInput) passwordInput.setAttribute('type', 'password');
+    if (passwordIcon) {
+      passwordIcon.classList.remove('fa-eye');
+      passwordIcon.classList.add('fa-eye-slash');
+    }
   }
   
   function closeAuthModal() { authModal.classList.remove('show'); }
@@ -881,7 +905,8 @@
         loadCartForUser();
         closeAuthModal();
         updateUserSection();
-        identifyBrevoUser(currentUser.email, currentUser.email.split('@')[0]);
+        // Set Brevo identity on login
+        setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
       } else { alert('Invalid email or password'); }
     } else {
       if (users.find(u => u.email === email)) { alert('Email already exists. Please login.'); return; }
@@ -894,7 +919,7 @@
       updateCartUI();
       closeAuthModal();
       updateUserSection();
-      identifyBrevoUser(currentUser.email, currentUser.email.split('@')[0]);
+      setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
     }
   }
   
@@ -917,7 +942,8 @@
     cart = [];
     updateCartUI();
     updateUserSection();
-    identifyBrevoUser(null, null);
+    // Clear Brevo identity on logout
+    setBrevoIdentity(null, null);
   }
   
   // FORGOT PASSWORD FUNCTIONS
