@@ -9,20 +9,16 @@
   
   <!-- Brevo Conversations Live Chat Widget -->
   <script>
-    // Store user info to apply once widget loads
     let pendingBrevoEmail = null;
     let pendingBrevoName = null;
     
-    // Function to set Brevo visitor identity
     function setBrevoIdentity(email, name) {
       if (window.BrevoConversations) {
         if (email && name) {
           window.BrevoConversations('updateVisitor', { email: email, name: name });
           window.BrevoConversations('identify', { email: email, name: name });
-          console.log("Brevo identity set to:", email);
         } else {
           window.BrevoConversations('updateVisitor', { email: '', name: '' });
-          console.log("Brevo identity cleared");
         }
       } else {
         pendingBrevoEmail = email;
@@ -30,7 +26,6 @@
       }
     }
     
-    // Load Brevo widget
     (function(d, w, c) {
         w.BrevoConversationsID = '69f2ce2c82bbf71d2f00b4e2';
         w[c] = w[c] || function() {
@@ -40,7 +35,6 @@
         s.async = true;
         s.src = 'https://conversations-widget.brevo.com/brevo-conversations.js';
         s.onload = function() {
-          console.log("Brevo widget loaded");
           if (pendingBrevoEmail) {
             setBrevoIdentity(pendingBrevoEmail, pendingBrevoName);
           }
@@ -714,13 +708,15 @@
   const API_URL = 'https://mryoungfargo-payment.onrender.com';
   
   // ==============================================================
-  // USER AUTHENTICATION SYSTEM (Backend-based)
+  // USER AUTHENTICATION (Backend-based, but ONLY on checkout)
   // ==============================================================
   
   let currentUser = null;
   let sessionToken = localStorage.getItem('session_token') || null;
   
-  // Helper function to make API calls
+  // Cart is stored locally until user logs in/checkout
+  let cart = [];
+  
   async function apiCall(endpoint, data) {
     try {
       const response = await fetch(`${API_URL}${endpoint}`, {
@@ -730,26 +726,25 @@
       });
       return await response.json();
     } catch (error) {
-      console.error('API Error:', error);
       return { success: false, error: 'Connection error' };
     }
   }
   
-  // Verify existing session on page load
   async function verifySession() {
     if (!sessionToken) return;
-    
     const result = await apiCall('/api/verify', { sessionToken });
     if (result.success && result.user) {
       currentUser = result.user;
-      cart = currentUser.cart || [];
-      updateCartUI();
+      // Only load cart from server if it exists and local cart is empty (for returning user)
+      if (result.user.cart && result.user.cart.length > 0 && cart.length === 0) {
+        cart = result.user.cart;
+        updateCartUI();
+      }
       updateUserSection();
       if (currentUser.email) {
         setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
       }
     } else {
-      // Session invalid, clear local storage
       localStorage.removeItem('session_token');
       sessionToken = null;
     }
@@ -758,7 +753,6 @@
   async function register(email, password) {
     const result = await apiCall('/api/register', { email, password });
     if (result.success) {
-      // Auto-login after registration
       return await login(email, password);
     } else {
       alert(result.error || 'Registration failed');
@@ -772,7 +766,22 @@
       currentUser = result.user;
       sessionToken = result.sessionToken;
       localStorage.setItem('session_token', sessionToken);
-      cart = currentUser.cart || [];
+      // Merge local cart with server cart
+      if (cart.length > 0 && result.user.cart) {
+        // Merge carts
+        for (let localItem of cart) {
+          const existing = result.user.cart.find(i => i.id === localItem.id && i.size === localItem.size && i.color === localItem.color);
+          if (existing) {
+            existing.qty += localItem.qty;
+          } else {
+            result.user.cart.push(localItem);
+          }
+        }
+        cart = result.user.cart;
+        await saveCartToServer();
+      } else if (result.user.cart && result.user.cart.length > 0) {
+        cart = result.user.cart;
+      }
       updateCartUI();
       updateUserSection();
       setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
@@ -975,7 +984,7 @@
   }
   
   // ==============================================================
-  // STORE DATA & FUNCTIONS
+  // STORE DATA & FUNCTIONS (NO LOGIN REQUIRED FOR ADD TO CART)
   // ==============================================================
   
   const colors = [
@@ -1010,26 +1019,13 @@
   ];
   
   const allProducts = [...tshirts, ...sweaters, ...hoodies];
-  let cart = [];
   let currentProduct = null, selectedSize = null, selectedColor = null;
   
-  // Override saveCart to also save to server
-  const originalUpdateCartUI = null;
-  
-  function saveCart() {
+  function saveCartToLocal() {
     updateCartUI();
     if (sessionToken) {
       saveCartToServer();
     }
-  }
-  
-  function loadCart() {
-    if (currentUser && currentUser.cart) {
-      cart = currentUser.cart;
-    } else {
-      cart = [];
-    }
-    updateCartUI();
   }
   
   function updateCartUI() {
@@ -1051,25 +1047,25 @@
       btn.addEventListener("click", () => {
         const id = parseInt(btn.dataset.id), size = btn.dataset.size, color = btn.dataset.color;
         cart = cart.filter(i => !(i.id === id && i.size === size && i.color === color));
-        saveCart();
+        saveCartToLocal();
       });
     });
   }
   
+  // ADD TO CART - NO LOGIN REQUIRED (anyone can add)
   function addToCart(product, size, color) {
-    if (!currentUser) { showAuthModal(); return false; }
     if (!size) { alert("Select size"); return false; }
     if (!color && product.id !== 99) { alert("Select color"); return false; }
     const existing = cart.find(i => i.id === product.id && i.size === size && i.color === color);
     if (existing) existing.qty++;
     else cart.push({ id: product.id, name: product.name, price: product.price, size: size || 'Digital', color: color || 'N/A', qty: 1 });
-    saveCart();
+    saveCartToLocal();
     document.getElementById("cartSidebar").classList.add("open");
     return true;
   }
   
   function showModal(product) {
-    if (!currentUser) { showAuthModal(); return; }
+    // No login required to see modal and add to cart
     currentProduct = product; selectedSize = null; selectedColor = null;
     document.getElementById("modalProductName").innerText = product.name;
     document.getElementById("modalProductPrice").innerText = `R${product.price.toFixed(2)}`;
@@ -1124,17 +1120,17 @@
     const buyBtn = document.getElementById('buyMixtapeBtn');
     if (buyBtn) {
       buyBtn.addEventListener('click', () => {
-        if (!currentUser) { showAuthModal(); return; }
+        // No login required to add mixtape to cart
         const existing = cart.find(i => i.id === 99);
         if (existing) existing.qty++;
         else cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
-        saveCart();
+        saveCartToLocal();
         document.getElementById("cartSidebar").classList.add("open");
       });
     }
   }
   
-  // CHECKOUT BUTTON
+  // CHECKOUT BUTTON - ONLY HERE REQUIRE LOGIN
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (!currentUser) {
       showAuthModal();
@@ -1180,8 +1176,8 @@
   }
   
   // EVENT LISTENERS
-  document.getElementById("cartIcon")?.addEventListener("click", () => { if (currentUser) document.getElementById("cartSidebar").classList.add("open"); else showAuthModal(); });
-  document.getElementById("stickyCartIcon")?.addEventListener("click", () => { if (currentUser) document.getElementById("cartSidebar").classList.add("open"); else showAuthModal(); });
+  document.getElementById("cartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
+  document.getElementById("stickyCartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
   document.getElementById("closeCartBtn")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.remove("open"));
   document.getElementById("modalConfirmBtn")?.addEventListener("click", confirmAdd);
   document.getElementById("modalCloseBtn")?.addEventListener("click", closeModal);
@@ -1210,4 +1206,4 @@
   });
 </script>
 </body>
-  </html> 
+</html>
