@@ -123,6 +123,7 @@
       text-align: center;
     }
     
+    /* User section - ALWAYS VISIBLE */
     .user-section {
       background: rgba(59,130,246,0.3);
       border-radius: 50%;
@@ -136,13 +137,13 @@
       position: relative;
     }
     .user-section:hover { background: var(--blue); }
-    .user-initials {
+    .user-section .user-initials {
       font-size: 0.75rem;
       font-weight: 700;
       color: white;
       text-transform: uppercase;
     }
-    .auth-icon {
+    .auth-icon-btn {
       background: rgba(59,130,246,0.3);
       border-radius: 50%;
       width: 32px;
@@ -153,8 +154,8 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .auth-icon:hover { background: var(--blue); }
-    .auth-icon i { font-size: 0.9rem; color: white; }
+    .auth-icon-btn:hover { background: var(--blue); }
+    .auth-icon-btn i { font-size: 0.9rem; color: white; }
     
     .user-dropdown {
       position: absolute;
@@ -657,7 +658,10 @@
       <a href="#" class="nav-sweaters">SWEATERS</a>
       <a href="#" class="nav-hoodies">HOODIES</a>
       <div class="cart-icon" id="cartIcon"><i class="fas fa-bag-shopping"></i><span class="cart-count" id="cartCount">0</span></div>
-      <div id="userSection"></div>
+      <div id="userSection">
+        <!-- Person icon will be inserted here -->
+        <div class="auth-icon-btn" id="authIconBtn"><i class="fas fa-user"></i></div>
+      </div>
     </div>
   </div>
 </div>
@@ -712,17 +716,11 @@
   
   let currentUser = null;
   let sessionToken = localStorage.getItem('session_token') || null;
-  
-  // Cart is stored locally and synced with server when logged in
   let cart = [];
   
   async function apiCall(endpoint, data) {
     try {
-      const response = await fetch(`${API_URL}${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+      const response = await fetch(`${API_URL}${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       return await response.json();
     } catch (error) {
       return { success: false, error: 'Connection error' };
@@ -738,7 +736,7 @@
         cart = result.user.cart;
         updateCartUI();
       }
-      updateUserSection();
+      updateUserUI();
       if (currentUser.email) {
         setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
       }
@@ -746,7 +744,7 @@
       localStorage.removeItem('session_token');
       sessionToken = null;
       currentUser = null;
-      updateUserSection();
+      updateUserUI();
     }
   }
   
@@ -767,15 +765,11 @@
       sessionToken = result.sessionToken;
       localStorage.setItem('session_token', sessionToken);
       
-      // Merge local cart with server cart
       if (cart.length > 0 && result.user.cart) {
         for (let localItem of cart) {
           const existing = result.user.cart.find(i => i.id === localItem.id && i.size === localItem.size && i.color === localItem.color);
-          if (existing) {
-            existing.qty += localItem.qty;
-          } else {
-            result.user.cart.push(localItem);
-          }
+          if (existing) existing.qty += localItem.qty;
+          else result.user.cart.push(localItem);
         }
         cart = result.user.cart;
         await saveCartToServer();
@@ -783,7 +777,7 @@
         cart = result.user.cart;
       }
       updateCartUI();
-      updateUserSection();
+      updateUserUI();
       setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
       closeAuthModal();
       return true;
@@ -794,22 +788,18 @@
   }
   
   async function logout() {
-    if (sessionToken) {
-      await apiCall('/api/logout', { sessionToken });
-    }
+    if (sessionToken) await apiCall('/api/logout', { sessionToken });
     currentUser = null;
     sessionToken = null;
     localStorage.removeItem('session_token');
     cart = [];
     updateCartUI();
-    updateUserSection();
+    updateUserUI();
     setBrevoIdentity(null, null);
   }
   
   async function saveCartToServer() {
-    if (sessionToken && cart) {
-      await apiCall('/api/update-cart', { sessionToken, cart });
-    }
+    if (sessionToken && cart) await apiCall('/api/update-cart', { sessionToken, cart });
   }
   
   async function markMixtapePurchased() {
@@ -844,9 +834,12 @@
   
   let dropdownElement = null;
   
-  function updateUserSection() {
+  function updateUserUI() {
     const userSection = document.getElementById('userSection');
     if (!userSection) return;
+    
+    // Clear the userSection first
+    userSection.innerHTML = '';
     
     if (currentUser && currentUser.email) {
       const initials = getInitials(currentUser.email);
@@ -863,9 +856,7 @@
       if (iconBtn) {
         iconBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          if (dropdownElement) {
-            dropdownElement.classList.toggle('show');
-          }
+          if (dropdownElement) dropdownElement.classList.toggle('show');
         });
       }
       const logoutBtn = document.getElementById('logoutBtn');
@@ -875,43 +866,28 @@
           logout();
         });
       }
-      updateMixtapeDownloadArea();
     } else {
-      userSection.innerHTML = `<div class="auth-icon" id="authIconBtn"><i class="fas fa-user"></i></div>`;
+      userSection.innerHTML = `<div class="auth-icon-btn" id="authIconBtn"><i class="fas fa-user"></i></div>`;
       const authBtn = document.getElementById('authIconBtn');
       if (authBtn) {
         authBtn.addEventListener('click', showAuthModal);
       }
-      const downloadArea = document.getElementById('mixtapeDownloadArea');
-      if (downloadArea) downloadArea.innerHTML = '';
     }
+    updateMixtapeDownloadArea();
   }
   
   function updateMixtapeDownloadArea() {
     const downloadArea = document.getElementById('mixtapeDownloadArea');
     if (!downloadArea) return;
-    
     downloadArea.innerHTML = '';
     if (currentUser && currentUser.hasPurchasedMixtape) {
-      downloadArea.innerHTML = `
-        <button class="download-mixtape-btn" id="downloadMixtapeBtn">
-          <i class="fas fa-download"></i> DOWNLOAD MIXTAPE (ZIP)
-        </button>
-      `;
+      downloadArea.innerHTML = `<button class="download-mixtape-btn" id="downloadMixtapeBtn"><i class="fas fa-download"></i> DOWNLOAD MIXTAPE (ZIP)</button>`;
       const downloadBtn = document.getElementById('downloadMixtapeBtn');
-      if (downloadBtn) {
-        downloadBtn.addEventListener('click', () => {
-          window.location.href = 'duets.zip';
-        });
-      }
+      if (downloadBtn) downloadBtn.addEventListener('click', () => window.location.href = 'duets.zip');
     }
   }
   
-  document.addEventListener('click', function() {
-    if (dropdownElement) {
-      dropdownElement.classList.remove('show');
-    }
-  });
+  document.addEventListener('click', function() { if (dropdownElement) dropdownElement.classList.remove('show'); });
   
   // AUTH MODAL FUNCTIONS
   const authModal = document.getElementById('authModal');
@@ -938,12 +914,8 @@
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value.trim();
     if (!email || !password) { alert('Please enter email and password'); return; }
-    
-    if (isLoginMode) {
-      await login(email, password);
-    } else {
-      await register(email, password);
-    }
+    if (isLoginMode) await login(email, password);
+    else await register(email, password);
   }
   
   function toggleAuthMode() {
@@ -961,11 +933,7 @@
   
   // FORGOT PASSWORD FUNCTIONS
   const resetModal = document.getElementById('resetModal');
-  function showResetModal() {
-    resetModal.classList.add('show');
-    document.getElementById('resetEmail').value = '';
-    document.getElementById('resetMessage').innerHTML = '';
-  }
+  function showResetModal() { resetModal.classList.add('show'); document.getElementById('resetEmail').value = ''; document.getElementById('resetMessage').innerHTML = ''; }
   function closeResetModal() { resetModal.classList.remove('show'); }
   
   async function sendResetLink() {
@@ -973,18 +941,13 @@
     const messageDiv = document.getElementById('resetMessage');
     if (!email) { messageDiv.innerHTML = '<span style="color:#ff8888;">Please enter your email</span>'; return; }
     messageDiv.innerHTML = '<span style="color:#aaa;">Sending...</span>';
-    
     const result = await apiCall('/forgot-password', { email });
-    if (result.success) {
-      messageDiv.innerHTML = '<span style="color:#10b981;">✓ Reset link sent! Check your email.</span>';
-      setTimeout(() => closeResetModal(), 3000);
-    } else {
-      messageDiv.innerHTML = '<span style="color:#ff8888;">Error: ' + (result.error || 'Could not send email') + '</span>';
-    }
+    if (result.success) { messageDiv.innerHTML = '<span style="color:#10b981;">✓ Reset link sent! Check your email.</span>'; setTimeout(() => closeResetModal(), 3000); }
+    else { messageDiv.innerHTML = '<span style="color:#ff8888;">Error: ' + (result.error || 'Could not send email') + '</span>'; }
   }
   
   // ==============================================================
-  // STORE DATA & FUNCTIONS (NO LOGIN REQUIRED FOR ADD TO CART)
+  // STORE DATA & FUNCTIONS
   // ==============================================================
   
   const colors = [
@@ -1021,12 +984,7 @@
   const allProducts = [...tshirts, ...sweaters, ...hoodies];
   let currentProduct = null, selectedSize = null, selectedColor = null;
   
-  function saveCartToLocal() {
-    updateCartUI();
-    if (sessionToken) {
-      saveCartToServer();
-    }
-  }
+  function saveCartToLocal() { updateCartUI(); if (sessionToken) saveCartToServer(); }
   
   function updateCartUI() {
     const count = cart.reduce((s,i) => s + i.qty, 0);
@@ -1052,7 +1010,6 @@
     });
   }
   
-  // ADD TO CART - NO LOGIN REQUIRED
   function addToCart(product, size, color) {
     if (!size) { alert("Select size"); return false; }
     if (!color && product.id !== 99) { alert("Select color"); return false; }
@@ -1128,14 +1085,9 @@
     }
   }
   
-  // CHECKOUT BUTTON - ONLY REQUIRE LOGIN HERE
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
-    if (!currentUser) {
-      showAuthModal();
-      return;
-    }
+    if (!currentUser) { showAuthModal(); return; }
     if (cart.length === 0) { alert("Cart is empty"); return; }
-    
     const hasMixtape = cart.some(item => item.id === 99);
     let total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
     const checkoutBtn = document.getElementById("checkoutBtn");
@@ -1143,33 +1095,19 @@
     checkoutBtn.innerText = "⏳ PROCESSING...";
     checkoutBtn.disabled = true;
     try {
-      const response = await fetch(`${API_URL}/create-payment`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: total, orderId: "ORDER_" + Date.now() })
-      });
+      const response = await fetch(`${API_URL}/create-payment`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: total, orderId: "ORDER_" + Date.now() }) });
       const data = await response.json();
       if (data.success && data.paymentUrl) {
-        if (hasMixtape) {
-          sessionStorage.setItem('pendingMixtapePurchase', 'true');
-        }
+        if (hasMixtape) sessionStorage.setItem('pendingMixtapePurchase', 'true');
         window.location.href = data.paymentUrl;
-      } else {
-        alert("Payment error: " + (data.error || "Unknown error"));
-        checkoutBtn.innerText = originalText;
-        checkoutBtn.disabled = false;
-      }
+      } else { alert("Payment error: " + (data.error || "Unknown error")); checkoutBtn.innerText = originalText; checkoutBtn.disabled = false; }
     } catch (error) { alert("Connection error. Please try again."); checkoutBtn.innerText = originalText; checkoutBtn.disabled = false; }
   });
   
   async function checkForSuccessfulPayment() {
     if (sessionStorage.getItem('pendingMixtapePurchase') === 'true') {
       sessionStorage.removeItem('pendingMixtapePurchase');
-      if (currentUser) {
-        await markMixtapePurchased();
-        alert("Thank you! Your mixtape is now available for download in your account.");
-        updateMixtapeDownloadArea();
-      }
+      if (currentUser) { await markMixtapePurchased(); alert("Thank you! Your mixtape is now available for download in your account."); updateMixtapeDownloadArea(); }
     }
   }
   
@@ -1187,13 +1125,8 @@
   document.getElementById("authToggleText")?.addEventListener("click", toggleAuthMode);
   document.getElementById("forgotPasswordBtn")?.addEventListener("click", showResetModal);
   document.getElementById("sendResetBtn")?.addEventListener("click", sendResetLink);
+  document.getElementById("mixtapeListenBtn")?.addEventListener("click", (e) => { e.preventDefault(); alert("Add the mixtape to cart (R50) to purchase and download the full ZIP file.\n\nYou can listen to previews on YouTube via the bottom button."); });
   
-  document.getElementById("mixtapeListenBtn")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    alert("Add the mixtape to cart (R50) to purchase and download the full ZIP file.\n\nYou can listen to previews on YouTube via the bottom button.");
-  });
-  
-  // INIT
   verifySession().then(() => {
     renderGrid(tshirts, "tshirtsGrid");
     renderGrid(sweaters, "sweatersGrid");
