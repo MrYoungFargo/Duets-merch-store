@@ -123,7 +123,6 @@
       text-align: center;
     }
     
-    /* User section styles */
     .user-section {
       background: rgba(59,130,246,0.3);
       border-radius: 50%;
@@ -588,7 +587,7 @@
       cursor: pointer;
       line-height: 1;
     }
-    ..close-reset:hover { color: #ff8888; }
+    .close-reset:hover { color: #ff8888; }
   </style>
 </head>
 <body>
@@ -659,7 +658,6 @@
       <a href="#" class="nav-hoodies">HOODIES</a>
       <div class="cart-icon" id="cartIcon"><i class="fas fa-bag-shopping"></i><span class="cart-count" id="cartCount">0</span></div>
       <div id="userSection">
-        <!-- Static person icon that works -->
         <div class="auth-icon-btn" id="globalAuthIconBtn"><i class="fas fa-user"></i></div>
       </div>
     </div>
@@ -718,7 +716,12 @@
   let sessionToken = localStorage.getItem('session_token') || null;
   let cart = [];
   
-  // GLOBAL function to show auth modal
+  // Helper function to normalize email (case‑insensitive)
+  function normalizeEmail(email) {
+    return email ? email.toLowerCase().trim() : '';
+  }
+  
+  // Global function to show auth modal
   window.showAuthModal = function() {
     const modal = document.getElementById('authModal');
     if (modal) modal.classList.add('show');
@@ -781,9 +784,11 @@
   }
   
   async function register(email, password) {
-    const result = await apiCall('/api/register', { email, password });
+    // Normalize email to lowercase for case‑insensitive storage
+    const normalizedEmail = normalizeEmail(email);
+    const result = await apiCall('/api/register', { email: normalizedEmail, password });
     if (result.success) {
-      return await login(email, password);
+      return await login(normalizedEmail, password);
     } else {
       alert(result.error || 'Registration failed');
       return false;
@@ -791,7 +796,9 @@
   }
   
   async function login(email, password) {
-    const result = await apiCall('/api/login', { email, password });
+    // Normalize email to lowercase for case‑insensitive lookup
+    const normalizedEmail = normalizeEmail(email);
+    const result = await apiCall('/api/login', { email: normalizedEmail, password });
     if (result.success) {
       currentUser = result.user;
       sessionToken = result.sessionToken;
@@ -924,9 +931,11 @@
   window.isLoginMode = true;
   
   async function handleAuth() {
-    const email = document.getElementById('authEmail').value.trim();
+    let email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value.trim();
     if (!email || !password) { alert('Please enter email and password'); return; }
+    // Normalize email to lowercase for case‑insensitive handling
+    email = normalizeEmail(email);
     if (window.isLoginMode) await login(email, password);
     else await register(email, password);
   }
@@ -950,9 +959,10 @@
   function closeResetModal() { resetModal.classList.remove('show'); }
   
   async function sendResetLink() {
-    const email = document.getElementById('resetEmail').value.trim();
+    let email = document.getElementById('resetEmail').value.trim();
     const messageDiv = document.getElementById('resetMessage');
     if (!email) { messageDiv.innerHTML = '<span style="color:#ff8888;">Please enter your email</span>'; return; }
+    email = normalizeEmail(email);
     messageDiv.innerHTML = '<span style="color:#aaa;">Sending...</span>';
     const result = await apiCall('/forgot-password', { email });
     if (result.success) { messageDiv.innerHTML = '<span style="color:#10b981;">✓ Reset link sent! Check your email.</span>'; setTimeout(() => closeResetModal(), 3000); }
