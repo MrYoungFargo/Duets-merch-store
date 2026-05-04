@@ -123,7 +123,7 @@
       text-align: center;
     }
     
-    /* User section - ALWAYS VISIBLE */
+    /* User section styles */
     .user-section {
       background: rgba(59,130,246,0.3);
       border-radius: 50%;
@@ -137,7 +137,7 @@
       position: relative;
     }
     .user-section:hover { background: var(--blue); }
-    .user-section .user-initials {
+    .user-initials {
       font-size: 0.75rem;
       font-weight: 700;
       color: white;
@@ -588,7 +588,7 @@
       cursor: pointer;
       line-height: 1;
     }
-    .close-reset:hover { color: #ff8888; }
+    ..close-reset:hover { color: #ff8888; }
   </style>
 </head>
 <body>
@@ -659,8 +659,8 @@
       <a href="#" class="nav-hoodies">HOODIES</a>
       <div class="cart-icon" id="cartIcon"><i class="fas fa-bag-shopping"></i><span class="cart-count" id="cartCount">0</span></div>
       <div id="userSection">
-        <!-- Person icon will be inserted here -->
-        <div class="auth-icon-btn" id="authIconBtn"><i class="fas fa-user"></i></div>
+        <!-- Static person icon that works -->
+        <div class="auth-icon-btn" id="globalAuthIconBtn"><i class="fas fa-user"></i></div>
       </div>
     </div>
   </div>
@@ -711,12 +711,44 @@
   const API_URL = 'https://mryoungfargo-payment.onrender.com';
   
   // ==============================================================
-  // USER AUTHENTICATION (Backend-based)
+  // USER AUTHENTICATION
   // ==============================================================
   
   let currentUser = null;
   let sessionToken = localStorage.getItem('session_token') || null;
   let cart = [];
+  
+  // GLOBAL function to show auth modal
+  window.showAuthModal = function() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.classList.add('show');
+    document.getElementById('authTitle').innerText = 'LOGIN';
+    document.getElementById('authSubmitBtn').innerText = 'LOGIN';
+    document.getElementById('authToggleText').innerText = 'Create an account';
+    window.isLoginMode = true;
+    document.getElementById('authEmail').value = '';
+    document.getElementById('authPassword').value = '';
+    const pwdInput = document.getElementById('authPassword');
+    if (pwdInput) pwdInput.setAttribute('type', 'password');
+    const pwdIcon = document.getElementById('passwordIcon');
+    if (pwdIcon) {
+      pwdIcon.classList.remove('fa-eye');
+      pwdIcon.classList.add('fa-eye-slash');
+    }
+  };
+  
+  window.closeAuthModal = function() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.classList.remove('show');
+  };
+  
+  // Attach click handler to global person icon
+  const globalAuthBtn = document.getElementById('globalAuthIconBtn');
+  if (globalAuthBtn) {
+    globalAuthBtn.addEventListener('click', function() {
+      window.showAuthModal();
+    });
+  }
   
   async function apiCall(endpoint, data) {
     try {
@@ -779,7 +811,7 @@
       updateCartUI();
       updateUserUI();
       setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
-      closeAuthModal();
+      window.closeAuthModal();
       return true;
     } else {
       alert(result.error || 'Login failed');
@@ -838,9 +870,6 @@
     const userSection = document.getElementById('userSection');
     if (!userSection) return;
     
-    // Clear the userSection first
-    userSection.innerHTML = '';
-    
     if (currentUser && currentUser.email) {
       const initials = getInitials(currentUser.email);
       userSection.innerHTML = `
@@ -867,10 +896,12 @@
         });
       }
     } else {
-      userSection.innerHTML = `<div class="auth-icon-btn" id="authIconBtn"><i class="fas fa-user"></i></div>`;
-      const authBtn = document.getElementById('authIconBtn');
-      if (authBtn) {
-        authBtn.addEventListener('click', showAuthModal);
+      userSection.innerHTML = `<div class="auth-icon-btn" id="dynamicAuthIconBtn"><i class="fas fa-user"></i></div>`;
+      const dynamicBtn = document.getElementById('dynamicAuthIconBtn');
+      if (dynamicBtn) {
+        dynamicBtn.addEventListener('click', function() {
+          window.showAuthModal();
+        });
       }
     }
     updateMixtapeDownloadArea();
@@ -889,38 +920,20 @@
   
   document.addEventListener('click', function() { if (dropdownElement) dropdownElement.classList.remove('show'); });
   
-  // AUTH MODAL FUNCTIONS
-  const authModal = document.getElementById('authModal');
-  let isLoginMode = true;
-  
-  function showAuthModal() {
-    authModal.classList.add('show');
-    document.getElementById('authTitle').innerText = 'LOGIN';
-    document.getElementById('authSubmitBtn').innerText = 'LOGIN';
-    document.getElementById('authToggleText').innerText = 'Create an account';
-    isLoginMode = true;
-    document.getElementById('authEmail').value = '';
-    document.getElementById('authPassword').value = '';
-    if (passwordInput) passwordInput.setAttribute('type', 'password');
-    if (passwordIcon) {
-      passwordIcon.classList.remove('fa-eye');
-      passwordIcon.classList.add('fa-eye-slash');
-    }
-  }
-  
-  function closeAuthModal() { authModal.classList.remove('show'); }
+  // Auth handlers
+  window.isLoginMode = true;
   
   async function handleAuth() {
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value.trim();
     if (!email || !password) { alert('Please enter email and password'); return; }
-    if (isLoginMode) await login(email, password);
+    if (window.isLoginMode) await login(email, password);
     else await register(email, password);
   }
   
   function toggleAuthMode() {
-    isLoginMode = !isLoginMode;
-    if (isLoginMode) {
+    window.isLoginMode = !window.isLoginMode;
+    if (window.isLoginMode) {
       document.getElementById('authTitle').innerText = 'LOGIN';
       document.getElementById('authSubmitBtn').innerText = 'LOGIN';
       document.getElementById('authToggleText').innerText = 'Create an account';
@@ -1086,7 +1099,7 @@
   }
   
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
-    if (!currentUser) { showAuthModal(); return; }
+    if (!currentUser) { window.showAuthModal(); return; }
     if (cart.length === 0) { alert("Cart is empty"); return; }
     const hasMixtape = cart.some(item => item.id === 99);
     let total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
@@ -1119,7 +1132,7 @@
   document.getElementById("modalCloseBtn")?.addEventListener("click", closeModal);
   window.addEventListener("click", (e) => { if (e.target === document.getElementById("sizeColorModal")) closeModal(); });
   
-  document.getElementById("closeAuthBtn")?.addEventListener("click", closeAuthModal);
+  document.getElementById("closeAuthBtn")?.addEventListener("click", window.closeAuthModal);
   document.getElementById("closeResetBtn")?.addEventListener("click", closeResetModal);
   document.getElementById("authSubmitBtn")?.addEventListener("click", handleAuth);
   document.getElementById("authToggleText")?.addEventListener("click", toggleAuthMode);
