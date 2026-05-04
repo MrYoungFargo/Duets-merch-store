@@ -12,11 +12,10 @@ const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
 const API_ENDPOINT = 'https://api.ikhokha.com/public-api/v1/api/payment';
 
-// Simple in-memory user storage (for demo - use a real database in production)
-// For a real store, use MongoDB, PostgreSQL, or a similar database
-let users = []; // This will reset on server restart
+// Simple in-memory user storage
+let users = [];
 
-// Load users from a file if it exists (simple persistence)
+// Load users from a file if it exists
 const fs = require('fs');
 const USERS_FILE = './users.json';
 try {
@@ -38,7 +37,21 @@ function saveUsersToFile() {
   }
 }
 
-// Simple password hashing (for demo - use bcrypt in production)
+// Helper function to find user by email (case-insensitive)
+function findUserByEmail(email) {
+  if (!email) return null;
+  const lowerEmail = email.toLowerCase();
+  return users.find(u => u.email.toLowerCase() === lowerEmail);
+}
+
+// Helper function to check if email exists (case-insensitive)
+function emailExists(email) {
+  if (!email) return false;
+  const lowerEmail = email.toLowerCase();
+  return users.some(u => u.email.toLowerCase() === lowerEmail);
+}
+
+// Simple password hashing
 function hashPassword(password, salt = null) {
   if (!salt) salt = crypto.randomBytes(16).toString('hex');
   const hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
@@ -62,13 +75,17 @@ app.post('/api/register', (req, res) => {
     return res.json({ success: false, error: 'Email and password required' });
   }
   
-  if (users.find(u => u.email === email)) {
+  // Case-insensitive email check
+  if (emailExists(email)) {
     return res.json({ success: false, error: 'Email already registered' });
   }
   
+  // Store email in lowercase for consistency
+  const normalizedEmail = email.toLowerCase();
   const { salt, hash } = hashPassword(password);
   const newUser = { 
-    email, 
+    email: normalizedEmail,
+    originalEmail: email, // preserve original case for display
     passwordHash: hash, 
     salt, 
     cart: [],
@@ -81,7 +98,7 @@ app.post('/api/register', (req, res) => {
   
   res.json({ 
     success: true, 
-    user: { email: newUser.email, cart: newUser.cart, hasPurchasedMixtape: newUser.hasPurchasedMixtape }
+    user: { email: normalizedEmail, cart: newUser.cart, hasPurchasedMixtape: newUser.hasPurchasedMixtape }
   });
 });
 
@@ -93,7 +110,8 @@ app.post('/api/login', (req, res) => {
     return res.json({ success: false, error: 'Email and password required' });
   }
   
-  const user = users.find(u => u.email === email);
+  // Case-insensitive email lookup
+  const user = findUserByEmail(email);
   if (!user) {
     return res.json({ success: false, error: 'Invalid email or password' });
   }
@@ -102,7 +120,7 @@ app.post('/api/login', (req, res) => {
     return res.json({ success: false, error: 'Invalid email or password' });
   }
   
-  // Generate a session token (simple for now - use JWT in production)
+  // Generate a session token
   const sessionToken = crypto.randomBytes(32).toString('hex');
   user.sessionToken = sessionToken;
   user.lastLogin = new Date().toISOString();
@@ -275,7 +293,8 @@ app.post('/forgot-password', async (req, res) => {
         return res.json({ success: false, error: "Email required" });
     }
     
-    const user = users.find(u => u.email === email);
+    // Case-insensitive email lookup
+    const user = findUserByEmail(email);
     if (!user) {
         return res.json({ success: false, error: "Email not found" });
     }
@@ -291,7 +310,7 @@ app.post('/forgot-password', async (req, res) => {
     user.resetExpires = resetExpires;
     saveUsersToFile();
     
-    const resetLink = `https://mryoungfargo.github.io/Mryoungfargo/reset-password.html?token=${resetToken}&email=${encodeURIComponent(email)}`;
+    const resetLink = `https://mryoungfargo.github.io/Mryoungfargo/reset-password.html?token=${resetToken}&email=${encodeURIComponent(user.email)}`;
     
     try {
         const response = await fetch('https://api.brevo.com/v3/smtp/email', {
@@ -302,7 +321,7 @@ app.post('/forgot-password', async (req, res) => {
             },
             body: JSON.stringify({
                 sender: { name: 'MrYoungFargo', email: 'noreply@mryoungfargo.com' },
-                to: [{ email: email }],
+                to: [{ email: user.email }],
                 subject: 'Reset your MrYoungFargo password',
                 htmlContent: `
                     <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; background: #1a1a2e; color: #e0e0e0; border-radius: 10px;">
@@ -328,7 +347,7 @@ app.post('/forgot-password', async (req, res) => {
 app.post('/reset-password', (req, res) => {
     const { email, token, newPassword } = req.body;
     
-    const user = users.find(u => u.email === email);
+    const user = findUserByEmail(email);
     if (!user || user.resetToken !== token || user.resetExpires < Date.now()) {
         return res.json({ success: false, error: "Invalid or expired reset token" });
     }
