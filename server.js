@@ -18,6 +18,9 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const ADMIN_EMAIL = 'mryoungfargo@gmail.com';
 
+console.log('Brevo API Key present:', BREVO_API_KEY ? 'YES' : 'NO');
+console.log('Admin email:', ADMIN_EMAIL);
+
 // ==============================================================
 // SUPABASE ADMIN CLIENT
 // ==============================================================
@@ -56,6 +59,9 @@ async function getUserStoreData(userId) {
 // HELPER: Send order confirmation email via Brevo
 // ==============================================================
 async function sendOrderConfirmationEmail(order) {
+  console.log('Attempting to send email for order:', order.order_id);
+  console.log('Brevo API Key present:', BREVO_API_KEY ? 'YES' : 'NO');
+  
   if (!BREVO_API_KEY) {
     console.log('Brevo API key missing, skipping email');
     return;
@@ -68,7 +74,7 @@ async function sendOrderConfirmationEmail(order) {
       <td style="padding: 8px; border: 1px solid #ddd;">${item.color || 'N/A'}</td>
       <td style="padding: 8px; border: 1px solid #ddd;">${item.qty}</td>
       <td style="padding: 8px; border: 1px solid #ddd;">R${item.price.toFixed(2)}</td>
-    </table>
+    </tr>
   `).join('');
   
   const emailHtml = `
@@ -88,7 +94,7 @@ async function sendOrderConfirmationEmail(order) {
             <th style="padding: 8px; border: 1px solid #ddd;">Color</th>
             <th style="padding: 8px; border: 1px solid #ddd;">Qty</th>
             <th style="padding: 8px; border: 1px solid #ddd;">Price</th>
-          </tr>
+          </td>
         </thead>
         <tbody>
           ${itemsHtml}
@@ -100,8 +106,20 @@ async function sendOrderConfirmationEmail(order) {
     </div>
   `;
   
+  const customerEmailHtml = `
+    <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; text-align: center;">
+      <h2 style="color: #3b82f6;">Thank You for Your Order!</h2>
+      <p>Your order <strong>#${order.order_id}</strong> has been received and is being processed.</p>
+      <p><strong>Total:</strong> R${order.total_amount.toFixed(2)}</p>
+      <p>You will receive a download link for your mixtape (if purchased) within 24 hours.</p>
+      <p>For any questions, reply to this email.</p>
+      <p>💿 <strong>MrYoungFargo</strong></p>
+    </div>
+  `;
+  
   try {
-    await fetch('https://api.brevo.com/v3/smtp/email', {
+    // Send to admin
+    const adminResponse = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'api-key': BREVO_API_KEY },
       body: JSON.stringify({
@@ -112,26 +130,29 @@ async function sendOrderConfirmationEmail(order) {
       })
     });
     
-    await fetch('https://api.brevo.com/v3/smtp/email', {
+    const adminData = await adminResponse.json();
+    console.log('Admin email response:', adminResponse.status, adminData);
+    
+    // Send to customer
+    const customerResponse = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'api-key': BREVO_API_KEY },
       body: JSON.stringify({
         sender: { name: 'MrYoungFargo Store', email: 'noreply@mryoungfargo.com' },
         to: [{ email: order.customer_email }],
         subject: `Thank you for your order #${order.order_id}`,
-        htmlContent: `
-          <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-            <h2 style="color: #3b82f6;">Thank You for Your Order!</h2>
-            <p>Your order #${order.order_id} has been received and is being processed.</p>
-            <p><strong>Total:</strong> R${order.total_amount.toFixed(2)}</p>
-            <p>You will receive a download link for your mixtape (if purchased) within 24 hours.</p>
-            <p>For any questions, reply to this email.</p>
-          </div>
-        `
+        htmlContent: customerEmailHtml
       })
     });
     
-    console.log(`Order confirmation emails sent for #${order.order_id}`);
+    const customerData = await customerResponse.json();
+    console.log('Customer email response:', customerResponse.status, customerData);
+    
+    if (adminResponse.ok && customerResponse.ok) {
+      console.log(`Order confirmation emails sent for #${order.order_id}`);
+    } else {
+      console.log('Email sending had issues');
+    }
   } catch (error) {
     console.error('Failed to send order email:', error);
   }
@@ -351,7 +372,7 @@ app.post('/forgot-password', async (req, res) => {
   const resetLink = `https://mryoungfargo.github.io/MrYoungFargo/reset-password.html?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
   try {
-    await fetch('https://api.brevo.com/v3/smtp/email', {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'api-key': BREVO_API_KEY },
       body: JSON.stringify({
@@ -361,8 +382,11 @@ app.post('/forgot-password', async (req, res) => {
         htmlContent: `<div><h2>Reset Your Password</h2><a href="${resetLink}">Click here to reset your password</a><p>This link expires in 1 hour.</p></div>`
       })
     });
-    res.json({ success: true, message: 'Reset email sent' });
+    const data = await response.json();
+    console.log('Forgot password email response:', response.status);
+    res.json({ success: response.ok, message: response.ok ? 'Reset email sent' : data.message });
   } catch (error) {
+    console.error('Forgot password error:', error);
     res.json({ success: false, error: error.message });
   }
 });
@@ -488,8 +512,10 @@ app.get('/test-supabase', async (req, res) => {
 });
 
 app.get('/test-email', async (req, res) => {
+  console.log('Test email endpoint called');
   if (!BREVO_API_KEY) {
-    return res.json({ error: 'BREVO_API_KEY not set' });
+    console.log('BREVO_API_KEY not set');
+    return res.json({ error: 'BREVO_API_KEY not set', key: BREVO_API_KEY ? 'exists' : 'missing' });
   }
   try {
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
@@ -503,10 +529,25 @@ app.get('/test-email', async (req, res) => {
       })
     });
     const data = await response.json();
-    res.json({ success: response.ok, data });
+    console.log('Test email response:', response.status, data);
+    res.json({ success: response.ok, status: response.status, data });
   } catch (error) {
+    console.error('Test email error:', error);
     res.json({ error: error.message });
   }
+});
+
+app.get('/test-order-email', async (req, res) => {
+  const testOrder = {
+    order_id: 'TEST_EMAIL_ORDER',
+    customer_email: 'mryoungfargo@gmail.com',
+    items: [{ name: 'Test Product', price: 50, qty: 1, size: 'M', color: 'Black' }],
+    total_amount: 50,
+    created_at: new Date().toISOString()
+  };
+  
+  await sendOrderConfirmationEmail(testOrder);
+  res.json({ message: 'Email send attempted. Check server logs for details.' });
 });
 
 app.get('/test-ikhokha', async (req, res) => {
