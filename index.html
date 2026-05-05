@@ -716,12 +716,10 @@
   let sessionToken = localStorage.getItem('session_token') || null;
   let cart = [];
   
-  // Helper function to normalize email (case‑insensitive)
   function normalizeEmail(email) {
     return email ? email.toLowerCase().trim() : '';
   }
   
-  // Global function to show auth modal
   window.showAuthModal = function() {
     const modal = document.getElementById('authModal');
     if (modal) modal.classList.add('show');
@@ -745,7 +743,6 @@
     if (modal) modal.classList.remove('show');
   };
   
-  // Attach click handler to global person icon
   const globalAuthBtn = document.getElementById('globalAuthIconBtn');
   if (globalAuthBtn) {
     globalAuthBtn.addEventListener('click', function() {
@@ -784,7 +781,6 @@
   }
   
   async function register(email, password) {
-    // Normalize email to lowercase for case‑insensitive storage
     const normalizedEmail = normalizeEmail(email);
     const result = await apiCall('/api/register', { email: normalizedEmail, password });
     if (result.success) {
@@ -796,7 +792,6 @@
   }
   
   async function login(email, password) {
-    // Normalize email to lowercase for case‑insensitive lookup
     const normalizedEmail = normalizeEmail(email);
     const result = await apiCall('/api/login', { email: normalizedEmail, password });
     if (result.success) {
@@ -848,6 +843,12 @@
         currentUser.hasPurchasedMixtape = true;
         updateMixtapeDownloadArea();
       }
+    }
+  }
+  
+  async function updateOrderStatus(orderId, paymentId) {
+    if (sessionToken) {
+      await apiCall('/api/update-order-status', { orderId, paymentId });
     }
   }
   
@@ -927,14 +928,12 @@
   
   document.addEventListener('click', function() { if (dropdownElement) dropdownElement.classList.remove('show'); });
   
-  // Auth handlers
   window.isLoginMode = true;
   
   async function handleAuth() {
     let email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value.trim();
     if (!email || !password) { alert('Please enter email and password'); return; }
-    // Normalize email to lowercase for case‑insensitive handling
     email = normalizeEmail(email);
     if (window.isLoginMode) await login(email, password);
     else await register(email, password);
@@ -953,7 +952,6 @@
     }
   }
   
-  // FORGOT PASSWORD FUNCTIONS
   const resetModal = document.getElementById('resetModal');
   function showResetModal() { resetModal.classList.add('show'); document.getElementById('resetEmail').value = ''; document.getElementById('resetMessage').innerHTML = ''; }
   function closeResetModal() { resetModal.classList.remove('show'); }
@@ -1108,29 +1106,94 @@
     }
   }
   
+  // CHECKOUT BUTTON WITH ORDER TRACKING
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
-    if (!currentUser) { window.showAuthModal(); return; }
-    if (cart.length === 0) { alert("Cart is empty"); return; }
+    if (!currentUser) {
+      window.showAuthModal();
+      return;
+    }
+    if (cart.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+    
     const hasMixtape = cart.some(item => item.id === 99);
+    const orderId = "ORDER_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
     let total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+    
     const checkoutBtn = document.getElementById("checkoutBtn");
     const originalText = checkoutBtn.innerText;
-    checkoutBtn.innerText = "⏳ PROCESSING...";
+    checkoutBtn.innerText = "⏳ SAVING ORDER...";
     checkoutBtn.disabled = true;
+    
     try {
-      const response = await fetch(`${API_URL}/create-payment`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: total, orderId: "ORDER_" + Date.now() }) });
-      const data = await response.json();
-      if (data.success && data.paymentUrl) {
-        if (hasMixtape) sessionStorage.setItem('pendingMixtapePurchase', 'true');
-        window.location.href = data.paymentUrl;
-      } else { alert("Payment error: " + (data.error || "Unknown error")); checkoutBtn.innerText = originalText; checkoutBtn.disabled = false; }
-    } catch (error) { alert("Connection error. Please try again."); checkoutBtn.innerText = originalText; checkoutBtn.disabled = false; }
+      // Step 1: Save order to database
+      const saveResponse = await fetch(`${API_URL}/api/save-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionToken: sessionToken,
+          orderId: orderId,
+          items: cart,
+          total: total,
+          customerEmail: currentUser.email
+        })
+      });
+      
+      const saveData = await saveResponse.json();
+      
+      if (!saveData.success) {
+        alert("Failed to save order: " + (saveData.error || "Unknown error"));
+        checkoutBtn.innerText = originalText;
+        checkoutBtn.disabled = false;
+        return;
+      }
+      
+      // Step 2: Create payment
+      checkoutBtn.innerText = "⏳ PROCESSING PAYMENT...";
+      
+      const paymentResponse = await fetch(`${API_URL}/create-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total, orderId: orderId })
+      });
+      
+      const paymentData = await paymentResponse.json();
+      
+      if (paymentData.success && paymentData.paymentUrl) {
+        if (hasMixtape) {
+          sessionStorage.setItem('pendingMixtapePurchase', 'true');
+        }
+        sessionStorage.setItem('pendingOrderId', orderId);
+        window.location.href = paymentData.paymentUrl;
+      } else {
+        alert("Payment error: " + (paymentData.error || "Unknown error"));
+        checkoutBtn.innerText = originalText;
+        checkoutBtn.disabled = false;
+      }
+    } catch (error) {
+      alert("Connection error. Please try again.");
+      checkoutBtn.innerText = originalText;
+      checkoutBtn.disabled = false;
+    }
   });
   
   async function checkForSuccessfulPayment() {
-    if (sessionStorage.getItem('pendingMixtapePurchase') === 'true') {
+    const pendingOrderId = sessionStorage.getItem('pendingOrderId');
+    const pendingMixtape = sessionStorage.getItem('pendingMixtapePurchase');
+    
+    if (pendingOrderId) {
+      sessionStorage.removeItem('pendingOrderId');
+      
+      if (currentUser && pendingMixtape === 'true') {
+        await markMixtapePurchased();
+        alert("Thank you! Your mixtape is now available for download in your account.");
+        updateMixtapeDownloadArea();
+      }
+    }
+    
+    if (pendingMixtape === 'true') {
       sessionStorage.removeItem('pendingMixtapePurchase');
-      if (currentUser) { await markMixtapePurchased(); alert("Thank you! Your mixtape is now available for download in your account."); updateMixtapeDownloadArea(); }
     }
   }
   
