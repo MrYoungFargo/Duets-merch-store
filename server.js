@@ -16,7 +16,6 @@ const BREVO_API_KEY = process.env.BREVO_API_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-// Your email for order notifications
 const ADMIN_EMAIL = 'mryoungfargo@gmail.com';
 
 // ==============================================================
@@ -54,7 +53,7 @@ async function getUserStoreData(userId) {
 }
 
 // ==============================================================
-// HELPER: Send order confirmation email
+// HELPER: Send order confirmation email via Brevo
 // ==============================================================
 async function sendOrderConfirmationEmail(order) {
   if (!BREVO_API_KEY) {
@@ -62,7 +61,6 @@ async function sendOrderConfirmationEmail(order) {
     return;
   }
   
-  // Build items table HTML
   const itemsHtml = order.items.map(item => `
     <tr>
       <td style="padding: 8px; border: 1px solid #ddd;">${item.name}</td>
@@ -70,7 +68,7 @@ async function sendOrderConfirmationEmail(order) {
       <td style="padding: 8px; border: 1px solid #ddd;">${item.color || 'N/A'}</td>
       <td style="padding: 8px; border: 1px solid #ddd;">${item.qty}</td>
       <td style="padding: 8px; border: 1px solid #ddd;">R${item.price.toFixed(2)}</td>
-    </tr>
+    </table>
   `).join('');
   
   const emailHtml = `
@@ -103,7 +101,6 @@ async function sendOrderConfirmationEmail(order) {
   `;
   
   try {
-    // Send to admin
     await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'api-key': BREVO_API_KEY },
@@ -115,7 +112,6 @@ async function sendOrderConfirmationEmail(order) {
       })
     });
     
-    // Also send confirmation to customer
     await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'api-key': BREVO_API_KEY },
@@ -149,8 +145,9 @@ app.get('/health', (req, res) => {
 });
 
 // ==============================================================
-// REGISTER
+// USER AUTHENTICATION ENDPOINTS
 // ==============================================================
+
 app.post('/api/register', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -182,9 +179,6 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// ==============================================================
-// LOGIN
-// ==============================================================
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -220,9 +214,6 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// ==============================================================
-// VERIFY SESSION
-// ==============================================================
 app.post('/api/verify', async (req, res) => {
   const { sessionToken } = req.body;
   if (!sessionToken || !global.sessions.has(sessionToken)) {
@@ -245,9 +236,6 @@ app.post('/api/verify', async (req, res) => {
   }
 });
 
-// ==============================================================
-// UPDATE CART
-// ==============================================================
 app.post('/api/update-cart', async (req, res) => {
   const { sessionToken, cart } = req.body;
   if (!sessionToken || !global.sessions.has(sessionToken)) {
@@ -266,9 +254,6 @@ app.post('/api/update-cart', async (req, res) => {
   }
 });
 
-// ==============================================================
-// MARK MIXTAPE PURCHASED
-// ==============================================================
 app.post('/api/mark-mixtape', async (req, res) => {
   const { sessionToken } = req.body;
   if (!sessionToken || !global.sessions.has(sessionToken)) {
@@ -287,9 +272,6 @@ app.post('/api/mark-mixtape', async (req, res) => {
   }
 });
 
-// ==============================================================
-// SAVE ORDER (called before payment)
-// ==============================================================
 app.post('/api/save-order', async (req, res) => {
   const { sessionToken, orderId, items, total, customerEmail } = req.body;
   
@@ -319,9 +301,6 @@ app.post('/api/save-order', async (req, res) => {
   }
 });
 
-// ==============================================================
-// UPDATE ORDER PAYMENT STATUS (called after payment success)
-// ==============================================================
 app.post('/api/update-order-status', async (req, res) => {
   const { orderId, paymentId } = req.body;
   
@@ -335,7 +314,6 @@ app.post('/api/update-order-status', async (req, res) => {
     
     if (error) throw error;
     
-    // Send order confirmation email
     await sendOrderConfirmationEmail(data);
     
     res.json({ success: true });
@@ -345,36 +323,6 @@ app.post('/api/update-order-status', async (req, res) => {
   }
 });
 
-// ==============================================================
-// GET ORDERS FOR A USER
-// ==============================================================
-app.post('/api/get-orders', async (req, res) => {
-  const { sessionToken } = req.body;
-  
-  if (!sessionToken || !global.sessions.has(sessionToken)) {
-    return res.json({ success: false, error: 'Invalid session' });
-  }
-
-  const session = global.sessions.get(sessionToken);
-  
-  try {
-    const { data, error } = await supabaseAdmin
-      .from('orders')
-      .select('*')
-      .eq('customer_email', session.email)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    
-    res.json({ success: true, orders: data });
-  } catch (error) {
-    res.json({ success: false, error: error.message });
-  }
-});
-
-// ==============================================================
-// LOGOUT
-// ==============================================================
 app.post('/api/logout', (req, res) => {
   const { sessionToken } = req.body;
   if (sessionToken && global.sessions) {
@@ -429,7 +377,7 @@ app.post('/reset-password', (req, res) => {
 });
 
 // ==============================================================
-// IKHOKHA PAYMENT
+// IKHOKHA PAYMENT ENDPOINTS
 // ==============================================================
 const IKHOKHA_API_ENDPOINT = 'https://api.ikhokha.com/public-api/v1/api/payment';
 
@@ -449,10 +397,17 @@ function generateSignature(payloadToSign, secret) {
 
 app.post('/create-payment', async (req, res) => {
   const { amount, orderId } = req.body;
-  if (!amount || amount <= 0) return res.json({ success: false, error: 'Invalid amount' });
-  if (!IKHOKHA_APP_ID || !IKHOKHA_SECRET) return res.json({ success: false, error: 'API keys not configured' });
-
+  
+  if (!amount || amount <= 0) {
+    return res.json({ success: false, error: 'Invalid amount' });
+  }
+  
+  if (!IKHOKHA_APP_ID || !IKHOKHA_SECRET) {
+    return res.json({ success: false, error: 'iKhokha API keys not configured' });
+  }
+  
   const amountInCents = Math.round(amount * 100);
+  
   const requestPayload = {
     entityID: IKHOKHA_APP_ID,
     amount: amountInCents,
@@ -467,21 +422,35 @@ app.post('/create-payment', async (req, res) => {
       cancelUrl: 'https://mryoungfargo.github.io/MrYoungFargo/cancel.html'
     }
   };
-
+  
   const requestBodyStr = JSON.stringify(requestPayload);
   const payloadToSign = createPayloadToSign(IKHOKHA_API_ENDPOINT, requestBodyStr);
   const signature = generateSignature(payloadToSign, IKHOKHA_SECRET);
-
+  
   try {
+    console.log('Creating payment for amount:', amountInCents, 'cents');
+    console.log('Order ID:', orderId);
+    
     const response = await fetch(IKHOKHA_API_ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'IK-APPID': IKHOKHA_APP_ID, 'IK-SIGN': signature },
+      headers: {
+        'Content-Type': 'application/json',
+        'IK-APPID': IKHOKHA_APP_ID,
+        'IK-SIGN': signature
+      },
       body: requestBodyStr
     });
+    
     const data = await response.json();
-    if (data.paylinkUrl) res.json({ success: true, paymentUrl: data.paylinkUrl, paymentId: data.paylinkID });
-    else res.json({ success: false, error: data.message || 'Payment creation failed' });
+    console.log('iKhokha response:', data);
+    
+    if (data.paylinkUrl) {
+      res.json({ success: true, paymentUrl: data.paylinkUrl, paymentId: data.paylinkID });
+    } else {
+      res.json({ success: false, error: data.message || 'Payment creation failed' });
+    }
   } catch (error) {
+    console.error('iKhokha error:', error);
     res.json({ success: false, error: error.message });
   }
 });
@@ -491,10 +460,15 @@ app.post('/webhook', async (req, res) => {
   const { paylinkID, status, externalTransactionID } = req.body;
   
   if (status === 'SUCCESS') {
-    await supabaseAdmin
-      .from('orders')
-      .update({ payment_status: 'paid', payment_id: paylinkID, updated_at: new Date() })
-      .eq('order_id', externalTransactionID);
+    try {
+      await supabaseAdmin
+        .from('orders')
+        .update({ payment_status: 'paid', payment_id: paylinkID, updated_at: new Date() })
+        .eq('order_id', externalTransactionID);
+      console.log(`Order ${externalTransactionID} marked as paid`);
+    } catch (error) {
+      console.error('Webhook error:', error);
+    }
   }
   
   res.status(200).send('OK');
@@ -513,47 +487,14 @@ app.get('/test-supabase', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => {
-  res.json({ status: '✅ Payment API is running!' });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`Supabase connected: ${SUPABASE_URL ? '✅' : '❌'}`);
-});
-app.get('/test-email', (req, res) => {
-  res.send(`
-    <h1>Email Test</h1>
-    <button onclick="sendTest()">Send Test Email</button>
-    <div id="result"></div>
-    <script>
-      async function sendTest() {
-        document.getElementById('result').innerHTML = 'Sending...';
-        try {
-          const response = await fetch('/send-test-email');
-          const data = await response.json();
-          document.getElementById('result').innerHTML = JSON.stringify(data, null, 2);
-        } catch(e) {
-          document.getElementById('result').innerHTML = 'Error: ' + e.message;
-        }
-      }
-    </script>
-  `);
-});
-
-app.get('/send-test-email', async (req, res) => {
-  if (!process.env.BREVO_API_KEY) {
-    return res.json({ error: 'BREVO_API_KEY not set in environment' });
+app.get('/test-email', async (req, res) => {
+  if (!BREVO_API_KEY) {
+    return res.json({ error: 'BREVO_API_KEY not set' });
   }
-  
   try {
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json', 
-        'api-key': process.env.BREVO_API_KEY 
-      },
+      headers: { 'Content-Type': 'application/json', 'api-key': BREVO_API_KEY },
       body: JSON.stringify({
         sender: { name: 'MrYoungFargo', email: 'noreply@mryoungfargo.com' },
         to: [{ email: 'mryoungfargo@gmail.com' }],
@@ -566,4 +507,60 @@ app.get('/send-test-email', async (req, res) => {
   } catch (error) {
     res.json({ error: error.message });
   }
+});
+
+app.get('/test-ikhokha', async (req, res) => {
+  if (!IKHOKHA_APP_ID) {
+    return res.json({ error: 'IKHOKHA_APP_ID not set' });
+  }
+  
+  const payload = {
+    entityID: IKHOKHA_APP_ID,
+    amount: 1000,
+    currency: "ZAR",
+    requesterUrl: "https://mryoungfargo.github.io/MrYoungFargo/",
+    mode: "TEST",
+    externalTransactionID: "TEST_" + Date.now(),
+    urls: {
+      callbackUrl: "https://mryoungfargo-payment.onrender.com/webhook",
+      successPageUrl: "https://mryoungfargo.github.io/MrYoungFargo/success.html",
+      failurePageUrl: "https://mryoungfargo.github.io/MrYoungFargo/failed.html",
+      cancelUrl: "https://mryoungfargo.github.io/MrYoungFargo/cancel.html"
+    }
+  };
+  
+  const requestBodyStr = JSON.stringify(payload);
+  const payloadToSign = createPayloadToSign(IKHOKHA_API_ENDPOINT, requestBodyStr);
+  const signature = generateSignature(payloadToSign, IKHOKHA_SECRET);
+  
+  try {
+    const response = await fetch(IKHOKHA_API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'IK-APPID': IKHOKHA_APP_ID,
+        'IK-SIGN': signature
+      },
+      body: requestBodyStr
+    });
+    const data = await response.json();
+    res.json({ status: response.status, data });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+// ==============================================================
+// ROOT ENDPOINT
+// ==============================================================
+app.get('/', (req, res) => {
+  res.json({ status: '✅ Payment API is running!' });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Supabase connected: ${SUPABASE_URL ? '✅' : '❌'}`);
+  console.log(`Brevo API key: ${BREVO_API_KEY ? '✅' : '❌'}`);
+  console.log(`iKhokha keys: ${IKHOKHA_APP_ID ? '✅' : '❌'}`);
 });
