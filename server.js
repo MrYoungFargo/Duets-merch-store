@@ -522,3 +522,25 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`Supabase connected: ${SUPABASE_URL ? '✅' : '❌'}`);
 });
+app.get('/test-email', async (req, res) => {
+  if (!BREVO_API_KEY) {
+    return res.json({ error: 'BREVO_API_KEY not set' });
+  }
+  
+  try {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'api-key': BREVO_API_KEY },
+      body: JSON.stringify({
+        sender: { name: 'MrYoungFargo', email: 'noreply@mryoungfargo.com' },
+        to: [{ email: 'mryoungfargo@gmail.com' }],
+        subject: 'Test Email',
+        htmlContent: '<h1>Test</h1><p>If you see this, Brevo is working!</p>'
+      })
+    });
+    const data = await response.json();
+    res.json({ success: response.ok, data });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
