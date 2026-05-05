@@ -1101,7 +1101,7 @@
   }
   
   // ==============================================================
-  // CHECKOUT BUTTON WITH TIMEOUT AND ERROR HANDLING
+  // CHECKOUT BUTTON WITH FIXED REDIRECT
   // ==============================================================
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (!currentUser) {
@@ -1122,7 +1122,6 @@
     checkoutBtn.innerText = "⏳ SAVING ORDER...";
     checkoutBtn.disabled = true;
     
-    // Set timeout to reset button after 30 seconds
     const timeoutId = setTimeout(() => {
       if (checkoutBtn.disabled) {
         checkoutBtn.innerText = "CHECKOUT →";
@@ -1156,7 +1155,7 @@
       }
       
       // Step 2: Create payment
-      checkoutBtn.innerText = "⏳ PROCESSING PAYMENT...";
+      checkoutBtn.innerText = "⏳ CREATING PAYMENT...";
       
       const paymentResponse = await fetch(`${API_URL}/create-payment`, {
         method: 'POST',
@@ -1165,6 +1164,7 @@
       });
       
       const paymentData = await paymentResponse.json();
+      console.log("Payment response:", paymentData);
       
       if (paymentData.success && paymentData.paymentUrl) {
         clearTimeout(timeoutId);
@@ -1172,6 +1172,7 @@
           sessionStorage.setItem('pendingMixtapePurchase', 'true');
         }
         sessionStorage.setItem('pendingOrderId', orderId);
+        // Redirect to iKhokha payment page
         window.location.href = paymentData.paymentUrl;
       } else {
         clearTimeout(timeoutId);
@@ -1182,7 +1183,7 @@
     } catch (error) {
       clearTimeout(timeoutId);
       console.error("Checkout error:", error);
-      alert("Connection error. Please check your internet and try again.");
+      alert("Connection error. Please try again.");
       checkoutBtn.innerText = originalText;
       checkoutBtn.disabled = false;
     }
@@ -1206,6 +1207,11 @@
       sessionStorage.removeItem('pendingMixtapePurchase');
     }
   }
+  
+  // Debug helper
+  console.log("Store loaded. API URL:", API_URL);
+  console.log("Session token:", sessionToken);
+  console.log("Current user:", currentUser);
   
   // EVENT LISTENERS
   document.getElementById("cartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
