@@ -522,20 +522,43 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`Supabase connected: ${SUPABASE_URL ? '✅' : '❌'}`);
 });
-app.get('/test-email', async (req, res) => {
-  if (!BREVO_API_KEY) {
-    return res.json({ error: 'BREVO_API_KEY not set' });
+app.get('/test-email', (req, res) => {
+  res.send(`
+    <h1>Email Test</h1>
+    <button onclick="sendTest()">Send Test Email</button>
+    <div id="result"></div>
+    <script>
+      async function sendTest() {
+        document.getElementById('result').innerHTML = 'Sending...';
+        try {
+          const response = await fetch('/send-test-email');
+          const data = await response.json();
+          document.getElementById('result').innerHTML = JSON.stringify(data, null, 2);
+        } catch(e) {
+          document.getElementById('result').innerHTML = 'Error: ' + e.message;
+        }
+      }
+    </script>
+  `);
+});
+
+app.get('/send-test-email', async (req, res) => {
+  if (!process.env.BREVO_API_KEY) {
+    return res.json({ error: 'BREVO_API_KEY not set in environment' });
   }
   
   try {
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'api-key': BREVO_API_KEY },
+      headers: { 
+        'Content-Type': 'application/json', 
+        'api-key': process.env.BREVO_API_KEY 
+      },
       body: JSON.stringify({
         sender: { name: 'MrYoungFargo', email: 'noreply@mryoungfargo.com' },
         to: [{ email: 'mryoungfargo@gmail.com' }],
-        subject: 'Test Email',
-        htmlContent: '<h1>Test</h1><p>If you see this, Brevo is working!</p>'
+        subject: 'Test Email from Your Store',
+        htmlContent: '<h1>✅ Test Successful!</h1><p>Your Brevo email is working correctly.</p>'
       })
     });
     const data = await response.json();
