@@ -179,22 +179,6 @@
     .user-dropdown div:hover { background: rgba(59,130,246,0.3); }
     .user-dropdown .logout-item { color: #ff8888; }
 
-    .download-mixtape-btn {
-      background: #10b981;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.7rem;
-      margin-top: 10px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .download-mixtape-btn:hover { background: #059669; transform: scale(0.98); }
-
     .sticky-nav {
       position: fixed;
       top: -45px;
@@ -291,6 +275,25 @@
     }
     .listen-btn-mix:hover {
       background: #cc0000;
+      transform: translateY(-1px);
+    }
+    /* Download button - same style as buy-btn but green */
+    .download-mixtape-btn {
+      background: #10b981;
+      border: none;
+      color: white;
+      padding: 5px 16px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.65rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .download-mixtape-btn:hover {
+      background: #059669;
       transform: translateY(-1px);
     }
 
@@ -671,11 +674,11 @@
     <img src="duetscover.png" alt="New Mixtape" class="mixtape-cover" onerror="this.src='https://placehold.co/140x140?text=Mixtape'">
     <div class="mixtape-title">DUETS · NEW MIXTAPE</div>
     <div class="mixtape-price">Digital Album (ZIP) — R50</div>
-    <div class="mixtape-buttons">
-      <button class="buy-btn" id="buyMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button>
+    <div class="mixtape-buttons" id="mixtapeButtons">
+      <button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button>
       <a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
     </div>
-    <div id="mixtapeDownloadArea" style="margin-top: 12px;"></div>
+    <div id="mixtapeDownloadArea"></div>
   </div>
 </div>
 
@@ -759,25 +762,16 @@
     }
   }
   
-  // MARK MIXTAPE AS PURCHASED - CALLED ONLY BY WEBHOOK (backend)
-  async function markMixtapePurchased() {
-    if (sessionToken) {
-      const result = await apiCall('/api/mark-mixtape', { sessionToken });
-      if (result.success && currentUser) {
-        currentUser.hasPurchasedMixtape = true;
-        updateMixtapeDownloadArea();
-      }
-    }
-  }
-  
-  // Check if user has purchased mixtape from server data
   async function refreshUserData() {
     if (sessionToken) {
       const result = await apiCall('/api/verify', { sessionToken });
       if (result.success && result.user) {
         currentUser = result.user;
-        updateMixtapeDownloadArea();
+        updateMixtapeButtons();
         updateUserUI();
+        if (currentUser.email) {
+          setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
+        }
       }
     }
   }
@@ -792,7 +786,7 @@
         updateCartUI();
       }
       updateUserUI();
-      updateMixtapeDownloadArea();
+      updateMixtapeButtons();
       if (currentUser.email) {
         setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
       }
@@ -801,6 +795,7 @@
       sessionToken = null;
       currentUser = null;
       updateUserUI();
+      updateMixtapeButtons();
     }
   }
   
@@ -836,7 +831,7 @@
       }
       updateCartUI();
       updateUserUI();
-      updateMixtapeDownloadArea();
+      updateMixtapeButtons();
       setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
       window.closeAuthModal();
       return true;
@@ -854,11 +849,65 @@
     cart = [];
     updateCartUI();
     updateUserUI();
+    updateMixtapeButtons();
     setBrevoIdentity(null, null);
   }
   
   async function saveCartToServer() {
     if (sessionToken && cart) await apiCall('/api/update-cart', { sessionToken, cart });
+  }
+  
+  function updateMixtapeButtons() {
+    const buttonsContainer = document.getElementById('mixtapeButtons');
+    const downloadArea = document.getElementById('mixtapeDownloadArea');
+    
+    if (!buttonsContainer) return;
+    
+    // Clear both areas
+    buttonsContainer.innerHTML = '';
+    if (downloadArea) downloadArea.innerHTML = '';
+    
+    if (currentUser && currentUser.hasPurchasedMixtape === true) {
+      // Show DOWNLOAD button (green)
+      buttonsContainer.innerHTML = `
+        <button class="download-mixtape-btn" id="downloadMixtapeBtn"><i class="fas fa-download"></i> DOWNLOAD MIXTAPE (ZIP)</button>
+        <a href="#" id="mixtapeListenBtn2" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
+      `;
+      const downloadBtn = document.getElementById('downloadMixtapeBtn');
+      if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => window.location.href = 'duets.zip');
+      }
+      const listenBtn = document.getElementById('mixtapeListenBtn2');
+      if (listenBtn) {
+        listenBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          alert("You can listen to previews on YouTube via the bottom button.");
+        });
+      }
+    } else {
+      // Show ADD TO CART button (blue)
+      buttonsContainer.innerHTML = `
+        <button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button>
+        <a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
+      `;
+      const addBtn = document.getElementById('addToCartMixtapeBtn');
+      if (addBtn) {
+        addBtn.addEventListener('click', () => {
+          const existing = cart.find(i => i.id === 99);
+          if (existing) existing.qty++;
+          else cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
+          saveCartToLocal();
+          document.getElementById("cartSidebar").classList.add("open");
+        });
+      }
+      const listenBtn = document.getElementById('mixtapeListenBtn');
+      if (listenBtn) {
+        listenBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          alert("Add the mixtape to cart (R50) to purchase and download the full ZIP file.\n\nYou can listen to previews on YouTube via the bottom button.");
+        });
+      }
+    }
   }
   
   // Password visibility toggle
@@ -920,19 +969,6 @@
           window.showAuthModal();
         });
       }
-    }
-    updateMixtapeDownloadArea();
-  }
-  
-  function updateMixtapeDownloadArea() {
-    const downloadArea = document.getElementById('mixtapeDownloadArea');
-    if (!downloadArea) return;
-    downloadArea.innerHTML = '';
-    // ONLY show download button if the user has purchased mixtape (from server data)
-    if (currentUser && currentUser.hasPurchasedMixtape === true) {
-      downloadArea.innerHTML = `<button class="download-mixtape-btn" id="downloadMixtapeBtn"><i class="fas fa-download"></i> DOWNLOAD MIXTAPE (ZIP)</button>`;
-      const downloadBtn = document.getElementById('downloadMixtapeBtn');
-      if (downloadBtn) downloadBtn.addEventListener('click', () => window.location.href = 'duets.zip');
     }
   }
   
@@ -1103,21 +1139,8 @@
     links.forEach(l => { document.querySelectorAll(l.class).forEach(el => { el.addEventListener("click", (e) => { e.preventDefault(); document.getElementById(l.id).scrollIntoView({ behavior: "smooth" }); }); }); });
   }
   
-  function setupMixtape() {
-    const buyBtn = document.getElementById('buyMixtapeBtn');
-    if (buyBtn) {
-      buyBtn.addEventListener('click', () => {
-        const existing = cart.find(i => i.id === 99);
-        if (existing) existing.qty++;
-        else cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
-        saveCartToLocal();
-        document.getElementById("cartSidebar").classList.add("open");
-      });
-    }
-  }
-  
   // ==============================================================
-  // CHECKOUT BUTTON - Does NOT mark mixtape as purchased here
+  // CHECKOUT BUTTON
   // ==============================================================
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (!currentUser) {
@@ -1146,7 +1169,6 @@
     }, 30000);
     
     try {
-      // Step 1: Save order to database
       const saveResponse = await fetch(`${API_URL}/api/save-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1169,7 +1191,6 @@
         return;
       }
       
-      // Step 2: Create payment (but do NOT mark mixtape as purchased yet)
       checkoutBtn.innerText = "⏳ CREATING PAYMENT...";
       
       const paymentResponse = await fetch(`${API_URL}/create-payment`, {
@@ -1183,9 +1204,7 @@
       
       if (paymentData.success && paymentData.paymentUrl) {
         clearTimeout(timeoutId);
-        // Store order ID to check payment status later
         sessionStorage.setItem('pendingOrderId', orderId);
-        // Redirect to iKhokha payment page
         window.location.href = paymentData.paymentUrl;
       } else {
         clearTimeout(timeoutId);
@@ -1202,37 +1221,27 @@
     }
   });
   
-  // Check payment status when returning from iKhokha
   async function checkForSuccessfulPayment() {
     const pendingOrderId = sessionStorage.getItem('pendingOrderId');
     
     if (pendingOrderId) {
       sessionStorage.removeItem('pendingOrderId');
-      
-      // Refresh user data from server - this will update hasPurchasedMixtape
       await refreshUserData();
       
-      // Check if mixtape was purchased by looking at updated user data
       if (currentUser && currentUser.hasPurchasedMixtape) {
-        alert("Thank you! Your mixtape is now available for download in your account.");
-        updateMixtapeDownloadArea();
+        alert("Thank you! Your mixtape is now available for download.");
+        updateMixtapeButtons();
       } else {
-        // Payment may still be processing, but we'll check again in a few seconds
         setTimeout(async () => {
           await refreshUserData();
           if (currentUser && currentUser.hasPurchasedMixtape) {
-            alert("Thank you! Your mixtape is now available for download in your account.");
-            updateMixtapeDownloadArea();
+            alert("Thank you! Your mixtape is now available for download.");
+            updateMixtapeButtons();
           }
         }, 5000);
       }
     }
   }
-  
-  // Debug helper
-  console.log("Store loaded. API URL:", API_URL);
-  console.log("Session token:", sessionToken);
-  console.log("Current user:", currentUser);
   
   // EVENT LISTENERS
   document.getElementById("cartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
@@ -1248,14 +1257,12 @@
   document.getElementById("authToggleText")?.addEventListener("click", toggleAuthMode);
   document.getElementById("forgotPasswordBtn")?.addEventListener("click", showResetModal);
   document.getElementById("sendResetBtn")?.addEventListener("click", sendResetLink);
-  document.getElementById("mixtapeListenBtn")?.addEventListener("click", (e) => { e.preventDefault(); alert("Add the mixtape to cart (R50) to purchase and download the full ZIP file.\n\nYou can listen to previews on YouTube via the bottom button."); });
   
   verifySession().then(() => {
     renderGrid(tshirts, "tshirtsGrid");
     renderGrid(sweaters, "sweatersGrid");
     renderGrid(hoodies, "hoodiesGrid");
     setupNav();
-    setupMixtape();
     checkForSuccessfulPayment();
   });
 </script>
