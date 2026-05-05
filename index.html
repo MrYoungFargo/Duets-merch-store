@@ -759,6 +759,29 @@
     }
   }
   
+  // MARK MIXTAPE AS PURCHASED - CALLED ONLY BY WEBHOOK (backend)
+  async function markMixtapePurchased() {
+    if (sessionToken) {
+      const result = await apiCall('/api/mark-mixtape', { sessionToken });
+      if (result.success && currentUser) {
+        currentUser.hasPurchasedMixtape = true;
+        updateMixtapeDownloadArea();
+      }
+    }
+  }
+  
+  // Check if user has purchased mixtape from server data
+  async function refreshUserData() {
+    if (sessionToken) {
+      const result = await apiCall('/api/verify', { sessionToken });
+      if (result.success && result.user) {
+        currentUser = result.user;
+        updateMixtapeDownloadArea();
+        updateUserUI();
+      }
+    }
+  }
+  
   async function verifySession() {
     if (!sessionToken) return;
     const result = await apiCall('/api/verify', { sessionToken });
@@ -769,6 +792,7 @@
         updateCartUI();
       }
       updateUserUI();
+      updateMixtapeDownloadArea();
       if (currentUser.email) {
         setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
       }
@@ -812,6 +836,7 @@
       }
       updateCartUI();
       updateUserUI();
+      updateMixtapeDownloadArea();
       setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
       window.closeAuthModal();
       return true;
@@ -834,16 +859,6 @@
   
   async function saveCartToServer() {
     if (sessionToken && cart) await apiCall('/api/update-cart', { sessionToken, cart });
-  }
-  
-  async function markMixtapePurchased() {
-    if (sessionToken) {
-      const result = await apiCall('/api/mark-mixtape', { sessionToken });
-      if (result.success && currentUser) {
-        currentUser.hasPurchasedMixtape = true;
-        updateMixtapeDownloadArea();
-      }
-    }
   }
   
   // Password visibility toggle
@@ -913,7 +928,8 @@
     const downloadArea = document.getElementById('mixtapeDownloadArea');
     if (!downloadArea) return;
     downloadArea.innerHTML = '';
-    if (currentUser && currentUser.hasPurchasedMixtape) {
+    // ONLY show download button if the user has purchased mixtape (from server data)
+    if (currentUser && currentUser.hasPurchasedMixtape === true) {
       downloadArea.innerHTML = `<button class="download-mixtape-btn" id="downloadMixtapeBtn"><i class="fas fa-download"></i> DOWNLOAD MIXTAPE (ZIP)</button>`;
       const downloadBtn = document.getElementById('downloadMixtapeBtn');
       if (downloadBtn) downloadBtn.addEventListener('click', () => window.location.href = 'duets.zip');
@@ -1101,7 +1117,7 @@
   }
   
   // ==============================================================
-  // CHECKOUT BUTTON WITH FIXED REDIRECT
+  // CHECKOUT BUTTON - Does NOT mark mixtape as purchased here
   // ==============================================================
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (!currentUser) {
@@ -1113,7 +1129,6 @@
       return;
     }
     
-    const hasMixtape = cart.some(item => item.id === 99);
     const orderId = "ORDER_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
     let total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
     
@@ -1154,7 +1169,7 @@
         return;
       }
       
-      // Step 2: Create payment
+      // Step 2: Create payment (but do NOT mark mixtape as purchased yet)
       checkoutBtn.innerText = "⏳ CREATING PAYMENT...";
       
       const paymentResponse = await fetch(`${API_URL}/create-payment`, {
@@ -1168,9 +1183,7 @@
       
       if (paymentData.success && paymentData.paymentUrl) {
         clearTimeout(timeoutId);
-        if (hasMixtape) {
-          sessionStorage.setItem('pendingMixtapePurchase', 'true');
-        }
+        // Store order ID to check payment status later
         sessionStorage.setItem('pendingOrderId', orderId);
         // Redirect to iKhokha payment page
         window.location.href = paymentData.paymentUrl;
@@ -1189,22 +1202,30 @@
     }
   });
   
+  // Check payment status when returning from iKhokha
   async function checkForSuccessfulPayment() {
     const pendingOrderId = sessionStorage.getItem('pendingOrderId');
-    const pendingMixtape = sessionStorage.getItem('pendingMixtapePurchase');
     
     if (pendingOrderId) {
       sessionStorage.removeItem('pendingOrderId');
       
-      if (currentUser && pendingMixtape === 'true') {
-        await markMixtapePurchased();
+      // Refresh user data from server - this will update hasPurchasedMixtape
+      await refreshUserData();
+      
+      // Check if mixtape was purchased by looking at updated user data
+      if (currentUser && currentUser.hasPurchasedMixtape) {
         alert("Thank you! Your mixtape is now available for download in your account.");
         updateMixtapeDownloadArea();
+      } else {
+        // Payment may still be processing, but we'll check again in a few seconds
+        setTimeout(async () => {
+          await refreshUserData();
+          if (currentUser && currentUser.hasPurchasedMixtape) {
+            alert("Thank you! Your mixtape is now available for download in your account.");
+            updateMixtapeDownloadArea();
+          }
+        }, 5000);
       }
-    }
-    
-    if (pendingMixtape === 'true') {
-      sessionStorage.removeItem('pendingMixtapePurchase');
     }
   }
   
