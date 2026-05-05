@@ -846,12 +846,6 @@
     }
   }
   
-  async function updateOrderStatus(orderId, paymentId) {
-    if (sessionToken) {
-      await apiCall('/api/update-order-status', { orderId, paymentId });
-    }
-  }
-  
   // Password visibility toggle
   const togglePasswordBtn = document.getElementById('togglePasswordBtn');
   const passwordInput = document.getElementById('authPassword');
@@ -1106,7 +1100,9 @@
     }
   }
   
-  // CHECKOUT BUTTON WITH ORDER TRACKING
+  // ==============================================================
+  // CHECKOUT BUTTON WITH TIMEOUT AND ERROR HANDLING
+  // ==============================================================
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (!currentUser) {
       window.showAuthModal();
@@ -1126,6 +1122,15 @@
     checkoutBtn.innerText = "⏳ SAVING ORDER...";
     checkoutBtn.disabled = true;
     
+    // Set timeout to reset button after 30 seconds
+    const timeoutId = setTimeout(() => {
+      if (checkoutBtn.disabled) {
+        checkoutBtn.innerText = "CHECKOUT →";
+        checkoutBtn.disabled = false;
+        alert("Request timed out. Please try again.");
+      }
+    }, 30000);
+    
     try {
       // Step 1: Save order to database
       const saveResponse = await fetch(`${API_URL}/api/save-order`, {
@@ -1143,6 +1148,7 @@
       const saveData = await saveResponse.json();
       
       if (!saveData.success) {
+        clearTimeout(timeoutId);
         alert("Failed to save order: " + (saveData.error || "Unknown error"));
         checkoutBtn.innerText = originalText;
         checkoutBtn.disabled = false;
@@ -1161,18 +1167,22 @@
       const paymentData = await paymentResponse.json();
       
       if (paymentData.success && paymentData.paymentUrl) {
+        clearTimeout(timeoutId);
         if (hasMixtape) {
           sessionStorage.setItem('pendingMixtapePurchase', 'true');
         }
         sessionStorage.setItem('pendingOrderId', orderId);
         window.location.href = paymentData.paymentUrl;
       } else {
-        alert("Payment error: " + (paymentData.error || "Unknown error"));
+        clearTimeout(timeoutId);
+        alert("Payment error: " + (paymentData.error || "Could not create payment link"));
         checkoutBtn.innerText = originalText;
         checkoutBtn.disabled = false;
       }
     } catch (error) {
-      alert("Connection error. Please try again.");
+      clearTimeout(timeoutId);
+      console.error("Checkout error:", error);
+      alert("Connection error. Please check your internet and try again.");
       checkoutBtn.innerText = originalText;
       checkoutBtn.disabled = false;
     }
