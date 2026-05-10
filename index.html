@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -558,6 +557,7 @@
     }
     .close-reset:hover { color: #ff8888; }
 
+    /* DELIVERY MODAL - WHITE BACKGROUND */
     .delivery-modal {
       display: none;
       position: fixed;
@@ -635,6 +635,7 @@
       background: #2563eb;
     }
 
+    /* NOTIFICATION MODAL - WHITE BACKGROUND for free collection */
     .notification-modal {
       display: none;
       position: fixed;
@@ -672,7 +673,18 @@
       width: 100%;
     }
 
-    /* STORE FINDER MODAL STYLES - SMALLER */
+    /* PAXI Modal - SMALLER STYLES */
+    #storeFinderModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 10000;
+      overflow-y: auto;
+    }
     #storeFinderModal .modal-container {
       max-width: 1000px;
       margin: 20px auto;
@@ -765,29 +777,13 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+      margin-top: 8px;
     }
     .manual-store-btn:hover {
       background: #d97706;
     }
     
-    .ui-autocomplete {
-      background: #1a1a2e;
-      border: 1px solid #3b82f6;
-      border-radius: 8px;
-      max-height: 200px;
-      overflow-y: auto;
-      color: white;
-      z-index: 10001;
-    }
-    .ui-autocomplete li {
-      padding: 6px 10px;
-      cursor: pointer;
-      font-size: 0.65rem;
-    }
-    .ui-autocomplete li:hover {
-      background: #3b82f6;
-    }
-    
+    /* Manual store modal */
     .manual-modal {
       display: none;
       position: fixed;
@@ -852,6 +848,7 @@
 </head>
 <body>
 
+<!-- NOTIFICATION MODAL for free collection -->
 <div id="freeCollectionNotif" class="notification-modal">
   <div class="notification-content">
     <i class="fas fa-check-circle"></i>
@@ -861,6 +858,7 @@
   </div>
 </div>
 
+<!-- DELIVERY MODAL (WHITE) -->
 <div id="deliveryModal" class="delivery-modal">
   <div class="delivery-modal-content">
     <h3>🚚 Select Delivery Option</h3>
@@ -879,6 +877,7 @@
   </div>
 </div>
 
+<!-- AUTH MODAL -->
 <div id="authModal" class="auth-modal">
   <div class="auth-modal-content">
     <button class="close-auth" id="closeAuthBtn">&times;</button>
@@ -896,6 +895,7 @@
   </div>
 </div>
 
+<!-- RESET PASSWORD MODAL -->
 <div id="resetModal" class="reset-modal">
   <div class="reset-modal-content">
     <button class="close-reset" id="closeResetBtn">&times;</button>
@@ -906,6 +906,7 @@
   </div>
 </div>
 
+<!-- PRODUCT MODAL -->
 <div id="sizeColorModal" class="modal">
   <div class="modal-content">
     <h3 id="modalProductName">Product</h3>
@@ -919,6 +920,7 @@
   </div>
 </div>
 
+<!-- STICKY NAV -->
 <div class="sticky-nav" id="stickyNav">
   <div class="sticky-nav-links">
     <a href="#" class="sticky-tshirts">T-SHIRTS</a>
@@ -931,6 +933,7 @@
   </div>
 </div>
 
+<!-- MAIN HEADER -->
 <div class="site-header">
   <div class="container header-inner">
     <div class="logo"><img src="fargo1.png" alt="MrYoungFargo" onerror="this.src='https://placehold.co/200x55?text=MrYoungFargo'"></div>
@@ -967,6 +970,7 @@
   <div id="hoodies-section"><div class="category-title"><i class="fas fa-hoodie"></i> HOODIES</div><div class="products-grid" id="hoodiesGrid"></div></div>
 </div>
 
+<!-- MUSIC BUTTON AT BOTTOM -->
 <div class="music-footer-btn">
   <a href="https://m.youtube.com/@MrYoungFargo_SA" target="_blank" class="listen-btn">
     <i class="fab fa-youtube"></i> LISTEN TO MY MUSIC
@@ -983,16 +987,19 @@
   <button class="checkout-btn" id="checkoutBtn">CHECKOUT →</button>
 </div>
 
+<!-- PAXI Hidden Fields -->
 <input type="hidden" id="paxi_store_name">
 <input type="hidden" id="paxi_store_address">
 <input type="hidden" id="paxi_store_code">
 <input type="hidden" id="delivery_amount" value="0">
 <input type="hidden" id="delivery_type" value="">
 
+<!-- PAXI SELECTOR BUTTON -->
 <button type="button" id="openStoreFinderBtn" style="background: #10b981; color: white; padding: 10px; border-radius: 30px; width: 90%; margin: 0 auto 20px; display: block; max-width: 400px; border: none; cursor: pointer;">
   📍 Select PAXI Pickup Point
 </button>
 
+<!-- PAXI MODAL -->
 <div id="storeFinderModal">
   <div class="modal-container">
     <div class="modal-header">
@@ -1011,6 +1018,7 @@
   </div>
 </div>
 
+<!-- Manual Store Modal -->
 <div id="manualStoreModal" class="manual-modal">
   <div class="manual-modal-content">
     <h3>✏️ Add Store Manually</h3>
@@ -1026,857 +1034,885 @@
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
 <script>
-// ==============================================================
-// BACKEND API URL
-// ==============================================================
-const API_URL = 'https://mryoungfargo-payment.onrender.com';
-
-let currentUser = null;
-let sessionToken = localStorage.getItem('session_token') || null;
-let cart = [];
-let deliveryAmount = 0;
-let selectedPaxiStore = null;
-let isKingWilliamsTown = false;
-
-function normalizeEmail(email) {
-  return email ? email.toLowerCase().trim() : '';
-}
-
-window.showAuthModal = function() {
-  const modal = document.getElementById('authModal');
-  if (modal) modal.classList.add('show');
-  document.getElementById('authTitle').innerText = 'LOGIN';
-  document.getElementById('authSubmitBtn').innerText = 'LOGIN';
-  document.getElementById('authToggleText').innerText = 'Create an account';
-  window.isLoginMode = true;
-  document.getElementById('authEmail').value = '';
-  document.getElementById('authPassword').value = '';
-};
-
-window.closeAuthModal = function() {
-  const modal = document.getElementById('authModal');
-  if (modal) modal.classList.remove('show');
-};
-
-async function apiCall(endpoint, data) {
-  try {
-    const response = await fetch(`${API_URL}${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-    return await response.json();
-  } catch (error) {
-    return { success: false, error: 'Connection error' };
-  }
-}
-
-async function refreshUserData() {
-  if (sessionToken) {
-    const result = await apiCall('/api/verify', { sessionToken });
-    if (result.success && result.user) {
-      currentUser = result.user;
-      updateMixtapeButtons();
-      updateUserUI();
-    }
-  }
-}
-
-async function verifySession() {
-  if (!sessionToken) return;
-  const result = await apiCall('/api/verify', { sessionToken });
-  if (result.success && result.user) {
-    currentUser = result.user;
-    if (result.user.cart && result.user.cart.length > 0 && cart.length === 0) {
-      cart = result.user.cart;
-      updateCartUI();
-    }
-    updateUserUI();
-    updateMixtapeButtons();
-  } else {
-    localStorage.removeItem('session_token');
-    sessionToken = null;
-    currentUser = null;
-    updateUserUI();
-    updateMixtapeButtons();
-  }
-}
-
-async function register(email, password) {
-  const normalizedEmail = normalizeEmail(email);
-  const result = await apiCall('/api/register', { email: normalizedEmail, password });
-  if (result.success) {
-    return await login(normalizedEmail, password);
-  } else {
-    alert(result.error || 'Registration failed');
-    return false;
-  }
-}
-
-async function login(email, password) {
-  const normalizedEmail = normalizeEmail(email);
-  const result = await apiCall('/api/login', { email: normalizedEmail, password });
-  if (result.success) {
-    currentUser = result.user;
-    sessionToken = result.sessionToken;
-    localStorage.setItem('session_token', sessionToken);
-    
-    if (cart.length > 0 && result.user.cart) {
-      for (let localItem of cart) {
-        const existing = result.user.cart.find(i => i.id === localItem.id && i.size === localItem.size && i.color === localItem.color);
-        if (existing) existing.qty += localItem.qty;
-        else result.user.cart.push(localItem);
-      }
-      cart = result.user.cart;
-      await saveCartToServer();
-    } else if (result.user.cart && result.user.cart.length > 0) {
-      cart = result.user.cart;
-    }
-    updateCartUI();
-    updateUserUI();
-    updateMixtapeButtons();
-    window.closeAuthModal();
-    return true;
-  } else {
-    alert(result.error || 'Login failed');
-    return false;
-  }
-}
-
-async function logout() {
-  if (sessionToken) await apiCall('/api/logout', { sessionToken });
-  currentUser = null;
-  sessionToken = null;
-  localStorage.removeItem('session_token');
-  cart = [];
-  updateCartUI();
-  updateUserUI();
-  updateMixtapeButtons();
-}
-
-async function saveCartToServer() {
-  if (sessionToken && cart) await apiCall('/api/update-cart', { sessionToken, cart });
-}
-
-function updateMixtapeButtons() {
-  const buttonsContainer = document.getElementById('mixtapeButtons');
-  if (!buttonsContainer) return;
+  // ==============================================================
+  // BACKEND API URL
+  // ==============================================================
+  const API_URL = 'https://mryoungfargo-payment.onrender.com';
   
-  buttonsContainer.innerHTML = '';
+  // ==============================================================
+  // PRICES UPDATED
+  // ==============================================================
+  // T-shirts: R150, Sweaters: R280, Hoodies: R300
   
-  if (currentUser && currentUser.hasPurchasedMixtape === true) {
-    buttonsContainer.innerHTML = `
-      <button class="download-mixtape-btn" id="downloadMixtapeBtn"><i class="fas fa-download"></i> DOWNLOAD MIXTAPE (ZIP)</button>
-      <a href="#" id="mixtapeListenBtn2" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
-    `;
-    const downloadBtn = document.getElementById('downloadMixtapeBtn');
-    if (downloadBtn) {
-      downloadBtn.addEventListener('click', () => window.location.href = 'duets.zip');
-    }
-  } else {
-    buttonsContainer.innerHTML = `
-      <button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button>
-      <a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
-    `;
-    const addBtn = document.getElementById('addToCartMixtapeBtn');
-    if (addBtn) {
-      addBtn.addEventListener('click', () => {
-        const existing = cart.find(i => i.id === 99);
-        if (existing) existing.qty++;
-        else cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
-        saveCartToLocal();
-        document.getElementById("cartSidebar").classList.add("open");
-      });
-    }
-  }
-}
-
-function getInitials(email) {
-  if (!email) return '';
-  const name = email.split('@')[0];
-  return name.substring(0, 2).toUpperCase();
-}
-
-let dropdownElement = null;
-
-function updateUserUI() {
-  const userSection = document.getElementById('userSection');
-  if (!userSection) return;
+  // ==============================================================
+  // USER AUTHENTICATION
+  // ==============================================================
   
-  if (currentUser && currentUser.email) {
-    const initials = getInitials(currentUser.email);
-    userSection.innerHTML = `
-      <div class="user-section" id="userIconBtn">
-        <span class="user-initials">${initials}</span>
-      </div>
-      <div class="user-dropdown" id="userDropdown">
-        <div class="logout-item" id="logoutBtn">Logout</div>
-      </div>
-    `;
-    const iconBtn = document.getElementById('userIconBtn');
-    dropdownElement = document.getElementById('userDropdown');
-    if (iconBtn) {
-      iconBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (dropdownElement) dropdownElement.classList.toggle('show');
-      });
-    }
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        logout();
-      });
-    }
-  } else {
-    userSection.innerHTML = `<div class="auth-icon-btn" id="dynamicAuthIconBtn"><i class="fas fa-user"></i></div>`;
-    const dynamicBtn = document.getElementById('dynamicAuthIconBtn');
-    if (dynamicBtn) {
-      dynamicBtn.addEventListener('click', function() {
-        window.showAuthModal();
-      });
-    }
+  let currentUser = null;
+  let sessionToken = localStorage.getItem('session_token') || null;
+  let cart = [];
+  let deliveryAmount = 0;
+  let selectedPaxiStore = null;
+  let isKingWilliamsTown = false;
+  
+  function normalizeEmail(email) {
+    return email ? email.toLowerCase().trim() : '';
   }
-}
-
-document.addEventListener('click', function() { if (dropdownElement) dropdownElement.classList.remove('show'); });
-
-window.isLoginMode = true;
-
-async function handleAuth() {
-  let email = document.getElementById('authEmail').value.trim();
-  const password = document.getElementById('authPassword').value.trim();
-  if (!email || !password) { alert('Please enter email and password'); return; }
-  email = normalizeEmail(email);
-  if (window.isLoginMode) await login(email, password);
-  else await register(email, password);
-}
-
-function toggleAuthMode() {
-  window.isLoginMode = !window.isLoginMode;
-  if (window.isLoginMode) {
+  
+  window.showAuthModal = function() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.classList.add('show');
     document.getElementById('authTitle').innerText = 'LOGIN';
     document.getElementById('authSubmitBtn').innerText = 'LOGIN';
     document.getElementById('authToggleText').innerText = 'Create an account';
-  } else {
-    document.getElementById('authTitle').innerText = 'SIGN UP';
-    document.getElementById('authSubmitBtn').innerText = 'SIGN UP';
-    document.getElementById('authToggleText').innerText = 'Back to login';
-  }
-}
-
-const resetModal = document.getElementById('resetModal');
-function showResetModal() { resetModal.classList.add('show'); document.getElementById('resetEmail').value = ''; document.getElementById('resetMessage').innerHTML = ''; }
-function closeResetModal() { resetModal.classList.remove('show'); }
-
-async function sendResetLink() {
-  let email = document.getElementById('resetEmail').value.trim();
-  const messageDiv = document.getElementById('resetMessage');
-  if (!email) { messageDiv.innerHTML = '<span style="color:#ff8888;">Please enter your email</span>'; return; }
-  email = normalizeEmail(email);
-  messageDiv.innerHTML = '<span style="color:#aaa;">Sending...</span>';
-  const result = await apiCall('/forgot-password', { email });
-  if (result.success) { messageDiv.innerHTML = '<span style="color:#10b981;">✓ Reset link sent! Check your email.</span>'; setTimeout(() => closeResetModal(), 3000); }
-  else { messageDiv.innerHTML = '<span style="color:#ff8888;">Error: ' + (result.error || 'Could not send email') + '</span>'; }
-}
-
-// ==============================================================
-// STORE DATA & FUNCTIONS
-// ==============================================================
-
-const colors = [
-  { name: "Red", value: "Red", bg: "#e11d2c" },
-  { name: "Black", value: "Black", bg: "#1a1a1a" },
-  { name: "Green", value: "Green", bg: "#10b981" },
-  { name: "Blue", value: "Blue", bg: "#3b82f6" }
-];
-
-const tshirts = [
-  { id: 1, name: "Neon Duets T-Shirt", price: 150, image: "t-shirt1.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 2, name: "Duets Lover T-Shirt", price: 150, image: "t-shirt2.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 3, name: "Duets Glitch T-Shirt", price: 150, image: "t-shirt3.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 4, name: "Sabaring T-Shirt", price: 150, image: "t-shirt4.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 5, name: "Monalisa Sabaring T-Shirt", price: 150, image: "t-shirt5.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 12, name: "Faka T-Shirt", price: 150, image: "t-shirt6.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 13, name: "Chinese Faka T-Shirt", price: 150, image: "t-shirt7.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 16, name: "Real Nigga T-Shirt", price: 150, image: "t-shirt8.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 17, name: "Lil' Nigga T-Shirt", price: 150, image: "t-shirt9.png", sizes: ["XS","S","M","L","XL","XXL"] }
-];
-
-const sweaters = [
-  { id: 6, name: "Sabaring Sweater", price: 280, image: "sweater1.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 7, name: "Neon Duets Sweater", price: 280, image: "sweater2.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 8, name: "Duets Lover Sweater", price: 280, image: "sweater3.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 9, name: "Duets Glitch Sweater", price: 280, image: "sweater4.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 14, name: "Faka Sweater", price: 280, image: "sweater5.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 18, name: "Real Nigga Sweater", price: 280, image: "sweater6.png", sizes: ["XS","S","M","L","XL","XXL"] }
-];
-
-const hoodies = [
-  { id: 10, name: "Duets Lover Hoodie", price: 300, image: "hoodie1.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 11, name: "Duets Glitch Hoodie", price: 300, image: "hoodie2.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 15, name: "Faka Hoodie", price: 300, image: "hoodie3.png", sizes: ["XS","S","M","L","XL","XXL"] },
-  { id: 19, name: "Real Nigga Hoodie", price: 300, image: "hoodie4.png", sizes: ["XS","S","M","L","XL","XXL"] }
-];
-
-const allProducts = [...tshirts, ...sweaters, ...hoodies];
-let currentProduct = null, selectedSize = null, selectedColor = null;
-
-function saveCartToLocal() { updateCartUI(); if (sessionToken) saveCartToServer(); }
-
-function updateCartUI() {
-  const count = cart.reduce((s,i) => s + i.qty, 0);
-  document.getElementById("cartCount").innerText = count;
-  document.getElementById("stickyCartCount").innerText = count;
-  const container = document.getElementById("cartItemsList");
-  let total = 0;
-  if (cart.length === 0) { container.innerHTML = "<p style='text-align:center;color:gray;'>Cart empty</p>"; document.getElementById("cartTotalPrice").innerText = "R0.00"; return; }
-  let html = "";
-  cart.forEach(item => {
-    const itemTotal = item.price * item.qty;
-    total += itemTotal;
-    html += `<div style="border-bottom:1px solid #333; padding:5px 0; display:flex; justify-content:space-between;"><div><strong>${item.name}</strong><br>${item.size || 'N/A'} / ${item.color || 'N/A'}<br>R${item.price.toFixed(2)} x ${item.qty}</div><button class="remove-item" data-id="${item.id}" data-size="${item.size}" data-color="${item.color}">Remove</button></div>`;
-  });
-  container.innerHTML = html;
-  document.getElementById("cartTotalPrice").innerText = `R${total.toFixed(2)}`;
-  document.querySelectorAll(".remove-item").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = parseInt(btn.dataset.id), size = btn.dataset.size, color = btn.dataset.color;
-      cart = cart.filter(i => !(i.id === id && i.size === size && i.color === color));
-      saveCartToLocal();
-    });
-  });
-}
-
-function addToCart(product, size, color) {
-  if (!size) { alert("Select size"); return false; }
-  if (!color && product.id !== 99) { alert("Select color"); return false; }
-  const existing = cart.find(i => i.id === product.id && i.size === size && i.color === color);
-  if (existing) existing.qty++;
-  else cart.push({ id: product.id, name: product.name, price: product.price, size: size || 'Digital', color: color || 'N/A', qty: 1 });
-  saveCartToLocal();
-  document.getElementById("cartSidebar").classList.add("open");
-  return true;
-}
-
-function showModal(product) {
-  currentProduct = product; selectedSize = null; selectedColor = null;
-  document.getElementById("modalProductName").innerText = product.name;
-  document.getElementById("modalProductPrice").innerText = `R${product.price.toFixed(2)}`;
-  const sizesDiv = document.getElementById("modalSizes");
-  sizesDiv.innerHTML = "";
-  product.sizes.forEach(s => {
-    const btn = document.createElement("div"); btn.className = "modal-size-btn"; btn.innerText = s;
-    btn.onclick = () => { document.querySelectorAll(".modal-size-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedSize = s; };
-    sizesDiv.appendChild(btn);
-  });
-  const colorsDiv = document.getElementById("modalColors");
-  colorsDiv.innerHTML = "";
-  colors.forEach(c => {
-    const btn = document.createElement("div"); btn.className = "modal-color-btn"; btn.style.backgroundColor = c.bg; btn.title = c.name;
-    btn.onclick = () => { document.querySelectorAll(".modal-color-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedColor = c.value; };
-    colorsDiv.appendChild(btn);
-  });
-  document.getElementById("sizeColorModal").classList.add("show");
-}
-
-function closeModal() { document.getElementById("sizeColorModal").classList.remove("show"); }
-function confirmAdd() { if (!selectedSize) { alert("Select size"); return; } if (!selectedColor) { alert("Select color"); return; } addToCart(currentProduct, selectedSize, selectedColor); closeModal(); }
-
-function renderGrid(products, containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = "";
-  products.forEach(prod => {
-    const card = document.createElement("div"); card.className = "product-card";
-    card.innerHTML = `<div class="product-img"><img src="${prod.image}" alt="${prod.name}" onerror="this.parentElement.innerHTML='<div class=\\'no-img\\'><i class=\\'fas fa-tshirt\\'></i></div>'"></div><div class="product-info"><div class="product-title">${prod.name}</div><div class="product-price">R${prod.price.toFixed(2)}</div><button class="add-to-cart-btn" data-id="${prod.id}"><i class="fas fa-cart-plus"></i> ADD TO CART</button></div>`;
-    container.appendChild(card);
-  });
-  container.querySelectorAll(".add-to-cart-btn").forEach(btn => {
-    btn.addEventListener("click", (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); const product = allProducts.find(p => p.id === id); showModal(product); });
-  });
-  container.querySelectorAll(".product-card").forEach(card => {
-    card.addEventListener("click", (e) => { if (e.target.closest(".add-to-cart-btn")) return; const btn = card.querySelector(".add-to-cart-btn"); if (btn) { const id = parseInt(btn.dataset.id); const product = allProducts.find(p => p.id === id); showModal(product); } });
-  });
-}
-
-window.addEventListener("scroll", () => { const sticky = document.getElementById("stickyNav"); if (window.scrollY > 60) sticky.classList.add("show"); else sticky.classList.remove("show"); });
-
-function setupNav() {
-  const links = [
-    { class: ".nav-tshirts", id: "tshirts-section" }, { class: ".nav-sweaters", id: "sweaters-section" }, { class: ".nav-hoodies", id: "hoodies-section" },
-    { class: ".sticky-tshirts", id: "tshirts-section" }, { class: ".sticky-sweaters", id: "sweaters-section" }, { class: ".sticky-hoodies", id: "hoodies-section" }
-  ];
-  links.forEach(l => { document.querySelectorAll(l.class).forEach(el => { el.addEventListener("click", (e) => { e.preventDefault(); document.getElementById(l.id).scrollIntoView({ behavior: "smooth" }); }); }); });
-}
-
-// ==============================================================
-// DELIVERY MODAL
-// ==============================================================
-let selectedDelivery = null;
-
-function showDeliveryModal() {
-  document.getElementById('deliveryModal').classList.add('show');
-}
-
-function hideDeliveryModal() {
-  document.getElementById('deliveryModal').classList.remove('show');
-}
-
-document.getElementById('economyOption')?.addEventListener('click', () => {
-  document.getElementById('economyOption').classList.add('selected');
-  document.getElementById('speedOption').classList.remove('selected');
-  selectedDelivery = { type: 'economy', amount: 59.95 };
-});
-
-document.getElementById('speedOption')?.addEventListener('click', () => {
-  document.getElementById('speedOption').classList.add('selected');
-  document.getElementById('economyOption').classList.remove('selected');
-  selectedDelivery = { type: 'speed', amount: 109.95 };
-});
-
-document.getElementById('confirmDeliveryBtn')?.addEventListener('click', async () => {
-  if (selectedDelivery) {
-    deliveryAmount = selectedDelivery.amount;
-    document.getElementById('delivery_amount').value = deliveryAmount;
-    document.getElementById('delivery_type').value = selectedDelivery.type;
-    hideDeliveryModal();
-    updateCartUI();
-    await proceedToPayment();
-  } else {
-    alert('Please select a delivery option');
-  }
-});
-
-// ==============================================================
-// STORE FINDER
-// ==============================================================
-let map = null;
-let markers = [];
-let currentStores = [];
-
-const storeBrands = ["PEP", "PEP Home", "PEPcell", "Tekkie Town", "Shoe City"];
-
-async function getCityCoordinates(cityName) {
-  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityName + ', South Africa')}&format=json&limit=1`;
-  const response = await fetch(url);
-  const data = await response.json();
-  if (data && data.length > 0) {
-    return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), displayName: data[0].display_name };
-  }
-  return null;
-}
-
-async function searchStoresWithPhoton(lat, lon) {
-  const allStores = [];
+    window.isLoginMode = true;
+    document.getElementById('authEmail').value = '';
+    document.getElementById('authPassword').value = '';
+    const pwdInput = document.getElementById('authPassword');
+    if (pwdInput) pwdInput.setAttribute('type', 'password');
+    const pwdIcon = document.getElementById('passwordIcon');
+    if (pwdIcon) {
+      pwdIcon.classList.remove('fa-eye');
+      pwdIcon.classList.add('fa-eye-slash');
+    }
+  };
   
-  for (const brand of storeBrands) {
-    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(brand)}&lat=${lat}&lon=${lon}&limit=30&lang=en`;
+  window.closeAuthModal = function() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.classList.remove('show');
+  };
+  
+  const globalAuthBtn = document.getElementById('globalAuthIconBtn');
+  if (globalAuthBtn) {
+    globalAuthBtn.addEventListener('click', function() {
+      window.showAuthModal();
+    });
+  }
+  
+  async function apiCall(endpoint, data) {
     try {
-      const response = await fetch(url);
-      const data = await response.json();
+      const response = await fetch(`${API_URL}${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Connection error' };
+    }
+  }
+  
+  async function refreshUserData() {
+    if (sessionToken) {
+      const result = await apiCall('/api/verify', { sessionToken });
+      if (result.success && result.user) {
+        currentUser = result.user;
+        updateMixtapeButtons();
+        updateUserUI();
+      }
+    }
+  }
+  
+  async function verifySession() {
+    if (!sessionToken) return;
+    const result = await apiCall('/api/verify', { sessionToken });
+    if (result.success && result.user) {
+      currentUser = result.user;
+      if (result.user.cart && result.user.cart.length > 0 && cart.length === 0) {
+        cart = result.user.cart;
+        updateCartUI();
+      }
+      updateUserUI();
+      updateMixtapeButtons();
+    } else {
+      localStorage.removeItem('session_token');
+      sessionToken = null;
+      currentUser = null;
+      updateUserUI();
+      updateMixtapeButtons();
+    }
+  }
+  
+  async function register(email, password) {
+    const normalizedEmail = normalizeEmail(email);
+    const result = await apiCall('/api/register', { email: normalizedEmail, password });
+    if (result.success) {
+      return await login(normalizedEmail, password);
+    } else {
+      alert(result.error || 'Registration failed');
+      return false;
+    }
+  }
+  
+  async function login(email, password) {
+    const normalizedEmail = normalizeEmail(email);
+    const result = await apiCall('/api/login', { email: normalizedEmail, password });
+    if (result.success) {
+      currentUser = result.user;
+      sessionToken = result.sessionToken;
+      localStorage.setItem('session_token', sessionToken);
       
-      if (data.features) {
-        data.features.forEach(feature => {
-          const props = feature.properties;
-          const coords = feature.geometry.coordinates;
-          const distance = calculateDistance(lat, lon, coords[1], coords[0]);
-          
-          if (distance < 20) {
-            allStores.push({
-              id: feature.properties.osm_id || Math.random(),
-              name: props.name || brand,
-              address: props.street || props.city || props.name || brand,
-              lat: coords[1],
-              lon: coords[0],
-              code: props.postcode || '',
-              brand: brand,
-              distance: distance
-            });
-          }
+      if (cart.length > 0 && result.user.cart) {
+        for (let localItem of cart) {
+          const existing = result.user.cart.find(i => i.id === localItem.id && i.size === localItem.size && i.color === localItem.color);
+          if (existing) existing.qty += localItem.qty;
+          else result.user.cart.push(localItem);
+        }
+        cart = result.user.cart;
+        await saveCartToServer();
+      } else if (result.user.cart && result.user.cart.length > 0) {
+        cart = result.user.cart;
+      }
+      updateCartUI();
+      updateUserUI();
+      updateMixtapeButtons();
+      window.closeAuthModal();
+      return true;
+    } else {
+      alert(result.error || 'Login failed');
+      return false;
+    }
+  }
+  
+  async function logout() {
+    if (sessionToken) await apiCall('/api/logout', { sessionToken });
+    currentUser = null;
+    sessionToken = null;
+    localStorage.removeItem('session_token');
+    cart = [];
+    updateCartUI();
+    updateUserUI();
+    updateMixtapeButtons();
+  }
+  
+  async function saveCartToServer() {
+    if (sessionToken && cart) await apiCall('/api/update-cart', { sessionToken, cart });
+  }
+  
+  function updateMixtapeButtons() {
+    const buttonsContainer = document.getElementById('mixtapeButtons');
+    if (!buttonsContainer) return;
+    
+    buttonsContainer.innerHTML = '';
+    
+    if (currentUser && currentUser.hasPurchasedMixtape === true) {
+      buttonsContainer.innerHTML = `
+        <button class="download-mixtape-btn" id="downloadMixtapeBtn"><i class="fas fa-download"></i> DOWNLOAD MIXTAPE (ZIP)</button>
+        <a href="#" id="mixtapeListenBtn2" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
+      `;
+      const downloadBtn = document.getElementById('downloadMixtapeBtn');
+      if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => window.location.href = 'duets.zip');
+      }
+      const listenBtn = document.getElementById('mixtapeListenBtn2');
+      if (listenBtn) {
+        listenBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          alert("You can listen to previews on YouTube via the bottom button.");
         });
       }
-    } catch (e) {
-      console.error(`Error searching for ${brand}:`, e);
+    } else {
+      buttonsContainer.innerHTML = `
+        <button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button>
+        <a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
+      `;
+      const addBtn = document.getElementById('addToCartMixtapeBtn');
+      if (addBtn) {
+        addBtn.addEventListener('click', () => {
+          const existing = cart.find(i => i.id === 99);
+          if (existing) existing.qty++;
+          else cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
+          saveCartToLocal();
+          document.getElementById("cartSidebar").classList.add("open");
+        });
+      }
+      const listenBtn = document.getElementById('mixtapeListenBtn');
+      if (listenBtn) {
+        listenBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          alert("Add the mixtape to cart (R50) to purchase and download the full ZIP file.\n\nYou can listen to previews on YouTube via the bottom button.");
+        });
+      }
     }
   }
   
-  const unique = [];
-  const seen = new Set();
-  for (const store of allStores) {
-    const key = `${store.name}_${store.lat}_${store.lon}`;
-    if (!seen.has(key)) {
-      seen.add(key);
-      unique.push(store);
+  const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+  const passwordInput = document.getElementById('authPassword');
+  const passwordIcon = document.getElementById('passwordIcon');
+  
+  if (togglePasswordBtn) {
+    togglePasswordBtn.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      passwordIcon.classList.toggle('fa-eye');
+      passwordIcon.classList.toggle('fa-eye-slash');
+    });
+  }
+  
+  function getInitials(email) {
+    if (!email) return '';
+    const name = email.split('@')[0];
+    return name.substring(0, 2).toUpperCase();
+  }
+  
+  let dropdownElement = null;
+  
+  function updateUserUI() {
+    const userSection = document.getElementById('userSection');
+    if (!userSection) return;
+    
+    if (currentUser && currentUser.email) {
+      const initials = getInitials(currentUser.email);
+      userSection.innerHTML = `
+        <div class="user-section" id="userIconBtn">
+          <span class="user-initials">${initials}</span>
+        </div>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="logout-item" id="logoutBtn">Logout</div>
+        </div>
+      `;
+      const iconBtn = document.getElementById('userIconBtn');
+      dropdownElement = document.getElementById('userDropdown');
+      if (iconBtn) {
+        iconBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (dropdownElement) dropdownElement.classList.toggle('show');
+        });
+      }
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          logout();
+        });
+      }
+    } else {
+      userSection.innerHTML = `<div class="auth-icon-btn" id="dynamicAuthIconBtn"><i class="fas fa-user"></i></div>`;
+      const dynamicBtn = document.getElementById('dynamicAuthIconBtn');
+      if (dynamicBtn) {
+        dynamicBtn.addEventListener('click', function() {
+          window.showAuthModal();
+        });
+      }
     }
   }
   
-  unique.sort((a, b) => a.distance - b.distance);
-  return unique;
-}
-
-function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
-}
-
-async function searchStoresByCity(cityName) {
-  if (!cityName) {
-    alert('Please enter a town or city');
-    return;
+  document.addEventListener('click', function() { if (dropdownElement) dropdownElement.classList.remove('show'); });
+  
+  window.isLoginMode = true;
+  
+  async function handleAuth() {
+    let email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value.trim();
+    if (!email || !password) { alert('Please enter email and password'); return; }
+    email = normalizeEmail(email);
+    if (window.isLoginMode) await login(email, password);
+    else await register(email, password);
   }
   
-  const searchBtn = document.getElementById('searchBtn');
-  searchBtn.innerText = 'Searching...';
-  searchBtn.disabled = true;
+  function toggleAuthMode() {
+    window.isLoginMode = !window.isLoginMode;
+    if (window.isLoginMode) {
+      document.getElementById('authTitle').innerText = 'LOGIN';
+      document.getElementById('authSubmitBtn').innerText = 'LOGIN';
+      document.getElementById('authToggleText').innerText = 'Create an account';
+    } else {
+      document.getElementById('authTitle').innerText = 'SIGN UP';
+      document.getElementById('authSubmitBtn').innerText = 'SIGN UP';
+      document.getElementById('authToggleText').innerText = 'Back to login';
+    }
+  }
   
-  try {
-    const cityCoords = await getCityCoordinates(cityName);
-    if (!cityCoords) {
-      alert(`Could not find coordinates for "${cityName}". Please try a different city name.`);
+  const resetModal = document.getElementById('resetModal');
+  function showResetModal() { resetModal.classList.add('show'); document.getElementById('resetEmail').value = ''; document.getElementById('resetMessage').innerHTML = ''; }
+  function closeResetModal() { resetModal.classList.remove('show'); }
+  
+  async function sendResetLink() {
+    let email = document.getElementById('resetEmail').value.trim();
+    const messageDiv = document.getElementById('resetMessage');
+    if (!email) { messageDiv.innerHTML = '<span style="color:#ff8888;">Please enter your email</span>'; return; }
+    email = normalizeEmail(email);
+    messageDiv.innerHTML = '<span style="color:#aaa;">Sending...</span>';
+    const result = await apiCall('/forgot-password', { email });
+    if (result.success) { messageDiv.innerHTML = '<span style="color:#10b981;">✓ Reset link sent! Check your email.</span>'; setTimeout(() => closeResetModal(), 3000); }
+    else { messageDiv.innerHTML = '<span style="color:#ff8888;">Error: ' + (result.error || 'Could not send email') + '</span>'; }
+  }
+  
+  // ==============================================================
+  // STORE DATA & FUNCTIONS (UPDATED PRICES)
+  // ==============================================================
+  
+  const colors = [
+    { name: "Red", value: "Red", bg: "#e11d2c" },
+    { name: "Black", value: "Black", bg: "#1a1a1a" },
+    { name: "Green", value: "Green", bg: "#10b981" },
+    { name: "Blue", value: "Blue", bg: "#3b82f6" }
+  ];
+  
+  // UPDATED PRICES: T-shirts R150, Sweaters R280, Hoodies R300
+  const tshirts = [
+    { id: 1, name: "Neon Duets T-Shirt", price: 150, image: "t-shirt1.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 2, name: "Duets Lover T-Shirt", price: 150, image: "t-shirt2.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 3, name: "Duets Glitch T-Shirt", price: 150, image: "t-shirt3.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 4, name: "Sabaring T-Shirt", price: 150, image: "t-shirt4.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 5, name: "Monalisa Sabaring T-Shirt", price: 150, image: "t-shirt5.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 12, name: "Faka T-Shirt", price: 150, image: "t-shirt6.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 13, name: "Chinese Faka T-Shirt", price: 150, image: "t-shirt7.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 16, name: "Real Nigga T-Shirt", price: 150, image: "t-shirt8.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 17, name: "Lil' Nigga T-Shirt", price: 150, image: "t-shirt9.png", sizes: ["XS","S","M","L","XL","XXL"] }
+  ];
+  
+  const sweaters = [
+    { id: 6, name: "Sabaring Sweater", price: 280, image: "sweater1.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 7, name: "Neon Duets Sweater", price: 280, image: "sweater2.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 8, name: "Duets Lover Sweater", price: 280, image: "sweater3.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 9, name: "Duets Glitch Sweater", price: 280, image: "sweater4.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 14, name: "Faka Sweater", price: 280, image: "sweater5.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 18, name: "Real Nigga Sweater", price: 280, image: "sweater6.png", sizes: ["XS","S","M","L","XL","XXL"] }
+  ];
+  
+  const hoodies = [
+    { id: 10, name: "Duets Lover Hoodie", price: 300, image: "hoodie1.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 11, name: "Duets Glitch Hoodie", price: 300, image: "hoodie2.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 15, name: "Faka Hoodie", price: 300, image: "hoodie3.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 19, name: "Real Nigga Hoodie", price: 300, image: "hoodie4.png", sizes: ["XS","S","M","L","XL","XXL"] }
+  ];
+  
+  const allProducts = [...tshirts, ...sweaters, ...hoodies];
+  let currentProduct = null, selectedSize = null, selectedColor = null;
+  
+  function saveCartToLocal() { updateCartUI(); if (sessionToken) saveCartToServer(); }
+  
+  function updateCartUI() {
+    const count = cart.reduce((s,i) => s + i.qty, 0);
+    document.getElementById("cartCount").innerText = count;
+    document.getElementById("stickyCartCount").innerText = count;
+    const container = document.getElementById("cartItemsList");
+    let total = 0;
+    if (cart.length === 0) { container.innerHTML = "<p style='text-align:center;color:gray;'>Cart empty</p>"; document.getElementById("cartTotalPrice").innerText = "R0.00"; return; }
+    let html = "";
+    cart.forEach(item => {
+      const itemTotal = item.price * item.qty;
+      total += itemTotal;
+      html += `<div style="border-bottom:1px solid #333; padding:5px 0; display:flex; justify-content:space-between;"><div><strong>${item.name}</strong><br>${item.size || 'N/A'} / ${item.color || 'N/A'}<br>R${item.price.toFixed(2)} x ${item.qty}</div><button class="remove-item" data-id="${item.id}" data-size="${item.size}" data-color="${item.color}">Remove</button></div>`;
+    });
+    container.innerHTML = html;
+    document.getElementById("cartTotalPrice").innerText = `R${total.toFixed(2)}`;
+    document.querySelectorAll(".remove-item").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = parseInt(btn.dataset.id), size = btn.dataset.size, color = btn.dataset.color;
+        cart = cart.filter(i => !(i.id === id && i.size === size && i.color === color));
+        saveCartToLocal();
+      });
+    });
+  }
+  
+  function addToCart(product, size, color) {
+    if (!size) { alert("Select size"); return false; }
+    if (!color && product.id !== 99) { alert("Select color"); return false; }
+    const existing = cart.find(i => i.id === product.id && i.size === size && i.color === color);
+    if (existing) existing.qty++;
+    else cart.push({ id: product.id, name: product.name, price: product.price, size: size || 'Digital', color: color || 'N/A', qty: 1 });
+    saveCartToLocal();
+    document.getElementById("cartSidebar").classList.add("open");
+    return true;
+  }
+  
+  function showModal(product) {
+    currentProduct = product; selectedSize = null; selectedColor = null;
+    document.getElementById("modalProductName").innerText = product.name;
+    document.getElementById("modalProductPrice").innerText = `R${product.price.toFixed(2)}`;
+    const sizesDiv = document.getElementById("modalSizes");
+    sizesDiv.innerHTML = "";
+    product.sizes.forEach(s => {
+      const btn = document.createElement("div"); btn.className = "modal-size-btn"; btn.innerText = s;
+      btn.onclick = () => { document.querySelectorAll(".modal-size-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedSize = s; };
+      sizesDiv.appendChild(btn);
+    });
+    const colorsDiv = document.getElementById("modalColors");
+    colorsDiv.innerHTML = "";
+    colors.forEach(c => {
+      const btn = document.createElement("div"); btn.className = "modal-color-btn"; btn.style.backgroundColor = c.bg; btn.title = c.name;
+      btn.onclick = () => { document.querySelectorAll(".modal-color-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedColor = c.value; };
+      colorsDiv.appendChild(btn);
+    });
+    document.getElementById("sizeColorModal").classList.add("show");
+  }
+  
+  function closeModal() { document.getElementById("sizeColorModal").classList.remove("show"); }
+  function confirmAdd() { if (!selectedSize) { alert("Select size"); return; } if (!selectedColor) { alert("Select color"); return; } addToCart(currentProduct, selectedSize, selectedColor); closeModal(); }
+  
+  function renderGrid(products, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+    products.forEach(prod => {
+      const card = document.createElement("div"); card.className = "product-card";
+      card.innerHTML = `<div class="product-img"><img src="${prod.image}" alt="${prod.name}" onerror="this.parentElement.innerHTML='<div class=\\'no-img\\'><i class=\\'fas fa-tshirt\\'></i></div>'"></div><div class="product-info"><div class="product-title">${prod.name}</div><div class="product-price">R${prod.price.toFixed(2)}</div><button class="add-to-cart-btn" data-id="${prod.id}"><i class="fas fa-cart-plus"></i> ADD TO CART</button></div>`;
+      container.appendChild(card);
+    });
+    container.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); const product = allProducts.find(p => p.id === id); showModal(product); });
+    });
+    container.querySelectorAll(".product-card").forEach(card => {
+      card.addEventListener("click", (e) => { if (e.target.closest(".add-to-cart-btn")) return; const btn = card.querySelector(".add-to-cart-btn"); if (btn) { const id = parseInt(btn.dataset.id); const product = allProducts.find(p => p.id === id); showModal(product); } });
+    });
+  }
+  
+  window.addEventListener("scroll", () => { const sticky = document.getElementById("stickyNav"); if (window.scrollY > 60) sticky.classList.add("show"); else sticky.classList.remove("show"); });
+  
+  function setupNav() {
+    const links = [
+      { class: ".nav-tshirts", id: "tshirts-section" }, { class: ".nav-sweaters", id: "sweaters-section" }, { class: ".nav-hoodies", id: "hoodies-section" },
+      { class: ".sticky-tshirts", id: "tshirts-section" }, { class: ".sticky-sweaters", id: "sweaters-section" }, { class: ".sticky-hoodies", id: "hoodies-section" }
+    ];
+    links.forEach(l => { document.querySelectorAll(l.class).forEach(el => { el.addEventListener("click", (e) => { e.preventDefault(); document.getElementById(l.id).scrollIntoView({ behavior: "smooth" }); }); }); });
+  }
+  
+  // ==============================================================
+  // DELIVERY MODAL - MODIFIED: removed the alert popup
+  // ==============================================================
+  let selectedDelivery = null;
+  
+  function showDeliveryModal() {
+    const modal = document.getElementById('deliveryModal');
+    modal.classList.add('show');
+  }
+  
+  function hideDeliveryModal() {
+    const modal = document.getElementById('deliveryModal');
+    modal.classList.remove('show');
+  }
+  
+  document.getElementById('economyOption')?.addEventListener('click', () => {
+    document.getElementById('economyOption').classList.add('selected');
+    document.getElementById('speedOption').classList.remove('selected');
+    selectedDelivery = { type: 'economy', amount: 59.95 };
+  });
+  
+  document.getElementById('speedOption')?.addEventListener('click', () => {
+    document.getElementById('speedOption').classList.add('selected');
+    document.getElementById('economyOption').classList.remove('selected');
+    selectedDelivery = { type: 'speed', amount: 109.95 };
+  });
+  
+  // MODIFIED: No alert, goes straight to payment
+  document.getElementById('confirmDeliveryBtn')?.addEventListener('click', async () => {
+    if (selectedDelivery) {
+      deliveryAmount = selectedDelivery.amount;
+      document.getElementById('delivery_amount').value = deliveryAmount;
+      document.getElementById('delivery_type').value = selectedDelivery.type;
+      hideDeliveryModal();
+      updateCartUI();
+      // Direct to payment - no alert
+      await proceedToPayment();
+    } else {
+      alert('Please select a delivery option');
+    }
+  });
+  
+  // ==============================================================
+  // PAXI STORE FINDER MAP - UPDATED with manual add
+  // ==============================================================
+  let map = null;
+  let markers = [];
+  let currentStores = [];
+  
+  // Expanded store brands
+  const storeBrands = ["PEP", "PEP Home", "PEPcell", "Tekkie Town", "Shoe City"];
+  const storeBrandQuery = storeBrands.map(b => `"${b}"`).join('|');
+  
+  async function queryStores(lat, lng, radius = 10000) {
+    const overpassUrl = 'https://overpass-api.de/api/interpreter';
+    const query = `
+      [out:json];
+      (
+        node["shop"]["brand"~"${storeBrandQuery}"](around:${radius},${lat},${lng});
+        way["shop"]["brand"~"${storeBrandQuery}"](around:${radius},${lat},${lng});
+      );
+      out body;
+    `;
+    try {
+      const response = await fetch(overpassUrl, { method: 'POST', body: query });
+      const data = await response.json();
+      return data.elements.map(el => ({
+        id: el.id,
+        name: el.tags.name || el.tags.brand || 'Store',
+        address: el.tags['addr:full'] || el.tags['addr:street'] || el.tags['addr:city'] || 'Address not available',
+        lat: el.lat || (el.center ? el.center.lat : lat),
+        lon: el.lon || (el.center ? el.center.lon : lng),
+        code: el.tags.ref || ''
+      }));
+    } catch (error) {
+      console.error('Overpass error:', error);
+      return [];
+    }
+  }
+  
+  function displayStores(stores) {
+    if (!map) return;
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+    const container = document.getElementById('storeList');
+    container.innerHTML = '';
+    currentStores = stores;
+    
+    if (stores.length === 0) {
+      container.innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">No stores found in this area. Try a different location or use "Add manually" below.</div>';
       return;
     }
     
-    const stores = await searchStoresWithPhoton(cityCoords.lat, cityCoords.lon);
+    stores.forEach(store => {
+      const marker = L.marker([store.lat, store.lon]).addTo(map);
+      marker.bindPopup(`<b>${store.name}</b><br>${store.address}<br><button onclick="selectStore('${store.id}')">Select</button>`);
+      markers.push(marker);
+      
+      const div = document.createElement('div');
+      div.className = 'store-item';
+      div.innerHTML = `<div class="store-name">${store.name}</div><div class="store-address">${store.address}</div>`;
+      div.onclick = () => selectStore(store.id);
+      container.appendChild(div);
+    });
     
-    if (map) {
-      map.setView([cityCoords.lat, cityCoords.lon], 12);
-    } else {
-      map = L.map('paxiMap').setView([cityCoords.lat, cityCoords.lon], 12);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-      }).addTo(map);
+    if (markers.length > 0) {
+      const group = L.featureGroup(markers);
+      map.fitBounds(group.getBounds().pad(0.2));
     }
-    
-    displayStores(stores, cityCoords.displayName);
-    
-    if (stores.length === 0) {
-      alert(`No ${storeBrands.join(', ')} stores found near ${cityCoords.displayName}. Try a different city or use "Add manually" button.`);
-    }
-    
-  } catch (error) {
-    console.error('Search error:', error);
-    alert('Error searching for stores. Please try again.');
-  } finally {
-    searchBtn.innerText = 'Search';
-    searchBtn.disabled = false;
-  }
-}
-
-function displayStores(stores, cityName) {
-  markers.forEach(m => map.removeLayer(m));
-  markers = [];
-  const container = document.getElementById('storeList');
-  container.innerHTML = '';
-  currentStores = stores;
-  
-  if (stores.length === 0) {
-    container.innerHTML = `<div style="color: #aaa; text-align: center; padding: 20px;">No stores found near ${cityName || 'this area'}<br>Click "Add manually" below to enter your store.</div>`;
-    return;
   }
   
-  stores.forEach(store => {
-    const marker = L.marker([store.lat, store.lon]).addTo(map);
-    marker.bindPopup(`<b>🏪 ${store.name}</b><br>📍 ${store.address}<br><button onclick="selectStore('${store.id}')">Select This Store</button>`);
-    markers.push(marker);
-    
-    const div = document.createElement('div');
-    div.className = 'store-item';
-    div.innerHTML = `<div class="store-name">🏪 ${store.name}</div><div class="store-address">📍 ${store.address.substring(0, 100)}</div><div class="store-code">📏 ${store.distance.toFixed(1)} km away</div>`;
-    div.onclick = () => selectStore(store.id);
-    container.appendChild(div);
+  window.selectStore = function(storeId) {
+    const store = currentStores.find(s => s.id == storeId);
+    if (store) {
+      selectedPaxiStore = store;
+      document.getElementById('paxi_store_name').value = store.name;
+      document.getElementById('paxi_store_address').value = store.address;
+      document.getElementById('paxi_store_code').value = store.code || '';
+      
+      const isKingTown = store.address.toLowerCase().includes('king william') || 
+                         store.name.toLowerCase().includes('king william') ||
+                         store.address.toLowerCase().includes('kingwilliam');
+      
+      if (isKingTown) {
+        isKingWilliamsTown = true;
+        deliveryAmount = 0;
+        document.getElementById('delivery_amount').value = 0;
+        // MODIFIED: Show white modal instead of alert
+        const notifModal = document.getElementById('freeCollectionNotif');
+        notifModal.classList.add('show');
+      } else {
+        isKingWilliamsTown = false;
+        showDeliveryModal();
+      }
+      closeStoreFinder();
+    }
+  };
+  
+  // Close the free collection notification and proceed to payment
+  document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', async () => {
+    document.getElementById('freeCollectionNotif').classList.remove('show');
+    await proceedToPayment();
   });
   
-  if (markers.length > 0) {
-    const group = L.featureGroup(markers);
-    map.fitBounds(group.getBounds().pad(0.2));
+  // Manual store functionality
+  function showManualStoreModal() {
+    document.getElementById('manualStoreModal').classList.add('show');
   }
-}
-
-window.selectStore = function(storeId) {
-  const store = currentStores.find(s => s.id == storeId);
-  if (store) {
-    selectedPaxiStore = store;
-    document.getElementById('paxi_store_name').value = store.name;
-    document.getElementById('paxi_store_address').value = store.address;
-    document.getElementById('paxi_store_code').value = store.code || '';
+  
+  function closeManualStoreModal() {
+    document.getElementById('manualStoreModal').classList.remove('show');
+    document.getElementById('manualStoreName').value = '';
+    document.getElementById('manualStoreAddress').value = '';
+  }
+  
+  function saveManualStore() {
+    const storeName = document.getElementById('manualStoreName').value.trim();
+    const storeAddress = document.getElementById('manualStoreAddress').value.trim();
     
-    const isKingTown = store.address.toLowerCase().includes('king william') || 
-                       store.name.toLowerCase().includes('king william') ||
-                       (store.address.toLowerCase().includes('king') && store.address.toLowerCase().includes('william'));
+    if (!storeName || !storeAddress) {
+      alert('Please enter both store name and address');
+      return;
+    }
     
-    if (isKingTown) {
-      isKingWilliamsTown = true;
+    selectedPaxiStore = {
+      id: 'manual_' + Date.now(),
+      name: storeName,
+      address: storeAddress,
+      lat: null,
+      lon: null,
+      code: '',
+      brand: 'Manual Entry'
+    };
+    
+    document.getElementById('paxi_store_name').value = storeName;
+    document.getElementById('paxi_store_address').value = storeAddress;
+    document.getElementById('paxi_store_code').value = '';
+    
+    isKingWilliamsTown = storeAddress.toLowerCase().includes('king william') || 
+                         storeName.toLowerCase().includes('king william') ||
+                         (storeAddress.toLowerCase().includes('king') && storeAddress.toLowerCase().includes('william'));
+    
+    if (isKingWilliamsTown) {
       deliveryAmount = 0;
       document.getElementById('delivery_amount').value = 0;
       document.getElementById('freeCollectionNotif').classList.add('show');
     } else {
-      isKingWilliamsTown = false;
       showDeliveryModal();
     }
+    
+    closeManualStoreModal();
     closeStoreFinder();
   }
-};
-
-function showManualStoreModal() {
-  document.getElementById('manualStoreModal').classList.add('show');
-}
-
-function closeManualStoreModal() {
-  document.getElementById('manualStoreModal').classList.remove('show');
-  document.getElementById('manualStoreName').value = '';
-  document.getElementById('manualStoreAddress').value = '';
-}
-
-function saveManualStore() {
-  const storeName = document.getElementById('manualStoreName').value.trim();
-  const storeAddress = document.getElementById('manualStoreAddress').value.trim();
   
-  if (!storeName || !storeAddress) {
-    alert('Please enter both store name and address');
-    return;
-  }
+  document.getElementById('manualStoreBtn')?.addEventListener('click', showManualStoreModal);
+  document.getElementById('manualSaveBtn')?.addEventListener('click', saveManualStore);
+  document.getElementById('manualCancelBtn')?.addEventListener('click', closeManualStoreModal);
   
-  selectedPaxiStore = {
-    id: 'manual_' + Date.now(),
-    name: storeName,
-    address: storeAddress,
-    lat: null,
-    lon: null,
-    code: '',
-    brand: 'Manual Entry'
-  };
+  // South African cities for autocomplete
+  const southAfricanCities = [
+    "Johannesburg", "Cape Town", "Durban", "Pretoria", "Gqeberha", "Port Elizabeth",
+    "Bloemfontein", "Pietermaritzburg", "Polokwane", "Nelspruit", "Mbombela",
+    "Kimberley", "Rustenburg", "Middelburg", "Vereeniging", "Newcastle",
+    "East London", "Botshabelo", "Witbank", "Emalahleni", "Soweto", "Benoni",
+    "Tembisa", "Boksburg", "Krugersdorp", "Diepsloot", "Randburg", "Brakpan",
+    "Vanderbijlpark", "Centurion", "Roodepoort", "Springs", "Carletonville",
+    "Klerksdorp", "Potchefstroom", "Stellenbosch", "Paarl", "Worcester",
+    "George", "Knysna", "Mossel Bay", "Oudtshoorn", "Beaufort West",
+    "Upington", "Mthatha", "Queenstown", "King William's Town", "Bhisho",
+    "Graaff-Reinet", "Aliwal North", "Kroonstad", "Welkom", "Virginia",
+    "Sasolburg", "Heilbron", "Parys", "Fochville", "Orkney", "Stilfontein",
+    "Hartbeespoort", "Brits", "Thabazimbi", "Modimolle", "Lephalale",
+    "Musina", "Louis Trichardt", "Tzaneen", "Phalaborwa", "Hoedspruit",
+    "White River", "Barberton", "Ermelo", "Secunda", "Standerton", "Volksrust",
+    "Vryheid", "Dundee", "Ladysmith", "Estcourt", "Mooi River", "Howick",
+    "Kokstad", "Matatiele", "Harding", "Port Shepstone", "Margate", "Scottburgh",
+    "Ballito", "Stanger", "Richards Bay", "Empangeni", "Ulundi", "Nongoma",
+    "Pongola", "Paulpietersburg", "Piet Retief", "Amsterdam", "Bethal",
+    "Port Alfred", "Grahamstown", "Makhanda", "Butterworth", "Lady Frere"
+  ];
   
-  document.getElementById('paxi_store_name').value = storeName;
-  document.getElementById('paxi_store_address').value = storeAddress;
-  document.getElementById('paxi_store_code').value = '';
-  
-  isKingWilliamsTown = storeAddress.toLowerCase().includes('king william') || 
-                       storeName.toLowerCase().includes('king william') ||
-                       (storeAddress.toLowerCase().includes('king') && storeAddress.toLowerCase().includes('william'));
-  
-  if (isKingWilliamsTown) {
-    deliveryAmount = 0;
-    document.getElementById('delivery_amount').value = 0;
-    document.getElementById('freeCollectionNotif').classList.add('show');
-  } else {
-    showDeliveryModal();
-  }
-  
-  closeManualStoreModal();
-  closeStoreFinder();
-}
-
-document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', async () => {
-  document.getElementById('freeCollectionNotif').classList.remove('show');
-  await proceedToPayment();
-});
-
-document.getElementById('manualStoreBtn')?.addEventListener('click', showManualStoreModal);
-document.getElementById('manualSaveBtn')?.addEventListener('click', saveManualStore);
-document.getElementById('manualCancelBtn')?.addEventListener('click', closeManualStoreModal);
-
-const southAfricanCities = [
-  "Johannesburg", "Cape Town", "Durban", "Pretoria", "Gqeberha", "Port Elizabeth",
-  "Bloemfontein", "Pietermaritzburg", "Polokwane", "Nelspruit", "Mbombela",
-  "Kimberley", "Rustenburg", "East London", "King William's Town", "Bhisho",
-  "George", "Knysna", "Mossel Bay", "Upington", "Mthatha", "Queenstown"
-];
-
-$(document).ready(function() {
-  $("#searchLocation").autocomplete({
-    source: southAfricanCities,
-    minLength: 2,
-    select: function(event, ui) {
-      $("#searchLocation").val(ui.item.value);
-      searchStoresByCity(ui.item.value);
-      return false;
-    }
-  });
-});
-
-async function searchStores() {
-  const location = document.getElementById('searchLocation').value.trim();
-  await searchStoresByCity(location);
-}
-
-function openStoreFinder() {
-  const modal = document.getElementById('storeFinderModal');
-  modal.style.display = 'block';
-  setTimeout(() => {
-    if (!map) {
-      map = L.map('paxiMap').setView([-28.9, 24.8], 5);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-      }).addTo(map);
-    } else {
-      map.invalidateSize();
-    }
-  }, 200);
-}
-
-function closeStoreFinder() {
-  document.getElementById('storeFinderModal').style.display = 'none';
-}
-
-document.getElementById('openStoreFinderBtn')?.addEventListener('click', openStoreFinder);
-document.getElementById('closeStoreFinderBtn')?.addEventListener('click', closeStoreFinder);
-document.getElementById('searchBtn')?.addEventListener('click', searchStores);
-document.getElementById('searchLocation')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchStores(); });
-
-// ==============================================================
-// CHECKOUT BUTTON - WORKING (DEFINED BEFORE EVENT LISTENERS)
-// ==============================================================
-async function proceedToPayment() {
-  if (!currentUser) {
-    window.showAuthModal();
-    return;
-  }
-  if (cart.length === 0) {
-    alert("Cart is empty");
-    return;
-  }
-  
-  const hasPhysicalItems = cart.some(item => item.id !== 99);
-  
-  if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
-    openStoreFinder();
-    return;
-  }
-  
-  const orderId = "ORDER_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
-  let total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-  
-  if (hasPhysicalItems && deliveryAmount > 0) {
-    total += deliveryAmount;
-  }
-  
-  const checkoutBtn = document.getElementById("checkoutBtn");
-  const originalText = checkoutBtn.innerText;
-  checkoutBtn.innerText = "⏳ SAVING ORDER...";
-  checkoutBtn.disabled = true;
-  
-  const timeoutId = setTimeout(() => {
-    if (checkoutBtn.disabled) {
-      checkoutBtn.innerText = "CHECKOUT →";
-      checkoutBtn.disabled = false;
-      alert("Request timed out. Please try again.");
-    }
-  }, 30000);
-  
-  try {
-    const saveResponse = await fetch(`${API_URL}/api/save-order`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionToken: sessionToken,
-        orderId: orderId,
-        items: cart,
-        total: total,
-        customerEmail: currentUser.email,
-        paxi_store_name: document.getElementById('paxi_store_name').value,
-        paxi_store_address: document.getElementById('paxi_store_address').value,
-        paxi_store_code: document.getElementById('paxi_store_code').value,
-        delivery_amount: deliveryAmount,
-        delivery_type: document.getElementById('delivery_type').value
-      })
+  $(document).ready(function() {
+    $("#searchLocation").autocomplete({
+      source: southAfricanCities,
+      minLength: 2,
+      select: function(event, ui) {
+        $("#searchLocation").val(ui.item.value);
+        searchStoresWithLocation(ui.item.value);
+        return false;
+      }
     });
-    
-    const saveData = await saveResponse.json();
-    
-    if (!saveData.success) {
-      clearTimeout(timeoutId);
-      alert("Failed to save order: " + (saveData.error || "Unknown error"));
-      checkoutBtn.innerText = originalText;
-      checkoutBtn.disabled = false;
+  });
+  
+  async function searchStoresWithLocation(location) {
+    if (!location) {
+      alert('Please enter a town or city');
+      return;
+    }
+    const searchBtn = document.getElementById('searchBtn');
+    searchBtn.innerText = 'Searching...';
+    searchBtn.disabled = true;
+    try {
+      const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location + ', South Africa')}&limit=1`;
+      const geoRes = await fetch(geoUrl);
+      const geoData = await geoRes.json();
+      if (!geoData.length) {
+        alert('Location not found');
+        return;
+      }
+      const { lat, lon } = geoData[0];
+      
+      if (map) {
+        map.setView([lat, lon], 12);
+      } else {
+        map = L.map('paxiMap').setView([lat, lon], 12);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+        }).addTo(map);
+      }
+      
+      const stores = await queryStores(lat, lon);
+      displayStores(stores);
+      if (stores.length === 0) alert('No stores found near that location. Try "Add manually" button.');
+    } catch (error) {
+      console.error(error);
+      alert('Error searching. Please try again.');
+    } finally {
+      searchBtn.innerText = 'Search';
+      searchBtn.disabled = false;
+    }
+  }
+  
+  async function searchStores() {
+    const location = document.getElementById('searchLocation').value.trim();
+    await searchStoresWithLocation(location);
+  }
+  
+  function openStoreFinder() {
+    const modal = document.getElementById('storeFinderModal');
+    modal.style.display = 'block';
+    setTimeout(() => {
+      if (!map) {
+        map = L.map('paxiMap').setView([-28.9, 24.8], 5);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+        }).addTo(map);
+      } else {
+        map.invalidateSize();
+      }
+    }, 200);
+  }
+  
+  function closeStoreFinder() {
+    document.getElementById('storeFinderModal').style.display = 'none';
+  }
+  
+  document.getElementById('openStoreFinderBtn')?.addEventListener('click', openStoreFinder);
+  document.getElementById('closeStoreFinderBtn')?.addEventListener('click', closeStoreFinder);
+  document.getElementById('searchBtn')?.addEventListener('click', searchStores);
+  document.getElementById('searchLocation')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchStores(); });
+  
+  // ==============================================================
+  // CHECKOUT BUTTON - MODIFIED to support direct payment after delivery
+  // ==============================================================
+  async function proceedToPayment() {
+    if (!currentUser) {
+      window.showAuthModal();
+      return;
+    }
+    if (cart.length === 0) {
+      alert("Cart is empty");
       return;
     }
     
-    checkoutBtn.innerText = "⏳ CREATING PAYMENT...";
+    // Check if only mixtape is in cart (no physical items)
+    const hasPhysicalItems = cart.some(item => item.id !== 99);
     
-    const paymentResponse = await fetch(`${API_URL}/create-payment`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: total, orderId: orderId })
-    });
+    if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
+      openStoreFinder();
+      return;
+    }
     
-    const paymentData = await paymentResponse.json();
+    const orderId = "ORDER_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
+    let total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
     
-    if (paymentData.success && paymentData.paymentUrl) {
+    if (hasPhysicalItems && deliveryAmount > 0) {
+      total += deliveryAmount;
+    }
+    
+    const checkoutBtn = document.getElementById("checkoutBtn");
+    const originalText = checkoutBtn.innerText;
+    checkoutBtn.innerText = "⏳ SAVING ORDER...";
+    checkoutBtn.disabled = true;
+    
+    const timeoutId = setTimeout(() => {
+      if (checkoutBtn.disabled) {
+        checkoutBtn.innerText = "CHECKOUT →";
+        checkoutBtn.disabled = false;
+        alert("Request timed out. Please try again.");
+      }
+    }, 30000);
+    
+    try {
+      const saveResponse = await fetch(`${API_URL}/api/save-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionToken: sessionToken,
+          orderId: orderId,
+          items: cart,
+          total: total,
+          customerEmail: currentUser.email,
+          paxi_store_name: document.getElementById('paxi_store_name').value,
+          paxi_store_address: document.getElementById('paxi_store_address').value,
+          paxi_store_code: document.getElementById('paxi_store_code').value,
+          delivery_amount: deliveryAmount,
+          delivery_type: document.getElementById('delivery_type').value
+        })
+      });
+      
+      const saveData = await saveResponse.json();
+      
+      if (!saveData.success) {
+        clearTimeout(timeoutId);
+        alert("Failed to save order: " + (saveData.error || "Unknown error"));
+        checkoutBtn.innerText = originalText;
+        checkoutBtn.disabled = false;
+        return;
+      }
+      
+      checkoutBtn.innerText = "⏳ CREATING PAYMENT...";
+      
+      const paymentResponse = await fetch(`${API_URL}/create-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total, orderId: orderId })
+      });
+      
+      const paymentData = await paymentResponse.json();
+      
+      if (paymentData.success && paymentData.paymentUrl) {
+        clearTimeout(timeoutId);
+        sessionStorage.setItem('pendingOrderId', orderId);
+        window.location.href = paymentData.paymentUrl;
+      } else {
+        clearTimeout(timeoutId);
+        alert("Payment error: " + (paymentData.error || "Could not create payment link"));
+        checkoutBtn.innerText = originalText;
+        checkoutBtn.disabled = false;
+      }
+    } catch (error) {
       clearTimeout(timeoutId);
-      sessionStorage.setItem('pendingOrderId', orderId);
-      window.location.href = paymentData.paymentUrl;
-    } else {
-      clearTimeout(timeoutId);
-      alert("Payment error: " + (paymentData.error || "Could not create payment link"));
+      alert("Connection error. Please try again.");
       checkoutBtn.innerText = originalText;
       checkoutBtn.disabled = false;
     }
-  } catch (error) {
-    clearTimeout(timeoutId);
-    alert("Connection error. Please try again.");
-    checkoutBtn.innerText = originalText;
-    checkoutBtn.disabled = false;
   }
-}
-
-async function checkForSuccessfulPayment() {
-  const pendingOrderId = sessionStorage.getItem('pendingOrderId');
-  if (pendingOrderId) {
-    sessionStorage.removeItem('pendingOrderId');
-    await refreshUserData();
-    if (currentUser && currentUser.hasPurchasedMixtape) {
-      alert("Thank you! Your mixtape is now available for download.");
-      updateMixtapeButtons();
+  
+  async function checkForSuccessfulPayment() {
+    const pendingOrderId = sessionStorage.getItem('pendingOrderId');
+    if (pendingOrderId) {
+      sessionStorage.removeItem('pendingOrderId');
+      await refreshUserData();
+      if (currentUser && currentUser.hasPurchasedMixtape) {
+        alert("Thank you! Your mixtape is now available for download.");
+        updateMixtapeButtons();
+      }
     }
   }
-}
-
-// ==============================================================
-// ALL EVENT LISTENERS (REGISTERED AFTER FUNCTIONS ARE DEFINED)
-// ==============================================================
-document.getElementById("cartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
-document.getElementById("stickyCartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
-document.getElementById("closeCartBtn")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.remove("open"));
-document.getElementById("modalConfirmBtn")?.addEventListener("click", confirmAdd);
-document.getElementById("modalCloseBtn")?.addEventListener("click", closeModal);
-window.addEventListener("click", (e) => { if (e.target === document.getElementById("sizeColorModal")) closeModal(); });
-
-document.getElementById("closeAuthBtn")?.addEventListener("click", window.closeAuthModal);
-document.getElementById("closeResetBtn")?.addEventListener("click", closeResetModal);
-document.getElementById("authSubmitBtn")?.addEventListener("click", handleAuth);
-document.getElementById("authToggleText")?.addEventListener("click", toggleAuthMode);
-document.getElementById("forgotPasswordBtn")?.addEventListener("click", showResetModal);
-document.getElementById("sendResetBtn")?.addEventListener("click", sendResetLink);
-
-// MAIN CHECKOUT BUTTON EVENT - NOW proceedToPayment IS DEFINED
-document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
-  if (!currentUser) {
-    window.showAuthModal();
-    return;
-  }
-  if (cart.length === 0) {
-    alert("Cart is empty");
-    return;
-  }
-  const hasPhysicalItems = cart.some(item => item.id !== 99);
-  if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
-    openStoreFinder();
-    return;
-  }
-  await proceedToPayment();
-});
-
-// INITIALIZATION
-verifySession().then(() => {
-  renderGrid(tshirts, "tshirtsGrid");
-  renderGrid(sweaters, "sweatersGrid");
-  renderGrid(hoodies, "hoodiesGrid");
-  setupNav();
-  checkForSuccessfulPayment();
-});
+  
+  document.getElementById("cartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
+  document.getElementById("stickyCartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
+  document.getElementById("closeCartBtn")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.remove("open"));
+  document.getElementById("modalConfirmBtn")?.addEventListener("click", confirmAdd);
+  document.getElementById("modalCloseBtn")?.addEventListener("click", closeModal);
+  window.addEventListener("click", (e) => { if (e.target === document.getElementById("sizeColorModal")) closeModal(); });
+  
+  document.getElementById("closeAuthBtn")?.addEventListener("click", window.closeAuthModal);
+  document.getElementById("closeResetBtn")?.addEventListener("click", closeResetModal);
+  document.getElementById("authSubmitBtn")?.addEventListener("click", handleAuth);
+  document.getElementById("authToggleText")?.addEventListener("click", toggleAuthMode);
+  document.getElementById("forgotPasswordBtn")?.addEventListener("click", showResetModal);
+  document.getElementById("sendResetBtn")?.addEventListener("click", sendResetLink);
+  
+  document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
+    if (!currentUser) {
+      window.showAuthModal();
+      return;
+    }
+    if (cart.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+    const hasPhysicalItems = cart.some(item => item.id !== 99);
+    if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
+      openStoreFinder();
+      return;
+    }
+    await proceedToPayment();
+  });
+  
+  verifySession().then(() => {
+    renderGrid(tshirts, "tshirtsGrid");
+    renderGrid(sweaters, "sweatersGrid");
+    renderGrid(hoodies, "hoodiesGrid");
+    setupNav();
+    checkForSuccessfulPayment();
+  });
 </script>
 </body>
 </html>
