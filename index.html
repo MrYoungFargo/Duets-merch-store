@@ -6,42 +6,8 @@
   <title>MrYoungFargo Merch | Official Store</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  
-  <!-- Brevo Conversations Live Chat Widget -->
-  <script>
-    let pendingBrevoEmail = null;
-    let pendingBrevoName = null;
-    
-    function setBrevoIdentity(email, name) {
-      if (window.BrevoConversations) {
-        if (email && name) {
-          window.BrevoConversations('updateVisitor', { email: email, name: name });
-          window.BrevoConversations('identify', { email: email, name: name });
-        } else {
-          window.BrevoConversations('updateVisitor', { email: '', name: '' });
-        }
-      } else {
-        pendingBrevoEmail = email;
-        pendingBrevoName = name;
-      }
-    }
-    
-    (function(d, w, c) {
-        w.BrevoConversationsID = '69f2ce2c82bbf71d2f00b4e2';
-        w[c] = w[c] || function() {
-            (w[c].q = w[c].q || []).push(arguments);
-        };
-        var s = d.createElement('script');
-        s.async = true;
-        s.src = 'https://conversations-widget.brevo.com/brevo-conversations.js';
-        s.onload = function() {
-          if (pendingBrevoEmail) {
-            setBrevoIdentity(pendingBrevoEmail, pendingBrevoName);
-          }
-        };
-        if (d.head) d.head.appendChild(s);
-    })(document, window, 'BrevoConversations');
-  </script>
+  <!-- Leaflet CSS for map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -591,6 +557,68 @@
       line-height: 1;
     }
     .close-reset:hover { color: #ff8888; }
+
+    /* PAXI Modal Styles */
+    #storeFinderModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 10000;
+      overflow-y: auto;
+    }
+    #storeFinderModal .modal-content {
+      max-width: 1000px;
+      margin: 20px auto;
+      background: #1a1a2e;
+      border-radius: 24px;
+      padding: 20px;
+    }
+    #storeFinderModal h2 {
+      color: white;
+      font-size: 1.3rem;
+    }
+    #storeFinderModal input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 40px;
+      background: #0a0a1a;
+      color: white;
+      border: 1px solid #2a2a4a;
+      margin: 10px 0;
+    }
+    #storeFinderModal button {
+      background: #3b82f6;
+      border: none;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 40px;
+      cursor: pointer;
+    }
+    #map {
+      height: 400px;
+      border-radius: 16px;
+      margin: 15px 0;
+    }
+    .store-list {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+    .store-item {
+      background: #0a0a1a;
+      margin-bottom: 10px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #2a2a4a;
+      cursor: pointer;
+    }
+    .store-item:hover { background: #1a1a3a; }
+    .store-name { font-weight: bold; color: #3b82f6; }
+    .store-address { font-size: 12px; color: #aaa; margin-top: 4px; }
+    .store-code { font-size: 11px; color: #10b981; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -705,6 +733,37 @@
   <button class="checkout-btn" id="checkoutBtn">CHECKOUT →</button>
 </div>
 
+<!-- PAXI Hidden Fields -->
+<input type="hidden" id="paxi_store_name">
+<input type="hidden" id="paxi_store_address">
+<input type="hidden" id="paxi_store_code">
+<input type="hidden" id="paxi_store_lat">
+<input type="hidden" id="paxi_store_lng">
+
+<!-- PAXI SELECTOR BUTTON -->
+<button type="button" id="openStoreFinderBtn" style="background: #10b981; color: white; padding: 10px; border-radius: 30px; width: 90%; margin: 0 auto 20px; display: block; max-width: 400px; border: none; cursor: pointer;">
+  📍 Select PAXI Pickup Point
+</button>
+
+<!-- PAXI MODAL (Map & Store List) -->
+<div id="storeFinderModal">
+  <div class="modal-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <h2>📍 Select Collection Point</h2>
+      <button id="closeStoreFinderBtn" style="background: red;">✕ Close</button>
+    </div>
+    <div>
+      <input type="text" id="searchLocation" placeholder="🔍 Enter town, suburb or city (e.g. Johannesburg, Cape Town)">
+      <button id="searchBtn">Search</button>
+    </div>
+    <div id="map"></div>
+    <div id="storeList" class="store-list"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
 <script>
   // ==============================================================
   // BACKEND API URL
@@ -770,7 +829,7 @@
         updateMixtapeButtons();
         updateUserUI();
         if (currentUser.email) {
-          setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
+          // Brevo identity will be set later
         }
       }
     }
@@ -787,9 +846,6 @@
       }
       updateUserUI();
       updateMixtapeButtons();
-      if (currentUser.email) {
-        setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
-      }
     } else {
       localStorage.removeItem('session_token');
       sessionToken = null;
@@ -832,7 +888,6 @@
       updateCartUI();
       updateUserUI();
       updateMixtapeButtons();
-      setBrevoIdentity(currentUser.email, currentUser.email.split('@')[0]);
       window.closeAuthModal();
       return true;
     } else {
@@ -850,7 +905,6 @@
     updateCartUI();
     updateUserUI();
     updateMixtapeButtons();
-    setBrevoIdentity(null, null);
   }
   
   async function saveCartToServer() {
@@ -859,16 +913,11 @@
   
   function updateMixtapeButtons() {
     const buttonsContainer = document.getElementById('mixtapeButtons');
-    const downloadArea = document.getElementById('mixtapeDownloadArea');
-    
     if (!buttonsContainer) return;
     
-    // Clear both areas
     buttonsContainer.innerHTML = '';
-    if (downloadArea) downloadArea.innerHTML = '';
     
     if (currentUser && currentUser.hasPurchasedMixtape === true) {
-      // Show DOWNLOAD button (green)
       buttonsContainer.innerHTML = `
         <button class="download-mixtape-btn" id="downloadMixtapeBtn"><i class="fas fa-download"></i> DOWNLOAD MIXTAPE (ZIP)</button>
         <a href="#" id="mixtapeListenBtn2" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
@@ -885,7 +934,6 @@
         });
       }
     } else {
-      // Show ADD TO CART button (blue)
       buttonsContainer.innerHTML = `
         <button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button>
         <a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
@@ -1024,7 +1072,6 @@
     { name: "Blue", value: "Blue", bg: "#3b82f6" }
   ];
   
-  // T-SHIRTS - Added t-shirt8.png and t-shirt9.png
   const tshirts = [
     { id: 1, name: "Neon Duets T-Shirt", price: 179.99, image: "t-shirt1.png", sizes: ["XS","S","M","L","XL","XXL"] },
     { id: 2, name: "Duets Lover T-Shirt", price: 179.99, image: "t-shirt2.png", sizes: ["XS","S","M","L","XL","XXL"] },
@@ -1037,7 +1084,6 @@
     { id: 17, name: "Lil' Nigga T-Shirt", price: 179.99, image: "t-shirt9.png", sizes: ["XS","S","M","L","XL","XXL"] }
   ];
   
-  // SWEATERS - Added sweater6.png
   const sweaters = [
     { id: 6, name: "Sabaring Sweater", price: 329.99, image: "sweater1.png", sizes: ["XS","S","M","L","XL","XXL"] },
     { id: 7, name: "Neon Duets Sweater", price: 329.99, image: "sweater2.png", sizes: ["XS","S","M","L","XL","XXL"] },
@@ -1047,7 +1093,6 @@
     { id: 18, name: "Real Nigga Sweater", price: 329.99, image: "sweater6.png", sizes: ["XS","S","M","L","XL","XXL"] }
   ];
   
-  // HOODIES - Added hoodie4.png
   const hoodies = [
     { id: 10, name: "Duets Lover Hoodie", price: 379.99, image: "hoodie1.png", sizes: ["XS","S","M","L","XL","XXL"] },
     { id: 11, name: "Duets Glitch Hoodie", price: 379.99, image: "hoodie2.png", sizes: ["XS","S","M","L","XL","XXL"] },
@@ -1147,6 +1192,167 @@
   }
   
   // ==============================================================
+  // PAXI STORE FINDER MAP
+  // ==============================================================
+  let map = null;
+  let markers = [];
+  let currentStores = [];
+  let selectedStore = null;
+  
+  function initMap(centerLat = -28.9, centerLng = 24.8, zoom = 5) {
+    if (map) map.remove();
+    map = L.map('map').setView([centerLat, centerLng], zoom);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+    }).addTo(map);
+  }
+  
+  function clearMarkers() {
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+  }
+  
+  async function queryStores(lat, lng, radius = 5000) {
+    const overpassUrl = 'https://overpass-api.de/api/interpreter';
+    const query = `
+      [out:json];
+      (
+        node["shop"]["brand"~"PEP|Tekkie Town|Shoe City|PEPcell"](around:${radius},${lat},${lng});
+        way["shop"]["brand"~"PEP|Tekkie Town|Shoe City|PEPcell"](around:${radius},${lat},${lng});
+      );
+      out body;
+    `;
+    try {
+      const response = await fetch(overpassUrl, {
+        method: 'POST',
+        body: query
+      });
+      const data = await response.json();
+      return data.elements.map(el => ({
+        id: el.id,
+        name: el.tags.name || el.tags.brand || 'PAXI Store',
+        brand: el.tags.brand || 'Store',
+        address: el.tags['addr:full'] || el.tags['addr:street'] || el.tags['addr:city'] || 'Address not available',
+        lat: el.lat || (el.center ? el.center.lat : lat),
+        lon: el.lon || (el.center ? el.center.lon : lng),
+        code: el.tags.ref || el.tags['paxi:code'] || ''
+      }));
+    } catch (error) {
+      console.error('Overpass error:', error);
+      return [];
+    }
+  }
+  
+  function displayStores(stores) {
+    clearMarkers();
+    const container = document.getElementById('storeList');
+    container.innerHTML = '';
+    currentStores = stores;
+    
+    if (stores.length === 0) {
+      container.innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">No PAXI stores found in this area. Try a different location.</div>';
+      return;
+    }
+    
+    stores.forEach(store => {
+      // Add marker to map
+      const marker = L.marker([store.lat, store.lon]).addTo(map);
+      marker.bindPopup(`
+        <b>${store.name}</b><br>
+        ${store.address}<br>
+        ${store.code ? `Code: ${store.code}<br>` : ''}
+        <button onclick="window.selectStoreFromMap('${store.id}')">Select this point</button>
+      `);
+      markers.push(marker);
+      
+      // Add to list
+      const div = document.createElement('div');
+      div.className = 'store-item';
+      div.innerHTML = `
+        <div class="store-name">${store.name}</div>
+        <div class="store-address">${store.address}</div>
+        <div class="store-code">${store.code ? `PAXI Code: ${store.code}` : 'PAXI Collection Point'}</div>
+      `;
+      div.onclick = () => selectStoreFromMap(store.id);
+      container.appendChild(div);
+    });
+  }
+  
+  window.selectStoreFromMap = function(storeId) {
+    const store = currentStores.find(s => s.id == storeId);
+    if (store) {
+      selectedStore = store;
+      document.getElementById('paxi_store_name').value = store.name;
+      document.getElementById('paxi_store_address').value = store.address;
+      document.getElementById('paxi_store_code').value = store.code || '';
+      document.getElementById('paxi_store_lat').value = store.lat;
+      document.getElementById('paxi_store_lng').value = store.lon;
+      closeStoreFinder();
+      alert(`✅ Collection point selected:\n${store.name}\n${store.address}`);
+    }
+  };
+  
+  async function searchStores() {
+    const location = document.getElementById('searchLocation').value.trim();
+    if (!location) {
+      alert('Please enter a town or city');
+      return;
+    }
+    const searchBtn = document.getElementById('searchBtn');
+    searchBtn.innerText = 'Searching...';
+    searchBtn.disabled = true;
+    try {
+      const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location + ', South Africa')}&limit=1`;
+      const geoRes = await fetch(geoUrl);
+      const geoData = await geoRes.json();
+      if (!geoData.length) {
+        alert('Location not found. Please try a different town name.');
+        searchBtn.innerText = 'Search';
+        searchBtn.disabled = false;
+        return;
+      }
+      const { lat, lon } = geoData[0];
+      initMap(lat, lon, 12);
+      const stores = await queryStores(lat, lon);
+      displayStores(stores);
+      if (stores.length === 0) {
+        alert('No PAXI stores found near that location. Try a larger town or city.');
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      alert('Error searching. Please try again.');
+    } finally {
+      searchBtn.innerText = 'Search';
+      searchBtn.disabled = false;
+    }
+  }
+  
+  function openStoreFinder() {
+    const modal = document.getElementById('storeFinderModal');
+    modal.style.display = 'block';
+    if (!map) initMap();
+  }
+  
+  function closeStoreFinder() {
+    const modal = document.getElementById('storeFinderModal');
+    modal.style.display = 'none';
+  }
+  
+  // Bind PAXI button events after DOM loads
+  document.addEventListener('DOMContentLoaded', () => {
+    const openBtn = document.getElementById('openStoreFinderBtn');
+    const closeBtn = document.getElementById('closeStoreFinderBtn');
+    const searchBtn = document.getElementById('searchBtn');
+    const searchInput = document.getElementById('searchLocation');
+    if (openBtn) openBtn.onclick = openStoreFinder;
+    if (closeBtn) closeBtn.onclick = closeStoreFinder;
+    if (searchBtn) searchBtn.onclick = searchStores;
+    if (searchInput) searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') searchStores();
+    });
+  });
+  
+  // ==============================================================
   // CHECKOUT BUTTON
   // ==============================================================
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
@@ -1156,6 +1362,13 @@
     }
     if (cart.length === 0) {
       alert("Cart is empty");
+      return;
+    }
+    
+    // Check if PAXI point is selected
+    const paxiStoreName = document.getElementById('paxi_store_name').value;
+    if (!paxiStoreName) {
+      alert("Please select a PAXI collection point before checkout.");
       return;
     }
     
@@ -1184,7 +1397,10 @@
           orderId: orderId,
           items: cart,
           total: total,
-          customerEmail: currentUser.email
+          customerEmail: currentUser.email,
+          paxi_store_name: document.getElementById('paxi_store_name').value,
+          paxi_store_address: document.getElementById('paxi_store_address').value,
+          paxi_store_code: document.getElementById('paxi_store_code').value
         })
       });
       
