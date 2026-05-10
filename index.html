@@ -635,7 +635,8 @@
       background: #2563eb;
     }
 
-    .notification-modal {
+    /* WHITE MODAL FOR ALL POPUPS */
+    .info-modal {
       display: none;
       position: fixed;
       top: 0;
@@ -647,8 +648,8 @@
       align-items: center;
       justify-content: center;
     }
-    .notification-modal.show { display: flex; }
-    .notification-content {
+    .info-modal.show { display: flex; }
+    .info-content {
       background: white;
       border-radius: 24px;
       padding: 28px 24px;
@@ -657,10 +658,47 @@
       width: 85%;
       color: #1e2a3e;
     }
-    .notification-content i { font-size: 48px; color: #10b981; margin-bottom: 16px; }
-    .notification-content h4 { font-size: 1.2rem; margin-bottom: 12px; font-weight: 700; }
-    .notification-content p { font-size: 0.9rem; margin: 8px 0; line-height: 1.4; }
-    .notification-close {
+    .info-content i { font-size: 48px; color: #10b981; margin-bottom: 16px; }
+    .info-content h4 { font-size: 1.2rem; margin-bottom: 12px; font-weight: 700; }
+    .info-content p { font-size: 0.9rem; margin: 8px 0; line-height: 1.4; }
+    .info-close {
+      background: #3b82f6;
+      margin-top: 20px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 40px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+    }
+    
+    .error-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 20002;
+      align-items: center;
+      justify-content: center;
+    }
+    .error-modal.show { display: flex; }
+    .error-content {
+      background: white;
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 340px;
+      width: 85%;
+      color: #1e2a3e;
+    }
+    .error-content i { font-size: 48px; color: #e11d2c; margin-bottom: 16px; }
+    .error-content h4 { font-size: 1.2rem; margin-bottom: 12px; font-weight: 700; }
+    .error-content p { font-size: 0.9rem; margin: 8px 0; line-height: 1.4; }
+    .error-close {
       background: #3b82f6;
       margin-top: 20px;
       padding: 10px 16px;
@@ -864,15 +902,37 @@
 </head>
 <body>
 
-<div id="freeCollectionNotif" class="notification-modal">
-  <div class="notification-content">
+<!-- FREE COLLECTION MODAL (WHITE) -->
+<div id="freeCollectionNotif" class="info-modal">
+  <div class="info-content">
     <i class="fas fa-check-circle"></i>
     <h4>✅ FREE COLLECTION AT CLICKS STONE TOWERS, KING WILLIAM'S TOWN!</h4>
     <p>You will receive an email when your order is ready for collection.</p>
-    <button class="notification-close" id="closeFreeCollectionBtn">Continue to Payment</button>
+    <button class="info-close" id="closeFreeCollectionBtn">Continue to Payment</button>
   </div>
 </div>
 
+<!-- SUCCESS MODAL (WHITE) -->
+<div id="successModal" class="info-modal">
+  <div class="info-content">
+    <i class="fas fa-check-circle"></i>
+    <h4 id="successTitle">Success!</h4>
+    <p id="successMessage">Action completed successfully.</p>
+    <button class="info-close" id="closeSuccessBtn">OK</button>
+  </div>
+</div>
+
+<!-- ERROR MODAL (WHITE) -->
+<div id="errorModal" class="error-modal">
+  <div class="error-content">
+    <i class="fas fa-exclamation-circle"></i>
+    <h4 id="errorTitle">Notice</h4>
+    <p id="errorMessage">Something happened.</p>
+    <button class="error-close" id="closeErrorBtn">OK</button>
+  </div>
+</div>
+
+<!-- DELIVERY MODAL (WHITE) -->
 <div id="deliveryModal" class="delivery-modal">
   <div class="delivery-modal-content">
     <h3>🚚 Select Delivery Option</h3>
@@ -1054,10 +1114,36 @@
   let selectedPaxiStore = null;
   let isKingWilliamsTown = false;
   
-  // Check if user has already purchased mixtape
-  function hasUserPurchasedMixtape() {
-    return currentUser && currentUser.hasPurchasedMixtape === true;
+  // WHITE MODAL FUNCTIONS
+  function showSuccessModal(title, message) {
+    document.getElementById('successTitle').innerText = title;
+    document.getElementById('successMessage').innerText = message;
+    document.getElementById('successModal').classList.add('show');
   }
+  
+  function showErrorModal(title, message) {
+    document.getElementById('errorTitle').innerText = title;
+    document.getElementById('errorMessage').innerText = message;
+    document.getElementById('errorModal').classList.add('show');
+  }
+  
+  function closeSuccessModal() {
+    document.getElementById('successModal').classList.remove('show');
+  }
+  
+  function closeErrorModal() {
+    document.getElementById('errorModal').classList.remove('show');
+  }
+  
+  document.getElementById('closeSuccessBtn')?.addEventListener('click', closeSuccessModal);
+  document.getElementById('closeErrorBtn')?.addEventListener('click', closeErrorModal);
+  
+  function closeFreeCollectionModal() {
+    document.getElementById('freeCollectionNotif').classList.remove('show');
+    proceedToPayment();
+  }
+  
+  document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', closeFreeCollectionModal);
   
   function normalizeEmail(email) {
     return email ? email.toLowerCase().trim() : '';
@@ -1139,7 +1225,7 @@
     if (result.success) {
       return await login(normalizedEmail, password);
     } else {
-      alert(result.error || 'Registration failed');
+      showErrorModal('Registration Failed', result.error || 'Could not create account');
       return false;
     }
   }
@@ -1169,7 +1255,7 @@
       window.closeAuthModal();
       return true;
     } else {
-      alert(result.error || 'Login failed');
+      showErrorModal('Login Failed', result.error || 'Invalid email or password');
       return false;
     }
   }
@@ -1189,7 +1275,7 @@
     if (sessionToken && cart) await apiCall('/api/update-cart', { sessionToken, cart });
   }
   
-  // MODIFIED: Mixtape button - can add without login, but only once, and checks if already purchased
+  // MIXTAPE BUTTON - Can add without login, only once
   function updateMixtapeButtons() {
     const buttonsContainer = document.getElementById('mixtapeButtons');
     if (!buttonsContainer) return;
@@ -1210,7 +1296,7 @@
       if (listenBtn) {
         listenBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          alert("You can listen to previews on YouTube via the bottom button.");
+          showErrorModal('Preview', 'You can listen to previews on YouTube via the bottom button.');
         });
       }
       return;
@@ -1228,14 +1314,14 @@
         // Check if mixtape already in cart (prevent duplicate)
         const existing = cart.find(i => i.id === 99);
         if (existing) {
-          alert("Mixtape is already in your cart. You can only purchase it once.");
+          showErrorModal('Already in Cart', 'Mixtape is already in your cart. You can only purchase it once.');
           return;
         }
         // Add mixtape to cart
         cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
         saveCartToLocal();
         document.getElementById("cartSidebar").classList.add("open");
-        alert("DUETS Mixtape added to cart! Complete checkout to get your download link.");
+        showSuccessModal('Added to Cart!', 'DUETS Mixtape added to cart! Complete checkout to get your download link.');
       });
     }
     
@@ -1243,7 +1329,7 @@
     if (listenBtn) {
       listenBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        alert("Add the mixtape to cart (R50) to purchase and download the full ZIP file.\n\nYou can listen to previews on YouTube via the bottom button.");
+        showErrorModal('How to Purchase', 'Add the mixtape to cart (R50) to purchase and download the full ZIP file.\n\nYou can listen to previews on YouTube via the bottom button.');
       });
     }
   }
@@ -1316,7 +1402,7 @@
   async function handleAuth() {
     let email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value.trim();
-    if (!email || !password) { alert('Please enter email and password'); return; }
+    if (!email || !password) { showErrorModal('Missing Info', 'Please enter email and password'); return; }
     email = normalizeEmail(email);
     if (window.isLoginMode) await login(email, password);
     else await register(email, password);
@@ -1351,7 +1437,7 @@
   }
   
   // ==============================================================
-  // STORE DATA & FUNCTIONS (UPDATED PRICES)
+  // STORE DATA & FUNCTIONS
   // ==============================================================
   
   const colors = [
@@ -1419,8 +1505,8 @@
   }
   
   function addToCart(product, size, color) {
-    if (!size) { alert("Select size"); return false; }
-    if (!color && product.id !== 99) { alert("Select color"); return false; }
+    if (!size) { showErrorModal('Size Required', 'Please select a size'); return false; }
+    if (!color && product.id !== 99) { showErrorModal('Color Required', 'Please select a color'); return false; }
     const existing = cart.find(i => i.id === product.id && i.size === size && i.color === color);
     if (existing) existing.qty++;
     else cart.push({ id: product.id, name: product.name, price: product.price, size: size || 'Digital', color: color || 'N/A', qty: 1 });
@@ -1451,7 +1537,7 @@
   }
   
   function closeModal() { document.getElementById("sizeColorModal").classList.remove("show"); }
-  function confirmAdd() { if (!selectedSize) { alert("Select size"); return; } if (!selectedColor) { alert("Select color"); return; } addToCart(currentProduct, selectedSize, selectedColor); closeModal(); }
+  function confirmAdd() { if (!selectedSize) { showErrorModal('Size Required', 'Please select a size'); return; } if (!selectedColor) { showErrorModal('Color Required', 'Please select a color'); return; } addToCart(currentProduct, selectedSize, selectedColor); closeModal(); }
   
   function renderGrid(products, containerId) {
     const container = document.getElementById(containerId);
@@ -1486,13 +1572,11 @@
   let selectedDelivery = null;
   
   function showDeliveryModal() {
-    const modal = document.getElementById('deliveryModal');
-    modal.classList.add('show');
+    document.getElementById('deliveryModal').classList.add('show');
   }
   
   function hideDeliveryModal() {
-    const modal = document.getElementById('deliveryModal');
-    modal.classList.remove('show');
+    document.getElementById('deliveryModal').classList.remove('show');
   }
   
   document.getElementById('economyOption')?.addEventListener('click', () => {
@@ -1516,7 +1600,7 @@
       updateCartUI();
       await proceedToPayment();
     } else {
-      alert('Please select a delivery option');
+      showErrorModal('Selection Required', 'Please select a delivery option');
     }
   });
   
@@ -1600,7 +1684,7 @@
   
   async function searchStoresByCity(cityName) {
     if (!cityName) {
-      alert('Please enter a town or city');
+      showErrorModal('No Location', 'Please enter a town or city');
       return;
     }
     
@@ -1611,7 +1695,7 @@
     try {
       const cityCoords = await getCityCoordinates(cityName);
       if (!cityCoords) {
-        alert(`Could not find coordinates for "${cityName}". Please try a different city name.`);
+        showErrorModal('Location Not Found', `Could not find coordinates for "${cityName}". Please try a different city name.`);
         return;
       }
       
@@ -1629,12 +1713,12 @@
       displayStores(stores, cityCoords.displayName);
       
       if (stores.length === 0) {
-        alert(`No ${storeBrands.join(', ')} stores found near ${cityCoords.displayName}. Try a different city or use "Add manually" button.`);
+        showErrorModal('No Stores Found', `No ${storeBrands.join(', ')} stores found near ${cityCoords.displayName}. Try a different city or use "Add manually" button.`);
       }
       
     } catch (error) {
       console.error('Search error:', error);
-      alert('Error searching for stores. Please try again.');
+      showErrorModal('Search Error', 'Error searching for stores. Please try again.');
     } finally {
       searchBtn.innerText = 'Search';
       searchBtn.disabled = false;
@@ -1671,7 +1755,7 @@
     }
   }
   
-  // MODIFIED: All King William's Town stores show free collection
+  // MODIFIED: Any store in King William's Town / Qonce area gets FREE collection
   window.selectStore = function(storeId) {
     const store = currentStores.find(s => s.id == storeId);
     if (store) {
@@ -1680,10 +1764,11 @@
       document.getElementById('paxi_store_address').value = store.address;
       document.getElementById('paxi_store_code').value = store.code || '';
       
-      // Check if store is in King William's Town area
+      // Check if store is in King William's Town / Qonce area
       const isKingTown = store.address.toLowerCase().includes('king william') || 
                          store.address.toLowerCase().includes('qonce') ||
                          store.name.toLowerCase().includes('king william') ||
+                         store.name.toLowerCase().includes('qonce') ||
                          (store.address.toLowerCase().includes('king') && store.address.toLowerCase().includes('william'));
       
       if (isKingTown) {
@@ -1691,8 +1776,7 @@
         deliveryAmount = 0;
         document.getElementById('delivery_amount').value = 0;
         // Show white modal for free collection
-        const notifModal = document.getElementById('freeCollectionNotif');
-        notifModal.classList.add('show');
+        document.getElementById('freeCollectionNotif').classList.add('show');
       } else {
         isKingWilliamsTown = false;
         showDeliveryModal();
@@ -1716,7 +1800,7 @@
     const storeAddress = document.getElementById('manualStoreAddress').value.trim();
     
     if (!storeName || !storeAddress) {
-      alert('Please enter both store name and address');
+      showErrorModal('Missing Info', 'Please enter both store name and address');
       return;
     }
     
@@ -1738,6 +1822,7 @@
     const isKingTown = storeAddress.toLowerCase().includes('king william') || 
                        storeAddress.toLowerCase().includes('qonce') ||
                        storeName.toLowerCase().includes('king william') ||
+                       storeName.toLowerCase().includes('qonce') ||
                        (storeAddress.toLowerCase().includes('king') && storeAddress.toLowerCase().includes('william'));
     
     if (isKingTown) {
@@ -1753,11 +1838,6 @@
     closeManualStoreModal();
     closeStoreFinder();
   }
-  
-  document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', async () => {
-    document.getElementById('freeCollectionNotif').classList.remove('show');
-    await proceedToPayment();
-  });
   
   document.getElementById('manualStoreBtn')?.addEventListener('click', showManualStoreModal);
   document.getElementById('manualSaveBtn')?.addEventListener('click', saveManualStore);
@@ -1821,7 +1901,7 @@
       return;
     }
     if (cart.length === 0) {
-      alert("Cart is empty");
+      showErrorModal('Empty Cart', 'Your cart is empty');
       return;
     }
     
@@ -1848,7 +1928,7 @@
       if (checkoutBtn.disabled) {
         checkoutBtn.innerText = "CHECKOUT →";
         checkoutBtn.disabled = false;
-        alert("Request timed out. Please try again.");
+        showErrorModal('Timeout', 'Request timed out. Please try again.');
       }
     }, 30000);
     
@@ -1874,7 +1954,7 @@
       
       if (!saveData.success) {
         clearTimeout(timeoutId);
-        alert("Failed to save order: " + (saveData.error || "Unknown error"));
+        showErrorModal('Order Failed', saveData.error || 'Failed to save order');
         checkoutBtn.innerText = originalText;
         checkoutBtn.disabled = false;
         return;
@@ -1896,13 +1976,13 @@
         window.location.href = paymentData.paymentUrl;
       } else {
         clearTimeout(timeoutId);
-        alert("Payment error: " + (paymentData.error || "Could not create payment link"));
+        showErrorModal('Payment Error', paymentData.error || 'Could not create payment link');
         checkoutBtn.innerText = originalText;
         checkoutBtn.disabled = false;
       }
     } catch (error) {
       clearTimeout(timeoutId);
-      alert("Connection error. Please try again.");
+      showErrorModal('Connection Error', 'Please check your internet and try again.');
       checkoutBtn.innerText = originalText;
       checkoutBtn.disabled = false;
     }
@@ -1914,7 +1994,7 @@
       sessionStorage.removeItem('pendingOrderId');
       await refreshUserData();
       if (currentUser && currentUser.hasPurchasedMixtape) {
-        alert("Thank you! Your mixtape is now available for download. Check your email or visit your account.");
+        showSuccessModal('Download Ready!', 'Thank you! Your mixtape is now available for download. Check your email or visit your account.');
         updateMixtapeButtons();
       }
     }
@@ -1943,7 +2023,7 @@
       return;
     }
     if (cart.length === 0) {
-      alert("Cart is empty");
+      showErrorModal('Empty Cart', 'Your cart is empty');
       return;
     }
     const hasPhysicalItems = cart.some(item => item.id !== 99);
