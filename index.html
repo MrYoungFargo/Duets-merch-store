@@ -1334,7 +1334,7 @@
   });
   
   // ==============================================================
-  // PAXI STORE FINDER MAP
+  // PAXI STORE FINDER MAP - WORKING VERSION
   // ==============================================================
   let map = null;
   let markers = [];
@@ -1406,7 +1406,6 @@
       document.getElementById('paxi_store_address').value = store.address;
       document.getElementById('paxi_store_code').value = store.code || '';
       
-      // Check if store is in King William's Town (free collection)
       const isKingTown = store.address.toLowerCase().includes('king william') || 
                          store.name.toLowerCase().includes('king william') ||
                          store.address.toLowerCase().includes('kingwilliam');
@@ -1442,6 +1441,7 @@
         return;
       }
       const { lat, lon } = geoData[0];
+      
       if (map) {
         map.setView([lat, lon], 12);
       } else {
@@ -1450,6 +1450,7 @@
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
         }).addTo(map);
       }
+      
       const stores = await queryStores(lat, lon);
       displayStores(stores);
       if (stores.length === 0) alert('No PAXI stores found near that location.');
@@ -1474,7 +1475,7 @@
       } else {
         map.invalidateSize();
       }
-    }, 100);
+    }, 200);
   }
   
   function closeStoreFinder() {
@@ -1487,7 +1488,7 @@
   document.getElementById('searchLocation')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchStores(); });
   
   // ==============================================================
-  // CHECKOUT BUTTON
+  // CHECKOUT BUTTON - NO "PLEASE SELECT PAXI" POPUP
   // ==============================================================
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (!currentUser) {
@@ -1503,14 +1504,14 @@
     const hasPhysicalItems = cart.some(item => item.id !== 99);
     
     if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
-      alert("Please select a PAXI collection point before checkout.");
+      // Instead of alert, open the map modal
+      openStoreFinder();
       return;
     }
     
     const orderId = "ORDER_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
     let total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
     
-    // Add delivery fee only if physical items exist
     if (hasPhysicalItems && deliveryAmount > 0) {
       total += deliveryAmount;
     }
