@@ -6,7 +6,6 @@
   <title>MrYoungFargo Merch | Official Store</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <!-- Leaflet CSS for map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   
   <style>
@@ -37,7 +36,7 @@
       pointer-events: none;
     }
 
-    .site-header, .hero, .container, .mixtape-section, footer, .cart-overlay, .modal, .auth-modal, .reset-modal, .music-footer-btn {
+    .site-header, .hero, .container, .mixtape-section, footer, .cart-overlay, .modal, .auth-modal, .reset-modal, .music-footer-btn, .delivery-modal {
       position: relative;
       z-index: 10;
     }
@@ -558,7 +557,85 @@
     }
     .close-reset:hover { color: #ff8888; }
 
-    /* PAXI Modal Styles - FIXED */
+    /* DELIVERY MODAL - WHITE BACKGROUND */
+    .delivery-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 10001;
+      align-items: center;
+      justify-content: center;
+    }
+    .delivery-modal.show {
+      display: flex;
+    }
+    .delivery-modal-content {
+      background: white;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 400px;
+      padding: 24px 20px;
+      text-align: center;
+      color: #1a1a2e;
+    }
+    .delivery-modal-content h3 {
+      color: #1a1a2e;
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+    }
+    .delivery-option {
+      background: #f0f0f0;
+      border-radius: 16px;
+      padding: 16px;
+      margin: 12px 0;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    .delivery-option:hover {
+      background: #e0e0e0;
+      transform: translateY(-2px);
+    }
+    .delivery-option.selected {
+      border-color: #3b82f6;
+      background: #e8f0fe;
+    }
+    .delivery-name {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+    .delivery-price {
+      color: #10b981;
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+    .delivery-time {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 5px;
+    }
+    .delivery-confirm {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 14px;
+      width: 100%;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    .delivery-confirm:hover {
+      background: #2563eb;
+    }
+
+    /* PAXI Modal */
     #storeFinderModal {
       display: none;
       position: fixed;
@@ -624,6 +701,25 @@
   </style>
 </head>
 <body>
+
+<!-- DELIVERY MODAL (WHITE) -->
+<div id="deliveryModal" class="delivery-modal">
+  <div class="delivery-modal-content">
+    <h3>🚚 Select Delivery Option</h3>
+    <p style="font-size: 0.8rem; margin-bottom: 15px;">We use PAXI's courier service</p>
+    <div id="economyOption" class="delivery-option">
+      <div class="delivery-name">Economy Delivery</div>
+      <div class="delivery-price">R59.95</div>
+      <div class="delivery-time">7–9 Business Days + 3-5 days printing (10-14 business days total)</div>
+    </div>
+    <div id="speedOption" class="delivery-option">
+      <div class="delivery-name">Speed Delivery</div>
+      <div class="delivery-price">R109.95</div>
+      <div class="delivery-time">3–5 Business Days + 3-5 days printing (6-10 business days total)</div>
+    </div>
+    <button class="delivery-confirm" id="confirmDeliveryBtn">Confirm Selection</button>
+  </div>
+</div>
 
 <!-- AUTH MODAL -->
 <div id="authModal" class="auth-modal">
@@ -739,15 +835,15 @@
 <input type="hidden" id="paxi_store_name">
 <input type="hidden" id="paxi_store_address">
 <input type="hidden" id="paxi_store_code">
-<input type="hidden" id="paxi_store_lat">
-<input type="hidden" id="paxi_store_lng">
+<input type="hidden" id="delivery_amount" value="0">
+<input type="hidden" id="delivery_type" value="">
 
 <!-- PAXI SELECTOR BUTTON -->
 <button type="button" id="openStoreFinderBtn" style="background: #10b981; color: white; padding: 10px; border-radius: 30px; width: 90%; margin: 0 auto 20px; display: block; max-width: 400px; border: none; cursor: pointer;">
   📍 Select PAXI Pickup Point
 </button>
 
-<!-- PAXI MODAL (Map & Store List) - FIXED -->
+<!-- PAXI MODAL -->
 <div id="storeFinderModal">
   <div class="modal-container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -755,7 +851,7 @@
       <button id="closeStoreFinderBtn" style="background: red;">✕ Close</button>
     </div>
     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-      <input type="text" id="searchLocation" placeholder="🔍 Enter town, suburb or city (e.g. Johannesburg, Cape Town)" style="flex: 1;">
+      <input type="text" id="searchLocation" placeholder="🔍 Enter town, suburb or city" style="flex: 1;">
       <button id="searchBtn">Search</button>
     </div>
     <div id="paxiMap" style="height: 400px; border-radius: 16px; margin: 15px 0; background: #0a0a2a;"></div>
@@ -772,12 +868,20 @@
   const API_URL = 'https://mryoungfargo-payment.onrender.com';
   
   // ==============================================================
-  // USER AUTHENTICATION (shortened for brevity - same as before)
+  // PRICES UPDATED
+  // ==============================================================
+  // T-shirts: R150, Sweaters: R280, Hoodies: R300
+  
+  // ==============================================================
+  // USER AUTHENTICATION
   // ==============================================================
   
   let currentUser = null;
   let sessionToken = localStorage.getItem('session_token') || null;
   let cart = [];
+  let deliveryAmount = 0;
+  let selectedPaxiStore = null;
+  let isKingWilliamsTown = false;
   
   function normalizeEmail(email) {
     return email ? email.toLowerCase().trim() : '';
@@ -1059,7 +1163,7 @@
   }
   
   // ==============================================================
-  // STORE DATA & FUNCTIONS
+  // STORE DATA & FUNCTIONS (UPDATED PRICES)
   // ==============================================================
   
   const colors = [
@@ -1069,32 +1173,33 @@
     { name: "Blue", value: "Blue", bg: "#3b82f6" }
   ];
   
+  // UPDATED PRICES: T-shirts R150, Sweaters R280, Hoodies R300
   const tshirts = [
-    { id: 1, name: "Neon Duets T-Shirt", price: 179.99, image: "t-shirt1.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 2, name: "Duets Lover T-Shirt", price: 179.99, image: "t-shirt2.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 3, name: "Duets Glitch T-Shirt", price: 179.99, image: "t-shirt3.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 4, name: "Sabaring T-Shirt", price: 179.99, image: "t-shirt4.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 5, name: "Monalisa Sabaring T-Shirt", price: 179.99, image: "t-shirt5.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 12, name: "Faka T-Shirt", price: 179.99, image: "t-shirt6.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 13, name: "Chinese Faka T-Shirt", price: 179.99, image: "t-shirt7.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 16, name: "Real Nigga T-Shirt", price: 179.99, image: "t-shirt8.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 17, name: "Lil' Nigga T-Shirt", price: 179.99, image: "t-shirt9.png", sizes: ["XS","S","M","L","XL","XXL"] }
+    { id: 1, name: "Neon Duets T-Shirt", price: 150, image: "t-shirt1.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 2, name: "Duets Lover T-Shirt", price: 150, image: "t-shirt2.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 3, name: "Duets Glitch T-Shirt", price: 150, image: "t-shirt3.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 4, name: "Sabaring T-Shirt", price: 150, image: "t-shirt4.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 5, name: "Monalisa Sabaring T-Shirt", price: 150, image: "t-shirt5.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 12, name: "Faka T-Shirt", price: 150, image: "t-shirt6.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 13, name: "Chinese Faka T-Shirt", price: 150, image: "t-shirt7.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 16, name: "Real Nigga T-Shirt", price: 150, image: "t-shirt8.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 17, name: "Lil' Nigga T-Shirt", price: 150, image: "t-shirt9.png", sizes: ["XS","S","M","L","XL","XXL"] }
   ];
   
   const sweaters = [
-    { id: 6, name: "Sabaring Sweater", price: 329.99, image: "sweater1.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 7, name: "Neon Duets Sweater", price: 329.99, image: "sweater2.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 8, name: "Duets Lover Sweater", price: 329.99, image: "sweater3.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 9, name: "Duets Glitch Sweater", price: 329.99, image: "sweater4.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 14, name: "Faka Sweater", price: 329.99, image: "sweater5.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 18, name: "Real Nigga Sweater", price: 329.99, image: "sweater6.png", sizes: ["XS","S","M","L","XL","XXL"] }
+    { id: 6, name: "Sabaring Sweater", price: 280, image: "sweater1.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 7, name: "Neon Duets Sweater", price: 280, image: "sweater2.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 8, name: "Duets Lover Sweater", price: 280, image: "sweater3.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 9, name: "Duets Glitch Sweater", price: 280, image: "sweater4.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 14, name: "Faka Sweater", price: 280, image: "sweater5.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 18, name: "Real Nigga Sweater", price: 280, image: "sweater6.png", sizes: ["XS","S","M","L","XL","XXL"] }
   ];
   
   const hoodies = [
-    { id: 10, name: "Duets Lover Hoodie", price: 379.99, image: "hoodie1.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 11, name: "Duets Glitch Hoodie", price: 379.99, image: "hoodie2.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 15, name: "Faka Hoodie", price: 379.99, image: "hoodie3.png", sizes: ["XS","S","M","L","XL","XXL"] },
-    { id: 19, name: "Real Nigga Hoodie", price: 379.99, image: "hoodie4.png", sizes: ["XS","S","M","L","XL","XXL"] }
+    { id: 10, name: "Duets Lover Hoodie", price: 300, image: "hoodie1.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 11, name: "Duets Glitch Hoodie", price: 300, image: "hoodie2.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 15, name: "Faka Hoodie", price: 300, image: "hoodie3.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 19, name: "Real Nigga Hoodie", price: 300, image: "hoodie4.png", sizes: ["XS","S","M","L","XL","XXL"] }
   ];
   
   const allProducts = [...tshirts, ...sweaters, ...hoodies];
@@ -1189,7 +1294,47 @@
   }
   
   // ==============================================================
-  // PAXI STORE FINDER MAP - FIXED VERSION
+  // DELIVERY MODAL
+  // ==============================================================
+  let selectedDelivery = null;
+  
+  function showDeliveryModal() {
+    const modal = document.getElementById('deliveryModal');
+    modal.classList.add('show');
+  }
+  
+  function hideDeliveryModal() {
+    const modal = document.getElementById('deliveryModal');
+    modal.classList.remove('show');
+  }
+  
+  document.getElementById('economyOption')?.addEventListener('click', () => {
+    document.getElementById('economyOption').classList.add('selected');
+    document.getElementById('speedOption').classList.remove('selected');
+    selectedDelivery = { type: 'economy', amount: 59.95 };
+  });
+  
+  document.getElementById('speedOption')?.addEventListener('click', () => {
+    document.getElementById('speedOption').classList.add('selected');
+    document.getElementById('economyOption').classList.remove('selected');
+    selectedDelivery = { type: 'speed', amount: 109.95 };
+  });
+  
+  document.getElementById('confirmDeliveryBtn')?.addEventListener('click', () => {
+    if (selectedDelivery) {
+      deliveryAmount = selectedDelivery.amount;
+      document.getElementById('delivery_amount').value = deliveryAmount;
+      document.getElementById('delivery_type').value = selectedDelivery.type;
+      hideDeliveryModal();
+      updateCartUI();
+      alert(`✅ Delivery option selected: ${selectedDelivery.type === 'economy' ? 'Economy (R59.95)' : 'Speed (R109.95)'}`);
+    } else {
+      alert('Please select a delivery option');
+    }
+  });
+  
+  // ==============================================================
+  // PAXI STORE FINDER MAP
   // ==============================================================
   let map = null;
   let markers = [];
@@ -1206,19 +1351,15 @@
       out body;
     `;
     try {
-      const response = await fetch(overpassUrl, {
-        method: 'POST',
-        body: query
-      });
+      const response = await fetch(overpassUrl, { method: 'POST', body: query });
       const data = await response.json();
       return data.elements.map(el => ({
         id: el.id,
         name: el.tags.name || el.tags.brand || 'PAXI Store',
-        brand: el.tags.brand || 'Store',
         address: el.tags['addr:full'] || el.tags['addr:street'] || el.tags['addr:city'] || 'Address not available',
         lat: el.lat || (el.center ? el.center.lat : lat),
         lon: el.lon || (el.center ? el.center.lon : lng),
-        code: el.tags.ref || el.tags['paxi:code'] || ''
+        code: el.tags.ref || ''
       }));
     } catch (error) {
       console.error('Overpass error:', error);
@@ -1228,11 +1369,8 @@
   
   function displayStores(stores) {
     if (!map) return;
-    
-    // Clear existing markers
     markers.forEach(m => map.removeLayer(m));
     markers = [];
-    
     const container = document.getElementById('storeList');
     container.innerHTML = '';
     currentStores = stores;
@@ -1243,29 +1381,17 @@
     }
     
     stores.forEach(store => {
-      // Add marker to map
       const marker = L.marker([store.lat, store.lon]).addTo(map);
-      marker.bindPopup(`
-        <b>${store.name}</b><br>
-        ${store.address}<br>
-        ${store.code ? `Code: ${store.code}<br>` : ''}
-        <button onclick="selectStore('${store.id}')">Select this point</button>
-      `);
+      marker.bindPopup(`<b>${store.name}</b><br>${store.address}<br><button onclick="selectStore('${store.id}')">Select</button>`);
       markers.push(marker);
       
-      // Add to list
       const div = document.createElement('div');
       div.className = 'store-item';
-      div.innerHTML = `
-        <div class="store-name">${store.name}</div>
-        <div class="store-address">${store.address}</div>
-        <div class="store-code">${store.code ? `PAXI Code: ${store.code}` : 'PAXI Collection Point'}</div>
-      `;
+      div.innerHTML = `<div class="store-name">${store.name}</div><div class="store-address">${store.address}</div>`;
       div.onclick = () => selectStore(store.id);
       container.appendChild(div);
     });
     
-    // Fit map to show all markers
     if (markers.length > 0) {
       const group = L.featureGroup(markers);
       map.fitBounds(group.getBounds().pad(0.2));
@@ -1275,13 +1401,26 @@
   window.selectStore = function(storeId) {
     const store = currentStores.find(s => s.id == storeId);
     if (store) {
+      selectedPaxiStore = store;
       document.getElementById('paxi_store_name').value = store.name;
       document.getElementById('paxi_store_address').value = store.address;
       document.getElementById('paxi_store_code').value = store.code || '';
-      document.getElementById('paxi_store_lat').value = store.lat;
-      document.getElementById('paxi_store_lng').value = store.lon;
+      
+      // Check if store is in King William's Town (free collection)
+      const isKingTown = store.address.toLowerCase().includes('king william') || 
+                         store.name.toLowerCase().includes('king william') ||
+                         store.address.toLowerCase().includes('kingwilliam');
+      
+      if (isKingTown) {
+        isKingWilliamsTown = true;
+        deliveryAmount = 0;
+        document.getElementById('delivery_amount').value = 0;
+        alert(`✅ Free collection at Clicks Stone Towers, King William's Town!\nYour items will be ready for collection at Clicks Stone Towers.`);
+      } else {
+        isKingWilliamsTown = false;
+        showDeliveryModal();
+      }
       closeStoreFinder();
-      alert(`✅ Collection point selected:\n${store.name}\n${store.address}`);
     }
   };
   
@@ -1299,12 +1438,10 @@
       const geoRes = await fetch(geoUrl);
       const geoData = await geoRes.json();
       if (!geoData.length) {
-        alert('Location not found. Please try a different town name.');
+        alert('Location not found');
         return;
       }
       const { lat, lon } = geoData[0];
-      
-      // Initialize or reinitialize map
       if (map) {
         map.setView([lat, lon], 12);
       } else {
@@ -1313,14 +1450,11 @@
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
         }).addTo(map);
       }
-      
       const stores = await queryStores(lat, lon);
       displayStores(stores);
-      if (stores.length === 0) {
-        alert('No PAXI stores found near that location. Try a larger town or city.');
-      }
+      if (stores.length === 0) alert('No PAXI stores found near that location.');
     } catch (error) {
-      console.error('Search error:', error);
+      console.error(error);
       alert('Error searching. Please try again.');
     } finally {
       searchBtn.innerText = 'Search';
@@ -1331,7 +1465,6 @@
   function openStoreFinder() {
     const modal = document.getElementById('storeFinderModal');
     modal.style.display = 'block';
-    // Small delay to ensure the modal is visible before map initializes
     setTimeout(() => {
       if (!map) {
         map = L.map('paxiMap').setView([-28.9, 24.8], 5);
@@ -1345,23 +1478,13 @@
   }
   
   function closeStoreFinder() {
-    const modal = document.getElementById('storeFinderModal');
-    modal.style.display = 'none';
+    document.getElementById('storeFinderModal').style.display = 'none';
   }
   
-  // Bind PAXI button events
-  document.addEventListener('DOMContentLoaded', () => {
-    const openBtn = document.getElementById('openStoreFinderBtn');
-    const closeBtn = document.getElementById('closeStoreFinderBtn');
-    const searchBtn = document.getElementById('searchBtn');
-    const searchInput = document.getElementById('searchLocation');
-    if (openBtn) openBtn.onclick = openStoreFinder;
-    if (closeBtn) closeBtn.onclick = closeStoreFinder;
-    if (searchBtn) searchBtn.onclick = searchStores;
-    if (searchInput) searchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') searchStores();
-    });
-  });
+  document.getElementById('openStoreFinderBtn')?.addEventListener('click', openStoreFinder);
+  document.getElementById('closeStoreFinderBtn')?.addEventListener('click', closeStoreFinder);
+  document.getElementById('searchBtn')?.addEventListener('click', searchStores);
+  document.getElementById('searchLocation')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchStores(); });
   
   // ==============================================================
   // CHECKOUT BUTTON
@@ -1376,14 +1499,21 @@
       return;
     }
     
-    const paxiStoreName = document.getElementById('paxi_store_name').value;
-    if (!paxiStoreName) {
+    // Check if only mixtape is in cart (no physical items)
+    const hasPhysicalItems = cart.some(item => item.id !== 99);
+    
+    if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
       alert("Please select a PAXI collection point before checkout.");
       return;
     }
     
     const orderId = "ORDER_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
     let total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+    
+    // Add delivery fee only if physical items exist
+    if (hasPhysicalItems && deliveryAmount > 0) {
+      total += deliveryAmount;
+    }
     
     const checkoutBtn = document.getElementById("checkoutBtn");
     const originalText = checkoutBtn.innerText;
@@ -1410,7 +1540,9 @@
           customerEmail: currentUser.email,
           paxi_store_name: document.getElementById('paxi_store_name').value,
           paxi_store_address: document.getElementById('paxi_store_address').value,
-          paxi_store_code: document.getElementById('paxi_store_code').value
+          paxi_store_code: document.getElementById('paxi_store_code').value,
+          delivery_amount: deliveryAmount,
+          delivery_type: document.getElementById('delivery_type').value
         })
       });
       
@@ -1433,7 +1565,6 @@
       });
       
       const paymentData = await paymentResponse.json();
-      console.log("Payment response:", paymentData);
       
       if (paymentData.success && paymentData.paymentUrl) {
         clearTimeout(timeoutId);
@@ -1447,7 +1578,6 @@
       }
     } catch (error) {
       clearTimeout(timeoutId);
-      console.error("Checkout error:", error);
       alert("Connection error. Please try again.");
       checkoutBtn.innerText = originalText;
       checkoutBtn.disabled = false;
@@ -1456,27 +1586,16 @@
   
   async function checkForSuccessfulPayment() {
     const pendingOrderId = sessionStorage.getItem('pendingOrderId');
-    
     if (pendingOrderId) {
       sessionStorage.removeItem('pendingOrderId');
       await refreshUserData();
-      
       if (currentUser && currentUser.hasPurchasedMixtape) {
         alert("Thank you! Your mixtape is now available for download.");
         updateMixtapeButtons();
-      } else {
-        setTimeout(async () => {
-          await refreshUserData();
-          if (currentUser && currentUser.hasPurchasedMixtape) {
-            alert("Thank you! Your mixtape is now available for download.");
-            updateMixtapeButtons();
-          }
-        }, 5000);
       }
     }
   }
   
-  // EVENT LISTENERS
   document.getElementById("cartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
   document.getElementById("stickyCartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
   document.getElementById("closeCartBtn")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.remove("open"));
