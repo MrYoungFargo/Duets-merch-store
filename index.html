@@ -940,7 +940,7 @@
   <div class="simple-error-content">
     <i class="fas fa-info-circle"></i>
     <h4>Notice</h4>
-    <p id="simpleErrorMessage">Please select a pickup point from map before checking out.</p>
+    <p id="simpleErrorMessage"></p>
     <button class="simple-error-close" id="closeSimpleErrorBtn">OK</button>
   </div>
 </div>
@@ -1295,7 +1295,7 @@
     if (sessionToken && cart) await apiCall('/api/update-cart', { sessionToken, cart });
   }
   
-  // MIXTAPE BUTTON - NO LOGIN REQUIRED TO ADD
+  // CHANGE 1: ADD TO CART WITHOUT LOGIN (No login check)
   function updateMixtapeButtons() {
     const buttonsContainer = document.getElementById('mixtapeButtons');
     if (!buttonsContainer) return;
@@ -1595,7 +1595,6 @@
     selectedDelivery = { type: 'speed', amount: 109.95 };
   });
   
-  // AFTER DELIVERY CONFIRM -> GO TO PAYMENT
   document.getElementById('confirmDeliveryBtn')?.addEventListener('click', async () => {
     if (selectedDelivery) {
       deliveryAmount = selectedDelivery.amount;
@@ -1609,7 +1608,6 @@
     }
   });
   
-  // X button on delivery modal -> GO BACK TO MAP
   document.getElementById('closeDeliveryModalBtn')?.addEventListener('click', () => {
     document.getElementById('deliveryModal').classList.remove('show');
     openStoreFinder();
@@ -1766,7 +1764,7 @@
     }
   }
   
-  // STORE SELECTION - King William's Town = FREE COLLECTION popup
+  // CHANGE 2: KING WILLIAM'S TOWN = FREE COLLECTION POPUP (NOT DELIVERY OPTIONS)
   window.selectStore = function(storeId) {
     const store = currentStores.find(s => s.id == storeId);
     if (store) {
@@ -1790,6 +1788,7 @@
         document.getElementById('paxi_store_code').value = selectedPaxiStore.code;
         document.getElementById('delivery_amount').value = 0;
         closeStoreFinder();
+        // SHOW FREE COLLECTION POPUP - NOT DELIVERY OPTIONS
         document.getElementById('freeCollectionNotif').classList.add('show');
       } else {
         selectedPaxiStore = store;
@@ -2025,9 +2024,7 @@
     }
   }
   
-  // ==============================================================
-  // CHECKOUT BUTTON - CORRECT FLOW
-  // ==============================================================
+  // CHANGE 3: CHECKOUT BUTTON FLOW - Login → Pickup point → Delivery options → Payment
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (!currentUser) {
       window.showAuthModal();
