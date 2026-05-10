@@ -558,7 +558,7 @@
     }
     .close-reset:hover { color: #ff8888; }
 
-    /* PAXI Modal Styles */
+    /* PAXI Modal Styles - FIXED */
     #storeFinderModal {
       display: none;
       position: fixed;
@@ -570,7 +570,7 @@
       z-index: 10000;
       overflow-y: auto;
     }
-    #storeFinderModal .modal-content {
+    #storeFinderModal .modal-container {
       max-width: 1000px;
       margin: 20px auto;
       background: #1a1a2e;
@@ -598,10 +598,12 @@
       border-radius: 40px;
       cursor: pointer;
     }
-    #map {
+    #paxiMap {
       height: 400px;
       border-radius: 16px;
       margin: 15px 0;
+      background: #0a0a2a;
+      width: 100%;
     }
     .store-list {
       max-height: 250px;
@@ -745,24 +747,23 @@
   📍 Select PAXI Pickup Point
 </button>
 
-<!-- PAXI MODAL (Map & Store List) -->
+<!-- PAXI MODAL (Map & Store List) - FIXED -->
 <div id="storeFinderModal">
-  <div class="modal-content">
+  <div class="modal-container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
       <h2>📍 Select Collection Point</h2>
       <button id="closeStoreFinderBtn" style="background: red;">✕ Close</button>
     </div>
-    <div>
-      <input type="text" id="searchLocation" placeholder="🔍 Enter town, suburb or city (e.g. Johannesburg, Cape Town)">
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <input type="text" id="searchLocation" placeholder="🔍 Enter town, suburb or city (e.g. Johannesburg, Cape Town)" style="flex: 1;">
       <button id="searchBtn">Search</button>
     </div>
-    <div id="map"></div>
+    <div id="paxiMap" style="height: 400px; border-radius: 16px; margin: 15px 0; background: #0a0a2a;"></div>
     <div id="storeList" class="store-list"></div>
   </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
 <script>
   // ==============================================================
@@ -771,7 +772,7 @@
   const API_URL = 'https://mryoungfargo-payment.onrender.com';
   
   // ==============================================================
-  // USER AUTHENTICATION
+  // USER AUTHENTICATION (shortened for brevity - same as before)
   // ==============================================================
   
   let currentUser = null;
@@ -828,9 +829,6 @@
         currentUser = result.user;
         updateMixtapeButtons();
         updateUserUI();
-        if (currentUser.email) {
-          // Brevo identity will be set later
-        }
       }
     }
   }
@@ -958,7 +956,6 @@
     }
   }
   
-  // Password visibility toggle
   const togglePasswordBtn = document.getElementById('togglePasswordBtn');
   const passwordInput = document.getElementById('authPassword');
   const passwordIcon = document.getElementById('passwordIcon');
@@ -1192,25 +1189,11 @@
   }
   
   // ==============================================================
-  // PAXI STORE FINDER MAP
+  // PAXI STORE FINDER MAP - FIXED VERSION
   // ==============================================================
   let map = null;
   let markers = [];
   let currentStores = [];
-  let selectedStore = null;
-  
-  function initMap(centerLat = -28.9, centerLng = 24.8, zoom = 5) {
-    if (map) map.remove();
-    map = L.map('map').setView([centerLat, centerLng], zoom);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-    }).addTo(map);
-  }
-  
-  function clearMarkers() {
-    markers.forEach(m => map.removeLayer(m));
-    markers = [];
-  }
   
   async function queryStores(lat, lng, radius = 5000) {
     const overpassUrl = 'https://overpass-api.de/api/interpreter';
@@ -1244,7 +1227,12 @@
   }
   
   function displayStores(stores) {
-    clearMarkers();
+    if (!map) return;
+    
+    // Clear existing markers
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+    
     const container = document.getElementById('storeList');
     container.innerHTML = '';
     currentStores = stores;
@@ -1261,7 +1249,7 @@
         <b>${store.name}</b><br>
         ${store.address}<br>
         ${store.code ? `Code: ${store.code}<br>` : ''}
-        <button onclick="window.selectStoreFromMap('${store.id}')">Select this point</button>
+        <button onclick="selectStore('${store.id}')">Select this point</button>
       `);
       markers.push(marker);
       
@@ -1273,15 +1261,20 @@
         <div class="store-address">${store.address}</div>
         <div class="store-code">${store.code ? `PAXI Code: ${store.code}` : 'PAXI Collection Point'}</div>
       `;
-      div.onclick = () => selectStoreFromMap(store.id);
+      div.onclick = () => selectStore(store.id);
       container.appendChild(div);
     });
+    
+    // Fit map to show all markers
+    if (markers.length > 0) {
+      const group = L.featureGroup(markers);
+      map.fitBounds(group.getBounds().pad(0.2));
+    }
   }
   
-  window.selectStoreFromMap = function(storeId) {
+  window.selectStore = function(storeId) {
     const store = currentStores.find(s => s.id == storeId);
     if (store) {
-      selectedStore = store;
       document.getElementById('paxi_store_name').value = store.name;
       document.getElementById('paxi_store_address').value = store.address;
       document.getElementById('paxi_store_code').value = store.code || '';
@@ -1307,12 +1300,20 @@
       const geoData = await geoRes.json();
       if (!geoData.length) {
         alert('Location not found. Please try a different town name.');
-        searchBtn.innerText = 'Search';
-        searchBtn.disabled = false;
         return;
       }
       const { lat, lon } = geoData[0];
-      initMap(lat, lon, 12);
+      
+      // Initialize or reinitialize map
+      if (map) {
+        map.setView([lat, lon], 12);
+      } else {
+        map = L.map('paxiMap').setView([lat, lon], 12);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+        }).addTo(map);
+      }
+      
       const stores = await queryStores(lat, lon);
       displayStores(stores);
       if (stores.length === 0) {
@@ -1330,7 +1331,17 @@
   function openStoreFinder() {
     const modal = document.getElementById('storeFinderModal');
     modal.style.display = 'block';
-    if (!map) initMap();
+    // Small delay to ensure the modal is visible before map initializes
+    setTimeout(() => {
+      if (!map) {
+        map = L.map('paxiMap').setView([-28.9, 24.8], 5);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+        }).addTo(map);
+      } else {
+        map.invalidateSize();
+      }
+    }, 100);
   }
   
   function closeStoreFinder() {
@@ -1338,7 +1349,7 @@
     modal.style.display = 'none';
   }
   
-  // Bind PAXI button events after DOM loads
+  // Bind PAXI button events
   document.addEventListener('DOMContentLoaded', () => {
     const openBtn = document.getElementById('openStoreFinderBtn');
     const closeBtn = document.getElementById('closeStoreFinderBtn');
@@ -1365,7 +1376,6 @@
       return;
     }
     
-    // Check if PAXI point is selected
     const paxiStoreName = document.getElementById('paxi_store_name').value;
     if (!paxiStoreName) {
       alert("Please select a PAXI collection point before checkout.");
