@@ -672,100 +672,99 @@
       width: 100%;
     }
 
-    /* MODIFIED: Smaller header and buttons */
+    /* MODIFIED STYLES - SMALLER HEADER & BUTTONS */
     #storeFinderModal .modal-container {
       max-width: 1000px;
       margin: 20px auto;
       background: #1a1a2e;
-      border-radius: 24px;
-      padding: 16px;
+      border-radius: 20px;
+      padding: 14px;
     }
-    #storeFinderModal .modal-header {
+    .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
-    #storeFinderModal h2 {
+    .modal-header h2 {
       color: white;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
       margin: 0;
     }
-    #storeFinderModal .close-store-btn {
+    .close-store-btn {
       background: #e11d2c;
       border: none;
       color: white;
-      padding: 4px 12px;
+      padding: 3px 10px;
       border-radius: 30px;
-      font-size: 0.6rem;
+      font-size: 0.55rem;
       font-weight: 600;
       cursor: pointer;
     }
     .search-row {
       display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 6px;
+      margin-bottom: 10px;
     }
     #storeFinderModal input {
       flex: 1;
-      padding: 8px 12px;
-      border-radius: 40px;
+      padding: 6px 10px;
+      border-radius: 30px;
       background: #0a0a1a;
       color: white;
       border: 1px solid #2a2a4a;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
     }
-    #storeFinderModal .search-btn {
+    .search-btn {
       background: #3b82f6;
       border: none;
       color: white;
-      padding: 6px 16px;
-      border-radius: 40px;
-      font-size: 0.65rem;
+      padding: 5px 14px;
+      border-radius: 30px;
+      font-size: 0.6rem;
       font-weight: 600;
       cursor: pointer;
     }
     #paxiMap {
-      height: 250px;
-      border-radius: 16px;
-      margin: 10px 0;
+      height: 220px;
+      border-radius: 14px;
+      margin: 8px 0;
       background: #0a0a2a;
       width: 100%;
     }
     .store-list {
-      max-height: 280px;
+      max-height: 250px;
       overflow-y: auto;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .store-item {
       background: #0a0a1a;
-      margin-bottom: 8px;
-      padding: 10px;
-      border-radius: 12px;
+      margin-bottom: 6px;
+      padding: 8px;
+      border-radius: 10px;
       border: 1px solid #2a2a4a;
       cursor: pointer;
     }
     .store-item:hover { background: #1a1a3a; }
-    .store-name { font-weight: bold; color: #3b82f6; font-size: 0.75rem; }
-    .store-address { font-size: 0.65rem; color: #aaa; margin-top: 4px; }
-    .store-code { font-size: 0.6rem; color: #10b981; margin-top: 4px; }
+    .store-name { font-weight: bold; color: #3b82f6; font-size: 0.7rem; }
+    .store-address { font-size: 0.6rem; color: #aaa; margin-top: 3px; }
+    .store-code { font-size: 0.55rem; color: #10b981; margin-top: 3px; }
     
     .manual-store-btn {
       background: #f59e0b;
       border: none;
       color: white;
-      padding: 10px;
+      padding: 8px;
       width: 100%;
       border-radius: 40px;
       font-weight: 600;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       cursor: pointer;
-      margin-top: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
     }
     .manual-store-btn:hover {
       background: #d97706;
@@ -781,15 +780,14 @@
       z-index: 10001;
     }
     .ui-autocomplete li {
-      padding: 8px 12px;
+      padding: 6px 10px;
       cursor: pointer;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
     }
     .ui-autocomplete li:hover {
       background: #3b82f6;
     }
     
-    /* Manual store modal */
     .manual-modal {
       display: none;
       position: fixed;
@@ -805,48 +803,50 @@
     .manual-modal.show { display: flex; }
     .manual-modal-content {
       background: #1a1a2e;
-      border-radius: 24px;
+      border-radius: 20px;
       width: 90%;
-      max-width: 400px;
-      padding: 24px;
+      max-width: 350px;
+      padding: 20px;
       border: 1px solid #3b82f6;
     }
     .manual-modal-content h3 {
       color: white;
-      font-size: 1rem;
-      margin-bottom: 16px;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
     }
     .manual-modal-content input {
       width: 100%;
-      padding: 12px;
-      margin: 8px 0;
+      padding: 10px;
+      margin: 6px 0;
       background: #0a0a1a;
       border: 1px solid #2a2a4a;
-      border-radius: 12px;
+      border-radius: 10px;
       color: white;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
     }
     .manual-save-btn {
       background: #10b981;
-      border: none;
-      color: white;
-      padding: 12px;
-      width: 100%;
-      border-radius: 40px;
-      font-weight: 600;
-      margin-top: 16px;
-      cursor: pointer;
-    }
-    .manual-cancel-btn {
-      background: #e11d2c;
       border: none;
       color: white;
       padding: 10px;
       width: 100%;
       border-radius: 40px;
       font-weight: 600;
-      margin-top: 8px;
+      margin-top: 12px;
       cursor: pointer;
+      font-size: 0.7rem;
+    }
+    .manual-cancel-btn {
+      background: #e11d2c;
+      border: none;
+      color: white;
+      padding: 8px;
+      width: 100%;
+      border-radius: 40px;
+      font-weight: 600;
+      margin-top: 6px;
+      cursor: pointer;
+      font-size: 0.7rem;
     }
   </style>
 </head>
@@ -1000,7 +1000,7 @@
       <button id="closeStoreFinderBtn" class="close-store-btn">✕ Close</button>
     </div>
     <div class="search-row">
-      <input type="text" id="searchLocation" placeholder="🔍 Enter town, suburb or city" style="flex: 1;">
+      <input type="text" id="searchLocation" placeholder="🔍 Enter town, suburb or city">
       <button id="searchBtn" class="search-btn">Search</button>
     </div>
     <div id="paxiMap"></div>
@@ -1011,12 +1011,11 @@
   </div>
 </div>
 
-<!-- Manual Store Modal -->
 <div id="manualStoreModal" class="manual-modal">
   <div class="manual-modal-content">
     <h3>✏️ Add Store Manually</h3>
-    <input type="text" id="manualStoreName" placeholder="Store name (e.g., PEP Mdantsane)" autocomplete="off">
-    <input type="text" id="manualStoreAddress" placeholder="Store address / Town" autocomplete="off">
+    <input type="text" id="manualStoreName" placeholder="Store name (e.g., PEP Mdantsane)">
+    <input type="text" id="manualStoreAddress" placeholder="Store address / Town">
     <button id="manualSaveBtn" class="manual-save-btn">Save & Use This Store</button>
     <button id="manualCancelBtn" class="manual-cancel-btn">Cancel</button>
   </div>
@@ -1509,7 +1508,7 @@
     return null;
   }
   
-  async function searchStoresWithPhoton(lat, lon, cityName) {
+  async function searchStoresWithPhoton(lat, lon) {
     const allStores = [];
     
     for (const brand of storeBrands) {
@@ -1585,7 +1584,7 @@
         return;
       }
       
-      const stores = await searchStoresWithPhoton(cityCoords.lat, cityCoords.lon, cityName);
+      const stores = await searchStoresWithPhoton(cityCoords.lat, cityCoords.lon);
       
       if (map) {
         map.setView([cityCoords.lat, cityCoords.lon], 12);
@@ -1667,7 +1666,6 @@
     }
   };
   
-  // Manual store add functionality
   function showManualStoreModal() {
     document.getElementById('manualStoreModal').classList.add('show');
   }
@@ -1791,7 +1789,7 @@
   document.getElementById('searchLocation')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchStores(); });
   
   // ==============================================================
-  // CHECKOUT BUTTON
+  // CHECKOUT BUTTON - WORKING
   // ==============================================================
   async function proceedToPayment() {
     if (!currentUser) {
@@ -1898,6 +1896,9 @@
     }
   }
   
+  // ==============================================================
+  // EVENT LISTENERS - ALL WORKING
+  // ==============================================================
   document.getElementById("cartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
   document.getElementById("stickyCartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
   document.getElementById("closeCartBtn")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.remove("open"));
@@ -1912,6 +1913,7 @@
   document.getElementById("forgotPasswordBtn")?.addEventListener("click", showResetModal);
   document.getElementById("sendResetBtn")?.addEventListener("click", sendResetLink);
   
+  // MAIN CHECKOUT BUTTON EVENT
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (!currentUser) {
       window.showAuthModal();
