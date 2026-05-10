@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- Added: jQuery UI for autocomplete suggestions -->
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
   
   <style>
@@ -637,7 +636,6 @@
       background: #2563eb;
     }
 
-    /* NOTIFICATION MODAL - WHITE BACKGROUND */
     .notification-modal {
       display: none;
       position: fixed;
@@ -675,7 +673,6 @@
       width: 100%;
     }
 
-    /* PAXI Modal */
     #storeFinderModal {
       display: none;
       position: fixed;
@@ -707,7 +704,6 @@
       border: 1px solid #2a2a4a;
       margin: 10px 0;
     }
-    /* Style for autocomplete suggestions */
     .ui-autocomplete {
       background: #1a1a2e;
       border: 1px solid #3b82f6;
@@ -759,7 +755,7 @@
 </head>
 <body>
 
-<!-- NOTIFICATION MODAL: FREE COLLECTION (White background) -->
+<!-- NOTIFICATION MODAL: FREE COLLECTION -->
 <div id="freeCollectionNotif" class="notification-modal">
   <div class="notification-content">
     <i class="fas fa-check-circle"></i>
@@ -769,7 +765,7 @@
   </div>
 </div>
 
-<!-- DELIVERY MODAL (WHITE) -->
+<!-- DELIVERY MODAL -->
 <div id="deliveryModal" class="delivery-modal">
   <div class="delivery-modal-content">
     <h3>🚚 Select Delivery Option</h3>
@@ -939,7 +935,6 @@
   // ==============================================================
   // PRICES UPDATED
   // ==============================================================
-  // T-shirts: R150, Sweaters: R280, Hoodies: R300
   
   // ==============================================================
   // USER AUTHENTICATION
@@ -1242,7 +1237,6 @@
     { name: "Blue", value: "Blue", bg: "#3b82f6" }
   ];
   
-  // UPDATED PRICES: T-shirts R150, Sweaters R280, Hoodies R300
   const tshirts = [
     { id: 1, name: "Neon Duets T-Shirt", price: 150, image: "t-shirt1.png", sizes: ["XS","S","M","L","XL","XXL"] },
     { id: 2, name: "Duets Lover T-Shirt", price: 150, image: "t-shirt2.png", sizes: ["XS","S","M","L","XL","XXL"] },
@@ -1405,40 +1399,107 @@
   document.getElementById('confirmDeliveryBtn')?.addEventListener('click', proceedToPaymentAfterDelivery);
   
   // ==============================================================
-  // PAXI STORE FINDER MAP - WITH IMPROVED STORE TYPES & SEARCH SUGGESTIONS
+  // OPEN CAGE API STORE FINDER (FREE, NO CARD REQUIRED)
   // ==============================================================
+  const OPENCAGE_API_KEY = 'ef9bd422a0fc46a782d525d105ac32f6';
+  
   let map = null;
   let markers = [];
   let currentStores = [];
   
-  // Expanded store brands: PEP, PEP Home, PEP Cell, Tekkie Town, Shoe City
+  // Store brands to search for
   const storeBrands = ["PEP", "PEP Home", "PEPcell", "Tekkie Town", "Shoe City"];
-  const storeBrandQuery = storeBrands.map(b => `"${b}"`).join('|');
   
-  async function queryStores(lat, lng, radius = 10000) {
-    const overpassUrl = 'https://overpass-api.de/api/interpreter';
-    const query = `
-      [out:json];
-      (
-        node["shop"]["brand"~"${storeBrandQuery}"](around:${radius},${lat},${lng});
-        way["shop"]["brand"~"${storeBrandQuery}"](around:${radius},${lat},${lng});
-      );
-      out body;
-    `;
+  async function searchStoresWithOpenCage(location) {
+    if (!location) {
+      alert('Please enter a town or city');
+      return;
+    }
+    
+    const searchBtn = document.getElementById('searchBtn');
+    searchBtn.innerText = 'Searching...';
+    searchBtn.disabled = true;
+    
     try {
-      const response = await fetch(overpassUrl, { method: 'POST', body: query });
-      const data = await response.json();
-      return data.elements.map(el => ({
-        id: el.id,
-        name: el.tags.name || el.tags.brand || 'Store',
-        address: el.tags['addr:full'] || el.tags['addr:street'] || el.tags['addr:city'] || 'Address not available',
-        lat: el.lat || (el.center ? el.center.lat : lat),
-        lon: el.lon || (el.center ? el.center.lon : lng),
-        code: el.tags.ref || ''
-      }));
+      // Step 1: Geocode the location using OpenCage
+      const geocodeUrl = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location + ', South Africa')}&key=${OPENCAGE_API_KEY}&limit=1&countrycode=za`;
+      const geoRes = await fetch(geocodeUrl);
+      const geoData = await geoRes.json();
+      
+      if (!geoData.results || geoData.results.length === 0) {
+        alert('Location not found. Please try a different town or city.');
+        return;
+      }
+      
+      const { lat, lng } = geoData.results[0].geometry;
+      const formattedLocation = geoData.results[0].formatted;
+      
+      // Step 2: Search for stores near that location
+      let allStores = [];
+      
+      for (const brand of storeBrands) {
+        const searchUrl = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(brand + ' near ' + location + ' South Africa')}&key=${OPENCAGE_API_KEY}&limit=20&boundary_country=za&proximity=${lat},${lng}&radius=10000`;
+        const storeRes = await fetch(searchUrl);
+        const storeData = await storeRes.json();
+        
+        if (storeData.results) {
+          storeData.results.forEach(result => {
+            // Check if result matches one of our brands
+            const brandMatch = storeBrands.some(b => 
+              result.formatted.toLowerCase().includes(b.toLowerCase()) ||
+              (result.components && (
+                (result.components.shop || '').toLowerCase().includes(b.toLowerCase()) ||
+                (result.components.brand || '').toLowerCase().includes(b.toLowerCase())
+              ))
+            );
+            
+            if (brandMatch || result.formatted.toLowerCase().includes('pep') || result.formatted.toLowerCase().includes('tekki') || result.formatted.toLowerCase().includes('shoe city')) {
+              allStores.push({
+                id: result.annotations?.OSM?.id || Math.random(),
+                name: result.components?.shop || result.components?.brand || brand,
+                address: result.formatted,
+                lat: result.geometry.lat,
+                lon: result.geometry.lng,
+                code: result.components?.postcode || ''
+              });
+            }
+          });
+        }
+      }
+      
+      // Remove duplicates
+      const uniqueStores = [];
+      const seen = new Set();
+      for (const store of allStores) {
+        const key = store.name + store.address;
+        if (!seen.has(key)) {
+          seen.add(key);
+          uniqueStores.push(store);
+        }
+      }
+      
+      // Setup or update map
+      if (map) {
+        map.setView([lat, lng], 13);
+      } else {
+        map = L.map('paxiMap').setView([lat, lng], 13);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; OpenCage'
+        }).addTo(map);
+      }
+      
+      displayStores(uniqueStores);
+      
+      if (uniqueStores.length === 0) {
+        alert(`No ${storeBrands.join(', ')} stores found near ${formattedLocation}. Try a different location or search for a nearby city.`);
+      }
+      
     } catch (error) {
-      console.error('Overpass error:', error);
-      return [];
+      console.error('OpenCage error:', error);
+      alert('Error searching for stores. Please try again.');
+    } finally {
+      searchBtn.innerText = 'Search';
+      searchBtn.disabled = false;
     }
   }
   
@@ -1451,18 +1512,18 @@
     currentStores = stores;
     
     if (stores.length === 0) {
-      container.innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">No stores found in this area. Try a different location.</div>';
+      container.innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">No stores found in this area. Try a different location or search for a nearby city.</div>';
       return;
     }
     
     stores.forEach(store => {
       const marker = L.marker([store.lat, store.lon]).addTo(map);
-      marker.bindPopup(`<b>${store.name}</b><br>${store.address}<br><button onclick="selectStore('${store.id}')">Select</button>`);
+      marker.bindPopup(`<b>${store.name}</b><br>${store.address.substring(0, 150)}<br><button onclick="selectStore('${store.id}')">Select This Store</button>`);
       markers.push(marker);
       
       const div = document.createElement('div');
       div.className = 'store-item';
-      div.innerHTML = `<div class="store-name">${store.name}</div><div class="store-address">${store.address}</div>`;
+      div.innerHTML = `<div class="store-name">🏪 ${store.name}</div><div class="store-address">📍 ${store.address.substring(0, 100)}</div>`;
       div.onclick = () => selectStore(store.id);
       container.appendChild(div);
     });
@@ -1483,7 +1544,8 @@
       
       const isKingTown = store.address.toLowerCase().includes('king william') || 
                          store.name.toLowerCase().includes('king william') ||
-                         store.address.toLowerCase().includes('kingwilliam');
+                         store.address.toLowerCase().includes('kingwilliam') ||
+                         (store.address.toLowerCase().includes('king') && store.address.toLowerCase().includes('william'));
       
       if (isKingTown) {
         isKingWilliamsTown = true;
@@ -1504,7 +1566,7 @@
     await proceedToPayment();
   });
   
-  // Autocomplete suggestions for South African cities/towns
+  // South African cities for autocomplete
   const southAfricanCities = [
     "Johannesburg", "Cape Town", "Durban", "Pretoria", "Gqeberha", "Port Elizabeth",
     "Bloemfontein", "Pietermaritzburg", "Polokwane", "Nelspruit", "Mbombela",
@@ -1523,7 +1585,10 @@
     "Vryheid", "Dundee", "Ladysmith", "Estcourt", "Mooi River", "Howick",
     "Kokstad", "Matatiele", "Harding", "Port Shepstone", "Margate", "Scottburgh",
     "Ballito", "Stanger", "Richards Bay", "Empangeni", "Ulundi", "Nongoma",
-    "Pongola", "Paulpietersburg", "Piet Retief", "Amsterdam", "Ermelo", "Bethal"
+    "Pongola", "Paulpietersburg", "Piet Retief", "Amsterdam", "Bethal",
+    "Port Alfred", "Grahamstown", "Makhanda", "Butterworth", "Lady Frere",
+    "Cradock", "Middelburg Eastern Cape", "Somerset East", "Addo", "Jeffreys Bay",
+    "Plettenberg Bay", "Hermanus", "Saldanha", "Vredenburg", "Malmesbury"
   ];
   
   $(document).ready(function() {
@@ -1532,54 +1597,15 @@
       minLength: 2,
       select: function(event, ui) {
         $("#searchLocation").val(ui.item.value);
-        searchStoresWithLocation(ui.item.value);
+        searchStoresWithOpenCage(ui.item.value);
         return false;
       }
     });
   });
   
-  async function searchStoresWithLocation(location) {
-    if (!location) {
-      alert('Please enter a town or city');
-      return;
-    }
-    const searchBtn = document.getElementById('searchBtn');
-    searchBtn.innerText = 'Searching...';
-    searchBtn.disabled = true;
-    try {
-      const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location + ', South Africa')}&limit=1`;
-      const geoRes = await fetch(geoUrl);
-      const geoData = await geoRes.json();
-      if (!geoData.length) {
-        alert('Location not found');
-        return;
-      }
-      const { lat, lon } = geoData[0];
-      
-      if (map) {
-        map.setView([lat, lon], 12);
-      } else {
-        map = L.map('paxiMap').setView([lat, lon], 12);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-        }).addTo(map);
-      }
-      
-      const stores = await queryStores(lat, lon);
-      displayStores(stores);
-      if (stores.length === 0) alert('No stores found near that location.');
-    } catch (error) {
-      console.error(error);
-      alert('Error searching. Please try again.');
-    } finally {
-      searchBtn.innerText = 'Search';
-      searchBtn.disabled = false;
-    }
-  }
-  
   async function searchStores() {
     const location = document.getElementById('searchLocation').value.trim();
-    await searchStoresWithLocation(location);
+    await searchStoresWithOpenCage(location);
   }
   
   function openStoreFinder() {
