@@ -74,8 +74,20 @@ async function sendOrderConfirmationEmail(order) {
       <td style="padding: 8px; border: 1px solid #ddd;">${item.color || 'N/A'}</td>
       <td style="padding: 8px; border: 1px solid #ddd;">${item.qty}</td>
       <td style="padding: 8px; border: 1px solid #ddd;">R${item.price.toFixed(2)}</td>
-    </tr>
+     </tr>
   `).join('');
+  
+  // Add PAXI information if present
+  let paxiHtml = '';
+  if (order.paxi_store_name) {
+    paxiHtml = `
+      <h3>📦 COLLECTION POINT (PAXI)</h3>
+      <p><strong>Store:</strong> ${order.paxi_store_name}</p>
+      <p><strong>Address:</strong> ${order.paxi_store_address}</p>
+      <p><strong>PAXI Code:</strong> ${order.paxi_store_code || 'N/A'}</p>
+      <hr>
+    `;
+  }
   
   const emailHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -84,6 +96,8 @@ async function sendOrderConfirmationEmail(order) {
       <p><strong>Customer:</strong> ${order.customer_email}</p>
       <p><strong>Order Date:</strong> ${new Date(order.created_at).toLocaleString()}</p>
       <p><strong>Total Amount:</strong> <span style="font-size: 1.2rem; color: #10b981;">R${order.total_amount.toFixed(2)}</span></p>
+      
+      ${paxiHtml}
       
       <h3>Items Purchased:</h3>
       <table style="width: 100%; border-collapse: collapse;">
@@ -94,12 +108,12 @@ async function sendOrderConfirmationEmail(order) {
             <th style="padding: 8px; border: 1px solid #ddd;">Color</th>
             <th style="padding: 8px; border: 1px solid #ddd;">Qty</th>
             <th style="padding: 8px; border: 1px solid #ddd;">Price</th>
-          </td>
+           </tr>
         </thead>
         <tbody>
           ${itemsHtml}
         </tbody>
-      </table>
+       </table>
       
       <hr style="margin: 20px 0;">
       <p style="color: #666; font-size: 12px;">This email was sent from your MrYoungFargo online store.</p>
@@ -111,6 +125,7 @@ async function sendOrderConfirmationEmail(order) {
       <h2 style="color: #3b82f6;">Thank You for Your Order!</h2>
       <p>Your order <strong>#${order.order_id}</strong> has been received and is being processed.</p>
       <p><strong>Total:</strong> R${order.total_amount.toFixed(2)}</p>
+      ${order.paxi_store_name ? `<p><strong>Collection Point:</strong> ${order.paxi_store_name}</p>` : ''}
       <p>You will receive a download link for your mixtape (if purchased) within 24 hours.</p>
       <p>For any questions, reply to this email.</p>
       <p>💿 <strong>MrYoungFargo</strong></p>
@@ -293,8 +308,11 @@ app.post('/api/mark-mixtape', async (req, res) => {
   }
 });
 
+// ==============================================================
+// SAVE ORDER ENDPOINT (with PAXI fields)
+// ==============================================================
 app.post('/api/save-order', async (req, res) => {
-  const { sessionToken, orderId, items, total, customerEmail } = req.body;
+  const { sessionToken, orderId, items, total, customerEmail, paxi_store_name, paxi_store_address, paxi_store_code } = req.body;
   
   if (!sessionToken || !global.sessions.has(sessionToken)) {
     return res.json({ success: false, error: 'Invalid session' });
@@ -308,7 +326,10 @@ app.post('/api/save-order', async (req, res) => {
         customer_email: customerEmail,
         items: items,
         total_amount: total,
-        payment_status: 'pending'
+        payment_status: 'pending',
+        paxi_store_name: paxi_store_name || null,
+        paxi_store_address: paxi_store_address || null,
+        paxi_store_code: paxi_store_code || null
       }])
       .select()
       .single();
@@ -535,19 +556,6 @@ app.get('/test-email', async (req, res) => {
     console.error('Test email error:', error);
     res.json({ error: error.message });
   }
-});
-
-app.get('/test-order-email', async (req, res) => {
-  const testOrder = {
-    order_id: 'TEST_EMAIL_ORDER',
-    customer_email: 'mryoungfargo@gmail.com',
-    items: [{ name: 'Test Product', price: 50, qty: 1, size: 'M', color: 'Black' }],
-    total_amount: 50,
-    created_at: new Date().toISOString()
-  };
-  
-  await sendOrderConfirmationEmail(testOrder);
-  res.json({ message: 'Email send attempted. Check server logs for details.' });
 });
 
 app.get('/test-ikhokha', async (req, res) => {
