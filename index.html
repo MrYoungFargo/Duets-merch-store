@@ -558,7 +558,7 @@
     }
     .close-reset:hover { color: #ff8888; }
 
-    /* DELIVERY MODAL WITH X BUTTON */
+    /* DELIVERY MODAL */
     .delivery-modal {
       display: none;
       position: fixed;
@@ -651,7 +651,7 @@
       background: #2563eb;
     }
 
-    /* WHITE MODAL FOR ALL POPUPS */
+    /* WHITE MODALS */
     .info-modal {
       display: none;
       position: fixed;
@@ -726,7 +726,7 @@
       width: 100%;
     }
 
-    /* STORE FINDER MODAL STYLES */
+    /* STORE FINDER MODAL */
     #storeFinderModal {
       display: none;
       position: fixed;
@@ -918,7 +918,6 @@
 </head>
 <body>
 
-<!-- FREE COLLECTION MODAL (WHITE) -->
 <div id="freeCollectionNotif" class="info-modal">
   <div class="info-content">
     <i class="fas fa-check-circle"></i>
@@ -928,7 +927,6 @@
   </div>
 </div>
 
-<!-- SUCCESS MODAL (WHITE) -->
 <div id="successModal" class="info-modal">
   <div class="info-content">
     <i class="fas fa-check-circle"></i>
@@ -938,7 +936,6 @@
   </div>
 </div>
 
-<!-- SIMPLE ERROR MODAL -->
 <div id="simpleErrorModal" class="simple-error-modal">
   <div class="simple-error-content">
     <i class="fas fa-info-circle"></i>
@@ -948,7 +945,6 @@
   </div>
 </div>
 
-<!-- DELIVERY MODAL (WHITE) -->
 <div id="deliveryModal" class="delivery-modal">
   <div class="delivery-modal-content">
     <button class="delivery-close" id="closeDeliveryModalBtn">&times;</button>
@@ -1130,7 +1126,6 @@
   let deliveryAmount = 0;
   let selectedPaxiStore = null;
   let isKingWilliamsTown = false;
-  let shouldProceedToPayment = false; // Flag to trigger payment after delivery selection
   
   function fixMixtapeDuplicate() {
     const mixtapeItems = cart.filter(item => item.id === 99);
@@ -1166,19 +1161,6 @@
   }
   
   document.getElementById('closeSuccessBtn')?.addEventListener('click', closeSuccessModal);
-  
-  function closeFreeCollectionModal() {
-    document.getElementById('freeCollectionNotif').classList.remove('show');
-    // After free collection popup, go directly to payment
-    startPayment();
-  }
-  
-  document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', closeFreeCollectionModal);
-  
-  document.getElementById('closeDeliveryModalBtn')?.addEventListener('click', () => {
-    document.getElementById('deliveryModal').classList.remove('show');
-    openStoreFinder();
-  });
   
   function normalizeEmail(email) {
     return email ? email.toLowerCase().trim() : '';
@@ -1313,6 +1295,7 @@
     if (sessionToken && cart) await apiCall('/api/update-cart', { sessionToken, cart });
   }
   
+  // MIXTAPE BUTTON - NO LOGIN REQUIRED TO ADD
   function updateMixtapeButtons() {
     const buttonsContainer = document.getElementById('mixtapeButtons');
     if (!buttonsContainer) return;
@@ -1325,16 +1308,7 @@
         <a href="#" id="mixtapeListenBtn2" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
       `;
       const downloadBtn = document.getElementById('downloadMixtapeBtn');
-      if (downloadBtn) {
-        downloadBtn.addEventListener('click', () => window.location.href = 'duets.zip');
-      }
-      const listenBtn = document.getElementById('mixtapeListenBtn2');
-      if (listenBtn) {
-        listenBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          showSimpleError('You can listen to previews on YouTube via the bottom button.');
-        });
-      }
+      if (downloadBtn) downloadBtn.addEventListener('click', () => window.location.href = 'duets.zip');
       return;
     }
     
@@ -1354,15 +1328,7 @@
         cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
         saveCartToLocal();
         document.getElementById("cartSidebar").classList.add("open");
-        showSuccessModal('Added to Cart!', 'DUETS Mixtape added to cart! Complete checkout to get your download link.');
-      });
-    }
-    
-    const listenBtn = document.getElementById('mixtapeListenBtn');
-    if (listenBtn) {
-      listenBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        showSimpleError('Add the mixtape to cart (R50) to purchase and download the full ZIP file.\n\nYou can listen to previews on YouTube via the bottom button.');
+        showSuccessModal('Added to Cart!', 'DUETS Mixtape added to cart!');
       });
     }
   }
@@ -1629,7 +1595,7 @@
     selectedDelivery = { type: 'speed', amount: 109.95 };
   });
   
-  // When delivery is confirmed, start payment
+  // AFTER DELIVERY CONFIRM -> GO TO PAYMENT
   document.getElementById('confirmDeliveryBtn')?.addEventListener('click', async () => {
     if (selectedDelivery) {
       deliveryAmount = selectedDelivery.amount;
@@ -1637,14 +1603,20 @@
       document.getElementById('delivery_type').value = selectedDelivery.type;
       hideDeliveryModal();
       updateCartUI();
-      startPayment(); // Start payment after delivery selection
+      await startPayment();
     } else {
       showSimpleError('Please select a delivery option');
     }
   });
   
+  // X button on delivery modal -> GO BACK TO MAP
+  document.getElementById('closeDeliveryModalBtn')?.addEventListener('click', () => {
+    document.getElementById('deliveryModal').classList.remove('show');
+    openStoreFinder();
+  });
+  
   // ==============================================================
-  // PHOTON (KOMOOT) STORE FINDER
+  // PHOTON STORE FINDER
   // ==============================================================
   let map = null;
   let markers = [];
@@ -1794,33 +1766,29 @@
     }
   }
   
-  // CRITICAL: ANY store in King William's Town = FREE collection popup
+  // STORE SELECTION - King William's Town = FREE COLLECTION popup
   window.selectStore = function(storeId) {
     const store = currentStores.find(s => s.id == storeId);
     if (store) {
       const isKingTown = store.address.toLowerCase().includes('king william') || 
                          store.address.toLowerCase().includes('qonce') ||
                          store.name.toLowerCase().includes('king william') ||
-                         store.name.toLowerCase().includes('qonce') ||
                          (store.address.toLowerCase().includes('king') && store.address.toLowerCase().includes('william'));
       
       if (isKingTown) {
-        // FORCE FREE COLLECTION - Save as Clicks Stone Towers
+        // FREE COLLECTION - Save as Clicks Stone Towers
         selectedPaxiStore = {
           id: 'clicks_stone_towers',
           name: 'CLICKS STONE TOWERS, KING WILLIAM\'S TOWN',
           address: 'Clicks Stone Towers, King William\'s Town, 5601',
-          lat: store.lat,
-          lon: store.lon,
-          code: 'CLICKS_KWT',
-          brand: 'Clicks'
+          code: 'CLICKS_KWT'
         };
         isKingWilliamsTown = true;
         deliveryAmount = 0;
-        document.getElementById('delivery_amount').value = 0;
         document.getElementById('paxi_store_name').value = selectedPaxiStore.name;
         document.getElementById('paxi_store_address').value = selectedPaxiStore.address;
         document.getElementById('paxi_store_code').value = selectedPaxiStore.code;
+        document.getElementById('delivery_amount').value = 0;
         closeStoreFinder();
         document.getElementById('freeCollectionNotif').classList.add('show');
       } else {
@@ -1830,10 +1798,16 @@
         document.getElementById('paxi_store_address').value = store.address;
         document.getElementById('paxi_store_code').value = store.code || '';
         closeStoreFinder();
-        showDeliveryModal(); // Show delivery options for non-King William's Town
+        showDeliveryModal();
       }
     }
   };
+  
+  // FREE COLLECTION CLOSE -> GO TO PAYMENT
+  document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', async () => {
+    document.getElementById('freeCollectionNotif').classList.remove('show');
+    await startPayment();
+  });
   
   function showManualStoreModal() {
     document.getElementById('manualStoreModal').classList.add('show');
@@ -1857,7 +1831,6 @@
     const isKingTown = storeAddress.toLowerCase().includes('king william') || 
                        storeAddress.toLowerCase().includes('qonce') ||
                        storeName.toLowerCase().includes('king william') ||
-                       storeName.toLowerCase().includes('qonce') ||
                        (storeAddress.toLowerCase().includes('king') && storeAddress.toLowerCase().includes('william'));
     
     if (isKingTown) {
@@ -1865,17 +1838,14 @@
         id: 'clicks_stone_towers',
         name: 'CLICKS STONE TOWERS, KING WILLIAM\'S TOWN',
         address: 'Clicks Stone Towers, King William\'s Town, 5601',
-        lat: null,
-        lon: null,
-        code: 'CLICKS_KWT',
-        brand: 'Clicks'
+        code: 'CLICKS_KWT'
       };
       isKingWilliamsTown = true;
       deliveryAmount = 0;
-      document.getElementById('delivery_amount').value = 0;
       document.getElementById('paxi_store_name').value = selectedPaxiStore.name;
       document.getElementById('paxi_store_address').value = selectedPaxiStore.address;
       document.getElementById('paxi_store_code').value = selectedPaxiStore.code;
+      document.getElementById('delivery_amount').value = 0;
       closeManualStoreModal();
       closeStoreFinder();
       document.getElementById('freeCollectionNotif').classList.add('show');
@@ -1884,10 +1854,7 @@
         id: 'manual_' + Date.now(),
         name: storeName,
         address: storeAddress,
-        lat: null,
-        lon: null,
-        code: '',
-        brand: 'Manual Entry'
+        code: ''
       };
       isKingWilliamsTown = false;
       document.getElementById('paxi_store_name').value = storeName;
@@ -1952,7 +1919,7 @@
   document.getElementById('searchLocation')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchStores(); });
   
   // ==============================================================
-  // PAYMENT FUNCTION - Only called AFTER pickup point is selected AND delivery is confirmed
+  // PAYMENT FUNCTION
   // ==============================================================
   async function startPayment() {
     if (!currentUser) {
@@ -1966,7 +1933,6 @@
     
     const hasPhysicalItems = cart.some(item => item.id !== 99);
     
-    // Must have pickup point selected
     if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
       showSimpleError('Please select a pickup point from map before checking out.');
       openStoreFinder();
@@ -2060,6 +2026,30 @@
   }
   
   // ==============================================================
+  // CHECKOUT BUTTON - CORRECT FLOW
+  // ==============================================================
+  document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
+    if (!currentUser) {
+      window.showAuthModal();
+      return;
+    }
+    if (cart.length === 0) {
+      showSimpleError('Your cart is empty');
+      return;
+    }
+    const hasPhysicalItems = cart.some(item => item.id !== 99);
+    if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
+      openStoreFinder();
+    } else if (hasPhysicalItems && selectedPaxiStore && !isKingWilliamsTown) {
+      showDeliveryModal();
+    } else if (isKingWilliamsTown) {
+      startPayment();
+    } else {
+      startPayment();
+    }
+  });
+  
+  // ==============================================================
   // EVENT LISTENERS
   // ==============================================================
   document.getElementById("cartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
@@ -2075,31 +2065,6 @@
   document.getElementById("authToggleText")?.addEventListener("click", toggleAuthMode);
   document.getElementById("forgotPasswordBtn")?.addEventListener("click", showResetModal);
   document.getElementById("sendResetBtn")?.addEventListener("click", sendResetLink);
-  
-  // Checkout button now just validates and opens map if needed
-  document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
-    if (!currentUser) {
-      window.showAuthModal();
-      return;
-    }
-    if (cart.length === 0) {
-      showSimpleError('Your cart is empty');
-      return;
-    }
-    const hasPhysicalItems = cart.some(item => item.id !== 99);
-    if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
-      openStoreFinder();
-    } else if (hasPhysicalItems && selectedPaxiStore && !isKingWilliamsTown) {
-      // Already has pickup point, show delivery options
-      showDeliveryModal();
-    } else if (isKingWilliamsTown) {
-      // Free collection, go directly to payment
-      startPayment();
-    } else {
-      // Digital only (just mixtape), go to payment
-      startPayment();
-    }
-  });
   
   verifySession().then(() => {
     renderGrid(tshirts, "tshirtsGrid");
