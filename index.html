@@ -558,7 +558,7 @@
     }
     .close-reset:hover { color: #ff8888; }
 
-    /* DELIVERY MODAL WITH X BUTTON - X GOES BACK TO MAP */
+    /* DELIVERY MODAL WITH X BUTTON */
     .delivery-modal {
       display: none;
       position: fixed;
@@ -689,7 +689,8 @@
       width: 100%;
     }
     
-    .error-modal {
+    /* SIMPLE ERROR MODAL - NO RED BACKGROUND */
+    .simple-error-modal {
       display: none;
       position: fixed;
       top: 0;
@@ -701,8 +702,8 @@
       align-items: center;
       justify-content: center;
     }
-    .error-modal.show { display: flex; }
-    .error-content {
+    .simple-error-modal.show { display: flex; }
+    .simple-error-content {
       background: white;
       border-radius: 24px;
       padding: 28px 24px;
@@ -711,10 +712,10 @@
       width: 85%;
       color: #1e2a3e;
     }
-    .error-content i { font-size: 48px; color: #e11d2c; margin-bottom: 16px; }
-    .error-content h4 { font-size: 1.2rem; margin-bottom: 12px; font-weight: 700; }
-    .error-content p { font-size: 0.9rem; margin: 8px 0; line-height: 1.4; }
-    .error-close {
+    .simple-error-content i { font-size: 48px; color: #f59e0b; margin-bottom: 16px; }
+    .simple-error-content h4 { font-size: 1.2rem; margin-bottom: 12px; font-weight: 700; color: #1e2a3e; }
+    .simple-error-content p { font-size: 0.9rem; margin: 8px 0; line-height: 1.4; }
+    .simple-error-close {
       background: #3b82f6;
       margin-top: 20px;
       padding: 10px 16px;
@@ -938,17 +939,17 @@
   </div>
 </div>
 
-<!-- ERROR MODAL (WHITE) -->
-<div id="errorModal" class="error-modal">
-  <div class="error-content">
-    <i class="fas fa-exclamation-circle"></i>
-    <h4 id="errorTitle">Notice</h4>
-    <p id="errorMessage">Something happened.</p>
-    <button class="error-close" id="closeErrorBtn">OK</button>
+<!-- SIMPLE ERROR MODAL - NO RED BACKGROUND -->
+<div id="simpleErrorModal" class="simple-error-modal">
+  <div class="simple-error-content">
+    <i class="fas fa-info-circle"></i>
+    <h4>Notice</h4>
+    <p id="simpleErrorMessage">Please select a pickup point from map before checking out.</p>
+    <button class="simple-error-close" id="closeSimpleErrorBtn">OK</button>
   </div>
 </div>
 
-<!-- DELIVERY MODAL (WHITE) WITH X BUTTON - X GOES BACK TO MAP -->
+<!-- DELIVERY MODAL (WHITE) WITH X BUTTON -->
 <div id="deliveryModal" class="delivery-modal">
   <div class="delivery-modal-content">
     <button class="delivery-close" id="closeDeliveryModalBtn">&times;</button>
@@ -1079,7 +1080,7 @@
 <input type="hidden" id="delivery_type" value="">
 
 <button type="button" id="openStoreFinderBtn" style="background: #10b981; color: white; padding: 10px; border-radius: 30px; width: 90%; margin: 0 auto 20px; display: block; max-width: 400px; border: none; cursor: pointer;">
-  📍 Select PAXI Pickup Point
+  📍 Select Pickup Point
 </button>
 
 <div id="storeFinderModal">
@@ -1144,6 +1145,18 @@
     }
   }
   
+  // SIMPLE ERROR MODAL - NO RED BACKGROUND
+  function showSimpleError(message) {
+    document.getElementById('simpleErrorMessage').innerText = message;
+    document.getElementById('simpleErrorModal').classList.add('show');
+  }
+  
+  function closeSimpleErrorModal() {
+    document.getElementById('simpleErrorModal').classList.remove('show');
+  }
+  
+  document.getElementById('closeSimpleErrorBtn')?.addEventListener('click', closeSimpleErrorModal);
+  
   // WHITE MODAL FUNCTIONS
   function showSuccessModal(title, message) {
     document.getElementById('successTitle').innerText = title;
@@ -1151,34 +1164,23 @@
     document.getElementById('successModal').classList.add('show');
   }
   
-  function showErrorModal(title, message) {
-    document.getElementById('errorTitle').innerText = title;
-    document.getElementById('errorMessage').innerText = message;
-    document.getElementById('errorModal').classList.add('show');
-  }
-  
   function closeSuccessModal() {
     document.getElementById('successModal').classList.remove('show');
   }
   
-  function closeErrorModal() {
-    document.getElementById('errorModal').classList.remove('show');
-  }
-  
   document.getElementById('closeSuccessBtn')?.addEventListener('click', closeSuccessModal);
-  document.getElementById('closeErrorBtn')?.addEventListener('click', closeErrorModal);
   
   function closeFreeCollectionModal() {
     document.getElementById('freeCollectionNotif').classList.remove('show');
-    proceedToPayment();
+    proceedToPayment(); // After FREE collection, go to payment
   }
   
   document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', closeFreeCollectionModal);
   
-  // Close delivery modal - GOES BACK TO MAP (reopen store finder)
+  // Close delivery modal - GOES BACK TO MAP
   document.getElementById('closeDeliveryModalBtn')?.addEventListener('click', () => {
     document.getElementById('deliveryModal').classList.remove('show');
-    openStoreFinder(); // Go back to map selection
+    openStoreFinder();
   });
   
   function normalizeEmail(email) {
@@ -1262,7 +1264,7 @@
     if (result.success) {
       return await login(normalizedEmail, password);
     } else {
-      showErrorModal('Registration Failed', result.error || 'Could not create account');
+      showSimpleError(result.error || 'Could not create account');
       return false;
     }
   }
@@ -1294,7 +1296,7 @@
       window.closeAuthModal();
       return true;
     } else {
-      showErrorModal('Login Failed', result.error || 'Invalid email or password');
+      showSimpleError(result.error || 'Invalid email or password');
       return false;
     }
   }
@@ -1314,7 +1316,6 @@
     if (sessionToken && cart) await apiCall('/api/update-cart', { sessionToken, cart });
   }
   
-  // MIXTAPE BUTTON - Can add without login, only once
   function updateMixtapeButtons() {
     const buttonsContainer = document.getElementById('mixtapeButtons');
     if (!buttonsContainer) return;
@@ -1334,7 +1335,7 @@
       if (listenBtn) {
         listenBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          showErrorModal('Preview', 'You can listen to previews on YouTube via the bottom button.');
+          showSimpleError('You can listen to previews on YouTube via the bottom button.');
         });
       }
       return;
@@ -1350,7 +1351,7 @@
       addBtn.addEventListener('click', () => {
         const existing = cart.find(i => i.id === 99);
         if (existing) {
-          showErrorModal('Already in Cart', 'Mixtape is already in your cart. You can only purchase it once.');
+          showSimpleError('Mixtape is already in your cart. You can only purchase it once.');
           return;
         }
         cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
@@ -1364,7 +1365,7 @@
     if (listenBtn) {
       listenBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        showErrorModal('How to Purchase', 'Add the mixtape to cart (R50) to purchase and download the full ZIP file.\n\nYou can listen to previews on YouTube via the bottom button.');
+        showSimpleError('Add the mixtape to cart (R50) to purchase and download the full ZIP file.\n\nYou can listen to previews on YouTube via the bottom button.');
       });
     }
   }
@@ -1437,7 +1438,7 @@
   async function handleAuth() {
     let email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value.trim();
-    if (!email || !password) { showErrorModal('Missing Info', 'Please enter email and password'); return; }
+    if (!email || !password) { showSimpleError('Please enter email and password'); return; }
     email = normalizeEmail(email);
     if (window.isLoginMode) await login(email, password);
     else await register(email, password);
@@ -1545,8 +1546,8 @@
   }
   
   function addToCart(product, size, color) {
-    if (!size) { showErrorModal('Size Required', 'Please select a size'); return false; }
-    if (!color && product.id !== 99) { showErrorModal('Color Required', 'Please select a color'); return false; }
+    if (!size) { showSimpleError('Please select a size'); return false; }
+    if (!color && product.id !== 99) { showSimpleError('Please select a color'); return false; }
     const existing = cart.find(i => i.id === product.id && i.size === size && i.color === color);
     if (existing) existing.qty++;
     else cart.push({ id: product.id, name: product.name, price: product.price, size: size || 'Digital', color: color || 'N/A', qty: 1 });
@@ -1577,7 +1578,7 @@
   }
   
   function closeModal() { document.getElementById("sizeColorModal").classList.remove("show"); }
-  function confirmAdd() { if (!selectedSize) { showErrorModal('Size Required', 'Please select a size'); return; } if (!selectedColor) { showErrorModal('Color Required', 'Please select a color'); return; } addToCart(currentProduct, selectedSize, selectedColor); closeModal(); }
+  function confirmAdd() { if (!selectedSize) { showSimpleError('Please select a size'); return; } if (!selectedColor) { showSimpleError('Please select a color'); return; } addToCart(currentProduct, selectedSize, selectedColor); closeModal(); }
   
   function renderGrid(products, containerId) {
     const container = document.getElementById(containerId);
@@ -1640,7 +1641,7 @@
       updateCartUI();
       await proceedToPayment();
     } else {
-      showErrorModal('Selection Required', 'Please select a delivery option');
+      showSimpleError('Please select a delivery option');
     }
   });
   
@@ -1724,7 +1725,7 @@
   
   async function searchStoresByCity(cityName) {
     if (!cityName) {
-      showErrorModal('No Location', 'Please enter a town or city');
+      showSimpleError('Please enter a town or city');
       return;
     }
     
@@ -1735,7 +1736,7 @@
     try {
       const cityCoords = await getCityCoordinates(cityName);
       if (!cityCoords) {
-        showErrorModal('Location Not Found', `Could not find coordinates for "${cityName}". Please try a different city name.`);
+        showSimpleError(`Could not find "${cityName}". Please try a different city name.`);
         return;
       }
       
@@ -1753,12 +1754,12 @@
       displayStores(stores, cityCoords.displayName);
       
       if (stores.length === 0) {
-        showErrorModal('No Stores Found', `No ${storeBrands.join(', ')} stores found near ${cityCoords.displayName}. Try a different city or use "Add manually" button.`);
+        showSimpleError(`No stores found near ${cityCoords.displayName}. Try a different city or use "Add manually" button.`);
       }
       
     } catch (error) {
       console.error('Search error:', error);
-      showErrorModal('Search Error', 'Error searching for stores. Please try again.');
+      showSimpleError('Error searching for stores. Please try again.');
     } finally {
       searchBtn.innerText = 'Search';
       searchBtn.disabled = false;
@@ -1795,15 +1796,10 @@
     }
   }
   
-  // FIXED: King William's Town = FREE collection (NO delivery options)
+  // CRITICAL FIX: King William's Town = FREE collection at CLICKS STONE TOWERS
   window.selectStore = function(storeId) {
     const store = currentStores.find(s => s.id == storeId);
     if (store) {
-      selectedPaxiStore = store;
-      document.getElementById('paxi_store_name').value = store.name;
-      document.getElementById('paxi_store_address').value = store.address;
-      document.getElementById('paxi_store_code').value = store.code || '';
-      
       const isKingTown = store.address.toLowerCase().includes('king william') || 
                          store.address.toLowerCase().includes('qonce') ||
                          store.name.toLowerCase().includes('king william') ||
@@ -1811,13 +1807,30 @@
                          (store.address.toLowerCase().includes('king') && store.address.toLowerCase().includes('william'));
       
       if (isKingTown) {
+        // FORCE FREE COLLECTION - Save as Clicks Stone Towers
+        selectedPaxiStore = {
+          id: 'clicks_stone_towers',
+          name: 'CLICKS STONE TOWERS, KING WILLIAM\'S TOWN',
+          address: 'Clicks Stone Towers, King William\'s Town, 5601',
+          lat: store.lat,
+          lon: store.lon,
+          code: 'CLICKS_KWT',
+          brand: 'Clicks'
+        };
         isKingWilliamsTown = true;
         deliveryAmount = 0;
         document.getElementById('delivery_amount').value = 0;
+        document.getElementById('paxi_store_name').value = selectedPaxiStore.name;
+        document.getElementById('paxi_store_address').value = selectedPaxiStore.address;
+        document.getElementById('paxi_store_code').value = selectedPaxiStore.code;
         closeStoreFinder();
         document.getElementById('freeCollectionNotif').classList.add('show');
       } else {
+        selectedPaxiStore = store;
         isKingWilliamsTown = false;
+        document.getElementById('paxi_store_name').value = store.name;
+        document.getElementById('paxi_store_address').value = store.address;
+        document.getElementById('paxi_store_code').value = store.code || '';
         closeStoreFinder();
         showDeliveryModal();
       }
@@ -1839,23 +1852,9 @@
     const storeAddress = document.getElementById('manualStoreAddress').value.trim();
     
     if (!storeName || !storeAddress) {
-      showErrorModal('Missing Info', 'Please enter both store name and address');
+      showSimpleError('Please enter both store name and address');
       return;
     }
-    
-    selectedPaxiStore = {
-      id: 'manual_' + Date.now(),
-      name: storeName,
-      address: storeAddress,
-      lat: null,
-      lon: null,
-      code: '',
-      brand: 'Manual Entry'
-    };
-    
-    document.getElementById('paxi_store_name').value = storeName;
-    document.getElementById('paxi_store_address').value = storeAddress;
-    document.getElementById('paxi_store_code').value = '';
     
     const isKingTown = storeAddress.toLowerCase().includes('king william') || 
                        storeAddress.toLowerCase().includes('qonce') ||
@@ -1864,14 +1863,38 @@
                        (storeAddress.toLowerCase().includes('king') && storeAddress.toLowerCase().includes('william'));
     
     if (isKingTown) {
+      selectedPaxiStore = {
+        id: 'clicks_stone_towers',
+        name: 'CLICKS STONE TOWERS, KING WILLIAM\'S TOWN',
+        address: 'Clicks Stone Towers, King William\'s Town, 5601',
+        lat: null,
+        lon: null,
+        code: 'CLICKS_KWT',
+        brand: 'Clicks'
+      };
       isKingWilliamsTown = true;
       deliveryAmount = 0;
       document.getElementById('delivery_amount').value = 0;
+      document.getElementById('paxi_store_name').value = selectedPaxiStore.name;
+      document.getElementById('paxi_store_address').value = selectedPaxiStore.address;
+      document.getElementById('paxi_store_code').value = selectedPaxiStore.code;
       closeManualStoreModal();
       closeStoreFinder();
       document.getElementById('freeCollectionNotif').classList.add('show');
     } else {
+      selectedPaxiStore = {
+        id: 'manual_' + Date.now(),
+        name: storeName,
+        address: storeAddress,
+        lat: null,
+        lon: null,
+        code: '',
+        brand: 'Manual Entry'
+      };
       isKingWilliamsTown = false;
+      document.getElementById('paxi_store_name').value = storeName;
+      document.getElementById('paxi_store_address').value = storeAddress;
+      document.getElementById('paxi_store_code').value = '';
       closeManualStoreModal();
       closeStoreFinder();
       showDeliveryModal();
@@ -1940,7 +1963,7 @@
       return;
     }
     if (cart.length === 0) {
-      showErrorModal('Empty Cart', 'Your cart is empty');
+      showSimpleError('Your cart is empty');
       return;
     }
     
@@ -1948,7 +1971,7 @@
     
     // CRITICAL: Customer MUST select a pickup point for physical items
     if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
-      showErrorModal('No Pickup Point Selected', 'Please select a pickup point from the map before checking out.');
+      showSimpleError('Please select a pickup point from map before checking out.');
       openStoreFinder();
       return;
     }
@@ -1969,7 +1992,7 @@
       if (checkoutBtn.disabled) {
         checkoutBtn.innerText = "CHECKOUT →";
         checkoutBtn.disabled = false;
-        showErrorModal('Timeout', 'Request timed out. Please try again.');
+        showSimpleError('Request timed out. Please try again.');
       }
     }, 30000);
     
@@ -1995,7 +2018,7 @@
       
       if (!saveData.success) {
         clearTimeout(timeoutId);
-        showErrorModal('Order Failed', saveData.error || 'Failed to save order');
+        showSimpleError(saveData.error || 'Failed to save order');
         checkoutBtn.innerText = originalText;
         checkoutBtn.disabled = false;
         return;
@@ -2017,13 +2040,13 @@
         window.location.href = paymentData.paymentUrl;
       } else {
         clearTimeout(timeoutId);
-        showErrorModal('Payment Error', paymentData.error || 'Could not create payment link');
+        showSimpleError(paymentData.error || 'Could not create payment link');
         checkoutBtn.innerText = originalText;
         checkoutBtn.disabled = false;
       }
     } catch (error) {
       clearTimeout(timeoutId);
-      showErrorModal('Connection Error', 'Please check your internet and try again.');
+      showSimpleError('Connection error. Please try again.');
       checkoutBtn.innerText = originalText;
       checkoutBtn.disabled = false;
     }
@@ -2064,12 +2087,12 @@
       return;
     }
     if (cart.length === 0) {
-      showErrorModal('Empty Cart', 'Your cart is empty');
+      showSimpleError('Your cart is empty');
       return;
     }
     const hasPhysicalItems = cart.some(item => item.id !== 99);
     if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
-      showErrorModal('No Pickup Point Selected', 'Please select a pickup point from the map before checking out.');
+      showSimpleError('Please select a pickup point from map before checking out.');
       openStoreFinder();
       return;
     }
