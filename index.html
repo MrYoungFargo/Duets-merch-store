@@ -558,6 +558,7 @@
     }
     .close-reset:hover { color: #ff8888; }
 
+    /* DELIVERY MODAL WITH X BUTTON */
     .delivery-modal {
       display: none;
       position: fixed;
@@ -581,6 +582,21 @@
       padding: 24px 20px;
       text-align: center;
       color: #1a1a2e;
+      position: relative;
+    }
+    .delivery-modal-content .delivery-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #999;
+      line-height: 1;
+    }
+    .delivery-modal-content .delivery-close:hover {
+      color: #e11d2c;
     }
     .delivery-modal-content h3 {
       color: #1a1a2e;
@@ -932,9 +948,10 @@
   </div>
 </div>
 
-<!-- DELIVERY MODAL (WHITE) -->
+<!-- DELIVERY MODAL (WHITE) WITH X BUTTON -->
 <div id="deliveryModal" class="delivery-modal">
   <div class="delivery-modal-content">
+    <button class="delivery-close" id="closeDeliveryModalBtn">&times;</button>
     <h3>🚚 Select Delivery Option</h3>
     <p style="font-size: 0.8rem; margin-bottom: 15px;">We use PAXI's courier service</p>
     <div id="economyOption" class="delivery-option">
@@ -1114,6 +1131,21 @@
   let selectedPaxiStore = null;
   let isKingWilliamsTown = false;
   
+  // Helper: Remove duplicate mixtape from cart (keeps only 1)
+  function fixMixtapeDuplicate() {
+    const mixtapeItems = cart.filter(item => item.id === 99);
+    if (mixtapeItems.length > 1) {
+      // Remove all mixtapes and add back exactly one
+      cart = cart.filter(item => item.id !== 99);
+      cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
+      saveCartToLocal();
+    } else if (mixtapeItems.length === 1 && mixtapeItems[0].qty > 1) {
+      // Fix quantity to 1
+      mixtapeItems[0].qty = 1;
+      saveCartToLocal();
+    }
+  }
+  
   // WHITE MODAL FUNCTIONS
   function showSuccessModal(title, message) {
     document.getElementById('successTitle').innerText = title;
@@ -1144,6 +1176,11 @@
   }
   
   document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', closeFreeCollectionModal);
+  
+  // Close delivery modal with X button
+  document.getElementById('closeDeliveryModalBtn')?.addEventListener('click', () => {
+    document.getElementById('deliveryModal').classList.remove('show');
+  });
   
   function normalizeEmail(email) {
     return email ? email.toLowerCase().trim() : '';
@@ -1206,6 +1243,7 @@
       currentUser = result.user;
       if (result.user.cart && result.user.cart.length > 0 && cart.length === 0) {
         cart = result.user.cart;
+        fixMixtapeDuplicate(); // Fix duplicate mixtape on load
         updateCartUI();
       }
       updateUserUI();
@@ -1239,15 +1277,18 @@
       localStorage.setItem('session_token', sessionToken);
       
       if (cart.length > 0 && result.user.cart) {
+        // Merge local cart with server cart
         for (let localItem of cart) {
           const existing = result.user.cart.find(i => i.id === localItem.id && i.size === localItem.size && i.color === localItem.color);
           if (existing) existing.qty += localItem.qty;
           else result.user.cart.push(localItem);
         }
         cart = result.user.cart;
+        fixMixtapeDuplicate(); // Fix duplicate mixtape after merge
         await saveCartToServer();
       } else if (result.user.cart && result.user.cart.length > 0) {
         cart = result.user.cart;
+        fixMixtapeDuplicate(); // Fix duplicate mixtape
       }
       updateCartUI();
       updateUserUI();
@@ -1478,7 +1519,11 @@
   const allProducts = [...tshirts, ...sweaters, ...hoodies];
   let currentProduct = null, selectedSize = null, selectedColor = null;
   
-  function saveCartToLocal() { updateCartUI(); if (sessionToken) saveCartToServer(); }
+  function saveCartToLocal() { 
+    fixMixtapeDuplicate(); // Always ensure only one mixtape
+    updateCartUI(); 
+    if (sessionToken) saveCartToServer(); 
+  }
   
   function updateCartUI() {
     const count = cart.reduce((s,i) => s + i.qty, 0);
@@ -1499,6 +1544,7 @@
       btn.addEventListener("click", () => {
         const id = parseInt(btn.dataset.id), size = btn.dataset.size, color = btn.dataset.color;
         cart = cart.filter(i => !(i.id === id && i.size === size && i.color === color));
+        fixMixtapeDuplicate(); // Fix duplicates after removal
         saveCartToLocal();
       });
     });
@@ -1755,7 +1801,7 @@
     }
   }
   
-  // MODIFIED: Any store in King William's Town / Qonce area gets FREE collection
+  // FIXED: Any store in King William's Town / Qonce area gets FREE collection popup, NO delivery options
   window.selectStore = function(storeId) {
     const store = currentStores.find(s => s.id == storeId);
     if (store) {
@@ -1775,13 +1821,14 @@
         isKingWilliamsTown = true;
         deliveryAmount = 0;
         document.getElementById('delivery_amount').value = 0;
-        // Show white modal for free collection
+        // Show FREE COLLECTION popup directly (NO delivery options)
+        closeStoreFinder();
         document.getElementById('freeCollectionNotif').classList.add('show');
       } else {
         isKingWilliamsTown = false;
-        showDeliveryModal();
+        closeStoreFinder();
+        showDeliveryModal(); // Show delivery options for non-King William's Town
       }
-      closeStoreFinder();
     }
   };
   
@@ -1829,14 +1876,15 @@
       isKingWilliamsTown = true;
       deliveryAmount = 0;
       document.getElementById('delivery_amount').value = 0;
+      closeManualStoreModal();
+      closeStoreFinder();
       document.getElementById('freeCollectionNotif').classList.add('show');
     } else {
       isKingWilliamsTown = false;
+      closeManualStoreModal();
+      closeStoreFinder();
       showDeliveryModal();
     }
-    
-    closeManualStoreModal();
-    closeStoreFinder();
   }
   
   document.getElementById('manualStoreBtn')?.addEventListener('click', showManualStoreModal);
