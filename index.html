@@ -689,7 +689,6 @@
       width: 100%;
     }
     
-    /* SIMPLE ERROR MODAL - NO RED BACKGROUND */
     .simple-error-modal {
       display: none;
       position: fixed;
@@ -939,7 +938,7 @@
   </div>
 </div>
 
-<!-- SIMPLE ERROR MODAL - NO RED BACKGROUND -->
+<!-- SIMPLE ERROR MODAL -->
 <div id="simpleErrorModal" class="simple-error-modal">
   <div class="simple-error-content">
     <i class="fas fa-info-circle"></i>
@@ -949,7 +948,7 @@
   </div>
 </div>
 
-<!-- DELIVERY MODAL (WHITE) WITH X BUTTON -->
+<!-- DELIVERY MODAL (WHITE) -->
 <div id="deliveryModal" class="delivery-modal">
   <div class="delivery-modal-content">
     <button class="delivery-close" id="closeDeliveryModalBtn">&times;</button>
@@ -1131,8 +1130,8 @@
   let deliveryAmount = 0;
   let selectedPaxiStore = null;
   let isKingWilliamsTown = false;
+  let shouldProceedToPayment = false; // Flag to trigger payment after delivery selection
   
-  // Helper: Remove duplicate mixtape from cart (keeps only 1)
   function fixMixtapeDuplicate() {
     const mixtapeItems = cart.filter(item => item.id === 99);
     if (mixtapeItems.length > 1) {
@@ -1145,7 +1144,6 @@
     }
   }
   
-  // SIMPLE ERROR MODAL - NO RED BACKGROUND
   function showSimpleError(message) {
     document.getElementById('simpleErrorMessage').innerText = message;
     document.getElementById('simpleErrorModal').classList.add('show');
@@ -1157,7 +1155,6 @@
   
   document.getElementById('closeSimpleErrorBtn')?.addEventListener('click', closeSimpleErrorModal);
   
-  // WHITE MODAL FUNCTIONS
   function showSuccessModal(title, message) {
     document.getElementById('successTitle').innerText = title;
     document.getElementById('successMessage').innerText = message;
@@ -1172,12 +1169,12 @@
   
   function closeFreeCollectionModal() {
     document.getElementById('freeCollectionNotif').classList.remove('show');
-    proceedToPayment(); // After FREE collection, go to payment
+    // After free collection popup, go directly to payment
+    startPayment();
   }
   
   document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', closeFreeCollectionModal);
   
-  // Close delivery modal - GOES BACK TO MAP
   document.getElementById('closeDeliveryModalBtn')?.addEventListener('click', () => {
     document.getElementById('deliveryModal').classList.remove('show');
     openStoreFinder();
@@ -1632,6 +1629,7 @@
     selectedDelivery = { type: 'speed', amount: 109.95 };
   });
   
+  // When delivery is confirmed, start payment
   document.getElementById('confirmDeliveryBtn')?.addEventListener('click', async () => {
     if (selectedDelivery) {
       deliveryAmount = selectedDelivery.amount;
@@ -1639,7 +1637,7 @@
       document.getElementById('delivery_type').value = selectedDelivery.type;
       hideDeliveryModal();
       updateCartUI();
-      await proceedToPayment();
+      startPayment(); // Start payment after delivery selection
     } else {
       showSimpleError('Please select a delivery option');
     }
@@ -1796,7 +1794,7 @@
     }
   }
   
-  // CRITICAL FIX: King William's Town = FREE collection at CLICKS STONE TOWERS
+  // CRITICAL: ANY store in King William's Town = FREE collection popup
   window.selectStore = function(storeId) {
     const store = currentStores.find(s => s.id == storeId);
     if (store) {
@@ -1832,7 +1830,7 @@
         document.getElementById('paxi_store_address').value = store.address;
         document.getElementById('paxi_store_code').value = store.code || '';
         closeStoreFinder();
-        showDeliveryModal();
+        showDeliveryModal(); // Show delivery options for non-King William's Town
       }
     }
   };
@@ -1954,10 +1952,9 @@
   document.getElementById('searchLocation')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchStores(); });
   
   // ==============================================================
-  // CHECKOUT BUTTON - MUST HAVE SELECTED PICKUP POINT
+  // PAYMENT FUNCTION - Only called AFTER pickup point is selected AND delivery is confirmed
   // ==============================================================
-  async function proceedToPayment() {
-    // If user is not logged in, show auth modal first
+  async function startPayment() {
     if (!currentUser) {
       window.showAuthModal();
       return;
@@ -1969,7 +1966,7 @@
     
     const hasPhysicalItems = cart.some(item => item.id !== 99);
     
-    // CRITICAL: Customer MUST select a pickup point for physical items
+    // Must have pickup point selected
     if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
       showSimpleError('Please select a pickup point from map before checking out.');
       openStoreFinder();
@@ -1985,7 +1982,7 @@
     
     const checkoutBtn = document.getElementById("checkoutBtn");
     const originalText = checkoutBtn.innerText;
-    checkoutBtn.innerText = "⏳ SAVING ORDER...";
+    checkoutBtn.innerText = "⏳ CREATING PAYMENT...";
     checkoutBtn.disabled = true;
     
     const timeoutId = setTimeout(() => {
@@ -2023,8 +2020,6 @@
         checkoutBtn.disabled = false;
         return;
       }
-      
-      checkoutBtn.innerText = "⏳ CREATING PAYMENT...";
       
       const paymentResponse = await fetch(`${API_URL}/create-payment`, {
         method: 'POST',
@@ -2081,6 +2076,7 @@
   document.getElementById("forgotPasswordBtn")?.addEventListener("click", showResetModal);
   document.getElementById("sendResetBtn")?.addEventListener("click", sendResetLink);
   
+  // Checkout button now just validates and opens map if needed
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (!currentUser) {
       window.showAuthModal();
@@ -2092,11 +2088,17 @@
     }
     const hasPhysicalItems = cart.some(item => item.id !== 99);
     if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
-      showSimpleError('Please select a pickup point from map before checking out.');
       openStoreFinder();
-      return;
+    } else if (hasPhysicalItems && selectedPaxiStore && !isKingWilliamsTown) {
+      // Already has pickup point, show delivery options
+      showDeliveryModal();
+    } else if (isKingWilliamsTown) {
+      // Free collection, go directly to payment
+      startPayment();
+    } else {
+      // Digital only (just mixtape), go to payment
+      startPayment();
     }
-    await proceedToPayment();
   });
   
   verifySession().then(() => {
