@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -557,7 +558,6 @@
     }
     .close-reset:hover { color: #ff8888; }
 
-    /* DELIVERY MODAL - WHITE BACKGROUND */
     .delivery-modal {
       display: none;
       position: fixed;
@@ -635,7 +635,6 @@
       background: #2563eb;
     }
 
-    /* NOTIFICATION MODAL - WHITE BACKGROUND for free collection */
     .notification-modal {
       display: none;
       position: fixed;
@@ -673,7 +672,7 @@
       width: 100%;
     }
 
-    /* PAXI Modal - SMALLER STYLES */
+    /* STORE FINDER MODAL - SMALLER STYLES (Komoot/Photon map stays same) */
     #storeFinderModal {
       display: none;
       position: fixed;
@@ -783,7 +782,6 @@
       background: #d97706;
     }
     
-    /* Manual store modal */
     .manual-modal {
       display: none;
       position: fixed;
@@ -844,11 +842,28 @@
       cursor: pointer;
       font-size: 0.7rem;
     }
+    
+    .ui-autocomplete {
+      background: #1a1a2e;
+      border: 1px solid #3b82f6;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      color: white;
+      z-index: 10001;
+    }
+    .ui-autocomplete li {
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 0.7rem;
+    }
+    .ui-autocomplete li:hover {
+      background: #3b82f6;
+    }
   </style>
 </head>
 <body>
 
-<!-- NOTIFICATION MODAL for free collection -->
 <div id="freeCollectionNotif" class="notification-modal">
   <div class="notification-content">
     <i class="fas fa-check-circle"></i>
@@ -858,7 +873,6 @@
   </div>
 </div>
 
-<!-- DELIVERY MODAL (WHITE) -->
 <div id="deliveryModal" class="delivery-modal">
   <div class="delivery-modal-content">
     <h3>🚚 Select Delivery Option</h3>
@@ -877,7 +891,6 @@
   </div>
 </div>
 
-<!-- AUTH MODAL -->
 <div id="authModal" class="auth-modal">
   <div class="auth-modal-content">
     <button class="close-auth" id="closeAuthBtn">&times;</button>
@@ -895,7 +908,6 @@
   </div>
 </div>
 
-<!-- RESET PASSWORD MODAL -->
 <div id="resetModal" class="reset-modal">
   <div class="reset-modal-content">
     <button class="close-reset" id="closeResetBtn">&times;</button>
@@ -906,7 +918,6 @@
   </div>
 </div>
 
-<!-- PRODUCT MODAL -->
 <div id="sizeColorModal" class="modal">
   <div class="modal-content">
     <h3 id="modalProductName">Product</h3>
@@ -920,7 +931,6 @@
   </div>
 </div>
 
-<!-- STICKY NAV -->
 <div class="sticky-nav" id="stickyNav">
   <div class="sticky-nav-links">
     <a href="#" class="sticky-tshirts">T-SHIRTS</a>
@@ -933,7 +943,6 @@
   </div>
 </div>
 
-<!-- MAIN HEADER -->
 <div class="site-header">
   <div class="container header-inner">
     <div class="logo"><img src="fargo1.png" alt="MrYoungFargo" onerror="this.src='https://placehold.co/200x55?text=MrYoungFargo'"></div>
@@ -970,7 +979,6 @@
   <div id="hoodies-section"><div class="category-title"><i class="fas fa-hoodie"></i> HOODIES</div><div class="products-grid" id="hoodiesGrid"></div></div>
 </div>
 
-<!-- MUSIC BUTTON AT BOTTOM -->
 <div class="music-footer-btn">
   <a href="https://m.youtube.com/@MrYoungFargo_SA" target="_blank" class="listen-btn">
     <i class="fab fa-youtube"></i> LISTEN TO MY MUSIC
@@ -987,19 +995,16 @@
   <button class="checkout-btn" id="checkoutBtn">CHECKOUT →</button>
 </div>
 
-<!-- PAXI Hidden Fields -->
 <input type="hidden" id="paxi_store_name">
 <input type="hidden" id="paxi_store_address">
 <input type="hidden" id="paxi_store_code">
 <input type="hidden" id="delivery_amount" value="0">
 <input type="hidden" id="delivery_type" value="">
 
-<!-- PAXI SELECTOR BUTTON -->
 <button type="button" id="openStoreFinderBtn" style="background: #10b981; color: white; padding: 10px; border-radius: 30px; width: 90%; margin: 0 auto 20px; display: block; max-width: 400px; border: none; cursor: pointer;">
   📍 Select PAXI Pickup Point
 </button>
 
-<!-- PAXI MODAL -->
 <div id="storeFinderModal">
   <div class="modal-container">
     <div class="modal-header">
@@ -1018,7 +1023,6 @@
   </div>
 </div>
 
-<!-- Manual Store Modal -->
 <div id="manualStoreModal" class="manual-modal">
   <div class="manual-modal-content">
     <h3>✏️ Add Store Manually</h3>
@@ -1040,12 +1044,7 @@
   const API_URL = 'https://mryoungfargo-payment.onrender.com';
   
   // ==============================================================
-  // PRICES UPDATED
-  // ==============================================================
-  // T-shirts: R150, Sweaters: R280, Hoodies: R300
-  
-  // ==============================================================
-  // USER AUTHENTICATION
+  // USER AUTHENTICATION (FULL ORIGINAL WORKING CODE)
   // ==============================================================
   
   let currentUser = null;
@@ -1345,7 +1344,6 @@
     { name: "Blue", value: "Blue", bg: "#3b82f6" }
   ];
   
-  // UPDATED PRICES: T-shirts R150, Sweaters R280, Hoodies R300
   const tshirts = [
     { id: 1, name: "Neon Duets T-Shirt", price: 150, image: "t-shirt1.png", sizes: ["XS","S","M","L","XL","XXL"] },
     { id: 2, name: "Duets Lover T-Shirt", price: 150, image: "t-shirt2.png", sizes: ["XS","S","M","L","XL","XXL"] },
@@ -1466,7 +1464,7 @@
   }
   
   // ==============================================================
-  // DELIVERY MODAL - MODIFIED: removed the alert popup
+  // DELIVERY MODAL
   // ==============================================================
   let selectedDelivery = null;
   
@@ -1500,7 +1498,6 @@
       document.getElementById('delivery_type').value = selectedDelivery.type;
       hideDeliveryModal();
       updateCartUI();
-      // Direct to payment - no alert
       await proceedToPayment();
     } else {
       alert('Please select a delivery option');
@@ -1508,45 +1505,127 @@
   });
   
   // ==============================================================
-  // PAXI STORE FINDER MAP - UPDATED with manual add
+  // PHOTON (KOMOOT) STORE FINDER - WORKING VERSION
   // ==============================================================
   let map = null;
   let markers = [];
   let currentStores = [];
   
-  // Expanded store brands
   const storeBrands = ["PEP", "PEP Home", "PEPcell", "Tekkie Town", "Shoe City"];
-  const storeBrandQuery = storeBrands.map(b => `"${b}"`).join('|');
   
-  async function queryStores(lat, lng, radius = 10000) {
-    const overpassUrl = 'https://overpass-api.de/api/interpreter';
-    const query = `
-      [out:json];
-      (
-        node["shop"]["brand"~"${storeBrandQuery}"](around:${radius},${lat},${lng});
-        way["shop"]["brand"~"${storeBrandQuery}"](around:${radius},${lat},${lng});
-      );
-      out body;
-    `;
+  async function getCityCoordinates(cityName) {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityName + ', South Africa')}&format=json&limit=1`;
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data && data.length > 0) {
+      return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), displayName: data[0].display_name };
+    }
+    return null;
+  }
+  
+  async function searchStoresWithPhoton(lat, lon) {
+    const allStores = [];
+    
+    for (const brand of storeBrands) {
+      const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(brand)}&lat=${lat}&lon=${lon}&limit=30&lang=en`;
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.features) {
+          data.features.forEach(feature => {
+            const props = feature.properties;
+            const coords = feature.geometry.coordinates;
+            const distance = calculateDistance(lat, lon, coords[1], coords[0]);
+            
+            if (distance < 20) {
+              allStores.push({
+                id: feature.properties.osm_id || Math.random(),
+                name: props.name || brand,
+                address: props.street || props.city || props.name || brand,
+                lat: coords[1],
+                lon: coords[0],
+                code: props.postcode || '',
+                brand: brand,
+                distance: distance
+              });
+            }
+          });
+        }
+      } catch (e) {
+        console.error(`Error searching for ${brand}:`, e);
+      }
+    }
+    
+    const unique = [];
+    const seen = new Set();
+    for (const store of allStores) {
+      const key = `${store.name}_${store.lat}_${store.lon}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(store);
+      }
+    }
+    
+    unique.sort((a, b) => a.distance - b.distance);
+    return unique;
+  }
+  
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+  
+  async function searchStoresByCity(cityName) {
+    if (!cityName) {
+      alert('Please enter a town or city');
+      return;
+    }
+    
+    const searchBtn = document.getElementById('searchBtn');
+    searchBtn.innerText = 'Searching...';
+    searchBtn.disabled = true;
+    
     try {
-      const response = await fetch(overpassUrl, { method: 'POST', body: query });
-      const data = await response.json();
-      return data.elements.map(el => ({
-        id: el.id,
-        name: el.tags.name || el.tags.brand || 'Store',
-        address: el.tags['addr:full'] || el.tags['addr:street'] || el.tags['addr:city'] || 'Address not available',
-        lat: el.lat || (el.center ? el.center.lat : lat),
-        lon: el.lon || (el.center ? el.center.lon : lng),
-        code: el.tags.ref || ''
-      }));
+      const cityCoords = await getCityCoordinates(cityName);
+      if (!cityCoords) {
+        alert(`Could not find coordinates for "${cityName}". Please try a different city name.`);
+        return;
+      }
+      
+      const stores = await searchStoresWithPhoton(cityCoords.lat, cityCoords.lon);
+      
+      if (map) {
+        map.setView([cityCoords.lat, cityCoords.lon], 12);
+      } else {
+        map = L.map('paxiMap').setView([cityCoords.lat, cityCoords.lon], 12);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+        }).addTo(map);
+      }
+      
+      displayStores(stores, cityCoords.displayName);
+      
+      if (stores.length === 0) {
+        alert(`No ${storeBrands.join(', ')} stores found near ${cityCoords.displayName}. Try a different city or use "Add manually" button.`);
+      }
+      
     } catch (error) {
-      console.error('Overpass error:', error);
-      return [];
+      console.error('Search error:', error);
+      alert('Error searching for stores. Please try again.');
+    } finally {
+      searchBtn.innerText = 'Search';
+      searchBtn.disabled = false;
     }
   }
   
-  function displayStores(stores) {
-    if (!map) return;
+  function displayStores(stores, cityName) {
     markers.forEach(m => map.removeLayer(m));
     markers = [];
     const container = document.getElementById('storeList');
@@ -1554,18 +1633,18 @@
     currentStores = stores;
     
     if (stores.length === 0) {
-      container.innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">No stores found in this area. Try a different location or use "Add manually" below.</div>';
+      container.innerHTML = `<div style="color: #aaa; text-align: center; padding: 20px;">No stores found near ${cityName || 'this area'}<br>Click "Add manually" below to enter your store.</div>`;
       return;
     }
     
     stores.forEach(store => {
       const marker = L.marker([store.lat, store.lon]).addTo(map);
-      marker.bindPopup(`<b>${store.name}</b><br>${store.address}<br><button onclick="selectStore('${store.id}')">Select</button>`);
+      marker.bindPopup(`<b>🏪 ${store.name}</b><br>📍 ${store.address}<br><button onclick="selectStore('${store.id}')">Select This Store</button>`);
       markers.push(marker);
       
       const div = document.createElement('div');
       div.className = 'store-item';
-      div.innerHTML = `<div class="store-name">${store.name}</div><div class="store-address">${store.address}</div>`;
+      div.innerHTML = `<div class="store-name">🏪 ${store.name}</div><div class="store-address">📍 ${store.address.substring(0, 100)}</div><div class="store-code">📏 ${store.distance.toFixed(1)} km away</div>`;
       div.onclick = () => selectStore(store.id);
       container.appendChild(div);
     });
@@ -1586,15 +1665,13 @@
       
       const isKingTown = store.address.toLowerCase().includes('king william') || 
                          store.name.toLowerCase().includes('king william') ||
-                         store.address.toLowerCase().includes('kingwilliam');
+                         (store.address.toLowerCase().includes('king') && store.address.toLowerCase().includes('william'));
       
       if (isKingTown) {
         isKingWilliamsTown = true;
         deliveryAmount = 0;
         document.getElementById('delivery_amount').value = 0;
-        // MODIFIED: Show white modal instead of alert
-        const notifModal = document.getElementById('freeCollectionNotif');
-        notifModal.classList.add('show');
+        document.getElementById('freeCollectionNotif').classList.add('show');
       } else {
         isKingWilliamsTown = false;
         showDeliveryModal();
@@ -1603,13 +1680,6 @@
     }
   };
   
-  // Close the free collection notification and proceed to payment
-  document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', async () => {
-    document.getElementById('freeCollectionNotif').classList.remove('show');
-    await proceedToPayment();
-  });
-  
-  // Manual store functionality
   function showManualStoreModal() {
     document.getElementById('manualStoreModal').classList.add('show');
   }
@@ -1659,31 +1729,20 @@
     closeStoreFinder();
   }
   
+  document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', async () => {
+    document.getElementById('freeCollectionNotif').classList.remove('show');
+    await proceedToPayment();
+  });
+  
   document.getElementById('manualStoreBtn')?.addEventListener('click', showManualStoreModal);
   document.getElementById('manualSaveBtn')?.addEventListener('click', saveManualStore);
   document.getElementById('manualCancelBtn')?.addEventListener('click', closeManualStoreModal);
   
-  // South African cities for autocomplete
   const southAfricanCities = [
     "Johannesburg", "Cape Town", "Durban", "Pretoria", "Gqeberha", "Port Elizabeth",
     "Bloemfontein", "Pietermaritzburg", "Polokwane", "Nelspruit", "Mbombela",
-    "Kimberley", "Rustenburg", "Middelburg", "Vereeniging", "Newcastle",
-    "East London", "Botshabelo", "Witbank", "Emalahleni", "Soweto", "Benoni",
-    "Tembisa", "Boksburg", "Krugersdorp", "Diepsloot", "Randburg", "Brakpan",
-    "Vanderbijlpark", "Centurion", "Roodepoort", "Springs", "Carletonville",
-    "Klerksdorp", "Potchefstroom", "Stellenbosch", "Paarl", "Worcester",
-    "George", "Knysna", "Mossel Bay", "Oudtshoorn", "Beaufort West",
-    "Upington", "Mthatha", "Queenstown", "King William's Town", "Bhisho",
-    "Graaff-Reinet", "Aliwal North", "Kroonstad", "Welkom", "Virginia",
-    "Sasolburg", "Heilbron", "Parys", "Fochville", "Orkney", "Stilfontein",
-    "Hartbeespoort", "Brits", "Thabazimbi", "Modimolle", "Lephalale",
-    "Musina", "Louis Trichardt", "Tzaneen", "Phalaborwa", "Hoedspruit",
-    "White River", "Barberton", "Ermelo", "Secunda", "Standerton", "Volksrust",
-    "Vryheid", "Dundee", "Ladysmith", "Estcourt", "Mooi River", "Howick",
-    "Kokstad", "Matatiele", "Harding", "Port Shepstone", "Margate", "Scottburgh",
-    "Ballito", "Stanger", "Richards Bay", "Empangeni", "Ulundi", "Nongoma",
-    "Pongola", "Paulpietersburg", "Piet Retief", "Amsterdam", "Bethal",
-    "Port Alfred", "Grahamstown", "Makhanda", "Butterworth", "Lady Frere"
+    "Kimberley", "Rustenburg", "East London", "King William's Town", "Bhisho",
+    "George", "Knysna", "Mossel Bay", "Upington", "Mthatha", "Queenstown"
   ];
   
   $(document).ready(function() {
@@ -1692,54 +1751,15 @@
       minLength: 2,
       select: function(event, ui) {
         $("#searchLocation").val(ui.item.value);
-        searchStoresWithLocation(ui.item.value);
+        searchStoresByCity(ui.item.value);
         return false;
       }
     });
   });
   
-  async function searchStoresWithLocation(location) {
-    if (!location) {
-      alert('Please enter a town or city');
-      return;
-    }
-    const searchBtn = document.getElementById('searchBtn');
-    searchBtn.innerText = 'Searching...';
-    searchBtn.disabled = true;
-    try {
-      const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location + ', South Africa')}&limit=1`;
-      const geoRes = await fetch(geoUrl);
-      const geoData = await geoRes.json();
-      if (!geoData.length) {
-        alert('Location not found');
-        return;
-      }
-      const { lat, lon } = geoData[0];
-      
-      if (map) {
-        map.setView([lat, lon], 12);
-      } else {
-        map = L.map('paxiMap').setView([lat, lon], 12);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-        }).addTo(map);
-      }
-      
-      const stores = await queryStores(lat, lon);
-      displayStores(stores);
-      if (stores.length === 0) alert('No stores found near that location. Try "Add manually" button.');
-    } catch (error) {
-      console.error(error);
-      alert('Error searching. Please try again.');
-    } finally {
-      searchBtn.innerText = 'Search';
-      searchBtn.disabled = false;
-    }
-  }
-  
   async function searchStores() {
     const location = document.getElementById('searchLocation').value.trim();
-    await searchStoresWithLocation(location);
+    await searchStoresByCity(location);
   }
   
   function openStoreFinder() {
@@ -1767,7 +1787,7 @@
   document.getElementById('searchLocation')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchStores(); });
   
   // ==============================================================
-  // CHECKOUT BUTTON - MODIFIED to support direct payment after delivery
+  // CHECKOUT BUTTON
   // ==============================================================
   async function proceedToPayment() {
     if (!currentUser) {
@@ -1779,7 +1799,6 @@
       return;
     }
     
-    // Check if only mixtape is in cart (no physical items)
     const hasPhysicalItems = cart.some(item => item.id !== 99);
     
     if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
@@ -1875,6 +1894,9 @@
     }
   }
   
+  // ==============================================================
+  // EVENT LISTENERS
+  // ==============================================================
   document.getElementById("cartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
   document.getElementById("stickyCartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
   document.getElementById("closeCartBtn")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.remove("open"));
