@@ -558,7 +558,7 @@
     }
     .close-reset:hover { color: #ff8888; }
 
-    /* DELIVERY MODAL WITH X BUTTON */
+    /* DELIVERY MODAL WITH X BUTTON - X GOES BACK TO MAP */
     .delivery-modal {
       display: none;
       position: fixed;
@@ -948,7 +948,7 @@
   </div>
 </div>
 
-<!-- DELIVERY MODAL (WHITE) WITH X BUTTON -->
+<!-- DELIVERY MODAL (WHITE) WITH X BUTTON - X GOES BACK TO MAP -->
 <div id="deliveryModal" class="delivery-modal">
   <div class="delivery-modal-content">
     <button class="delivery-close" id="closeDeliveryModalBtn">&times;</button>
@@ -1135,12 +1135,10 @@
   function fixMixtapeDuplicate() {
     const mixtapeItems = cart.filter(item => item.id === 99);
     if (mixtapeItems.length > 1) {
-      // Remove all mixtapes and add back exactly one
       cart = cart.filter(item => item.id !== 99);
       cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
       saveCartToLocal();
     } else if (mixtapeItems.length === 1 && mixtapeItems[0].qty > 1) {
-      // Fix quantity to 1
       mixtapeItems[0].qty = 1;
       saveCartToLocal();
     }
@@ -1177,9 +1175,10 @@
   
   document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', closeFreeCollectionModal);
   
-  // Close delivery modal with X button
+  // Close delivery modal - GOES BACK TO MAP (reopen store finder)
   document.getElementById('closeDeliveryModalBtn')?.addEventListener('click', () => {
     document.getElementById('deliveryModal').classList.remove('show');
+    openStoreFinder(); // Go back to map selection
   });
   
   function normalizeEmail(email) {
@@ -1243,7 +1242,7 @@
       currentUser = result.user;
       if (result.user.cart && result.user.cart.length > 0 && cart.length === 0) {
         cart = result.user.cart;
-        fixMixtapeDuplicate(); // Fix duplicate mixtape on load
+        fixMixtapeDuplicate();
         updateCartUI();
       }
       updateUserUI();
@@ -1277,18 +1276,17 @@
       localStorage.setItem('session_token', sessionToken);
       
       if (cart.length > 0 && result.user.cart) {
-        // Merge local cart with server cart
         for (let localItem of cart) {
           const existing = result.user.cart.find(i => i.id === localItem.id && i.size === localItem.size && i.color === localItem.color);
           if (existing) existing.qty += localItem.qty;
           else result.user.cart.push(localItem);
         }
         cart = result.user.cart;
-        fixMixtapeDuplicate(); // Fix duplicate mixtape after merge
+        fixMixtapeDuplicate();
         await saveCartToServer();
       } else if (result.user.cart && result.user.cart.length > 0) {
         cart = result.user.cart;
-        fixMixtapeDuplicate(); // Fix duplicate mixtape
+        fixMixtapeDuplicate();
       }
       updateCartUI();
       updateUserUI();
@@ -1323,7 +1321,6 @@
     
     buttonsContainer.innerHTML = '';
     
-    // If user is logged in AND has purchased mixtape, show download button
     if (currentUser && currentUser.hasPurchasedMixtape === true) {
       buttonsContainer.innerHTML = `
         <button class="download-mixtape-btn" id="downloadMixtapeBtn"><i class="fas fa-download"></i> DOWNLOAD MIXTAPE (ZIP)</button>
@@ -1343,7 +1340,6 @@
       return;
     }
     
-    // Show add to cart button (can be added without login)
     buttonsContainer.innerHTML = `
       <button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button>
       <a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
@@ -1352,13 +1348,11 @@
     const addBtn = document.getElementById('addToCartMixtapeBtn');
     if (addBtn) {
       addBtn.addEventListener('click', () => {
-        // Check if mixtape already in cart (prevent duplicate)
         const existing = cart.find(i => i.id === 99);
         if (existing) {
           showErrorModal('Already in Cart', 'Mixtape is already in your cart. You can only purchase it once.');
           return;
         }
-        // Add mixtape to cart
         cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
         saveCartToLocal();
         document.getElementById("cartSidebar").classList.add("open");
@@ -1520,7 +1514,7 @@
   let currentProduct = null, selectedSize = null, selectedColor = null;
   
   function saveCartToLocal() { 
-    fixMixtapeDuplicate(); // Always ensure only one mixtape
+    fixMixtapeDuplicate();
     updateCartUI(); 
     if (sessionToken) saveCartToServer(); 
   }
@@ -1544,7 +1538,7 @@
       btn.addEventListener("click", () => {
         const id = parseInt(btn.dataset.id), size = btn.dataset.size, color = btn.dataset.color;
         cart = cart.filter(i => !(i.id === id && i.size === size && i.color === color));
-        fixMixtapeDuplicate(); // Fix duplicates after removal
+        fixMixtapeDuplicate();
         saveCartToLocal();
       });
     });
@@ -1801,7 +1795,7 @@
     }
   }
   
-  // FIXED: Any store in King William's Town / Qonce area gets FREE collection popup, NO delivery options
+  // FIXED: King William's Town = FREE collection (NO delivery options)
   window.selectStore = function(storeId) {
     const store = currentStores.find(s => s.id == storeId);
     if (store) {
@@ -1810,7 +1804,6 @@
       document.getElementById('paxi_store_address').value = store.address;
       document.getElementById('paxi_store_code').value = store.code || '';
       
-      // Check if store is in King William's Town / Qonce area
       const isKingTown = store.address.toLowerCase().includes('king william') || 
                          store.address.toLowerCase().includes('qonce') ||
                          store.name.toLowerCase().includes('king william') ||
@@ -1821,13 +1814,12 @@
         isKingWilliamsTown = true;
         deliveryAmount = 0;
         document.getElementById('delivery_amount').value = 0;
-        // Show FREE COLLECTION popup directly (NO delivery options)
         closeStoreFinder();
         document.getElementById('freeCollectionNotif').classList.add('show');
       } else {
         isKingWilliamsTown = false;
         closeStoreFinder();
-        showDeliveryModal(); // Show delivery options for non-King William's Town
+        showDeliveryModal();
       }
     }
   };
@@ -1865,7 +1857,6 @@
     document.getElementById('paxi_store_address').value = storeAddress;
     document.getElementById('paxi_store_code').value = '';
     
-    // Check if manually entered store is in King William's Town
     const isKingTown = storeAddress.toLowerCase().includes('king william') || 
                        storeAddress.toLowerCase().includes('qonce') ||
                        storeName.toLowerCase().includes('king william') ||
@@ -1940,7 +1931,7 @@
   document.getElementById('searchLocation')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchStores(); });
   
   // ==============================================================
-  // CHECKOUT BUTTON
+  // CHECKOUT BUTTON - MUST HAVE SELECTED PICKUP POINT
   // ==============================================================
   async function proceedToPayment() {
     // If user is not logged in, show auth modal first
@@ -1955,7 +1946,9 @@
     
     const hasPhysicalItems = cart.some(item => item.id !== 99);
     
+    // CRITICAL: Customer MUST select a pickup point for physical items
     if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
+      showErrorModal('No Pickup Point Selected', 'Please select a pickup point from the map before checking out.');
       openStoreFinder();
       return;
     }
@@ -2076,6 +2069,7 @@
     }
     const hasPhysicalItems = cart.some(item => item.id !== 99);
     if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
+      showErrorModal('No Pickup Point Selected', 'Please select a pickup point from the map before checking out.');
       openStoreFinder();
       return;
     }
