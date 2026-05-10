@@ -558,7 +558,6 @@
     }
     .close-reset:hover { color: #ff8888; }
 
-    /* DELIVERY MODAL - WHITE BACKGROUND */
     .delivery-modal {
       display: none;
       position: fixed;
@@ -755,7 +754,6 @@
 </head>
 <body>
 
-<!-- NOTIFICATION MODAL: FREE COLLECTION -->
 <div id="freeCollectionNotif" class="notification-modal">
   <div class="notification-content">
     <i class="fas fa-check-circle"></i>
@@ -765,7 +763,6 @@
   </div>
 </div>
 
-<!-- DELIVERY MODAL -->
 <div id="deliveryModal" class="delivery-modal">
   <div class="delivery-modal-content">
     <h3>🚚 Select Delivery Option</h3>
@@ -784,7 +781,6 @@
   </div>
 </div>
 
-<!-- AUTH MODAL -->
 <div id="authModal" class="auth-modal">
   <div class="auth-modal-content">
     <button class="close-auth" id="closeAuthBtn">&times;</button>
@@ -802,7 +798,6 @@
   </div>
 </div>
 
-<!-- RESET PASSWORD MODAL -->
 <div id="resetModal" class="reset-modal">
   <div class="reset-modal-content">
     <button class="close-reset" id="closeResetBtn">&times;</button>
@@ -813,7 +808,6 @@
   </div>
 </div>
 
-<!-- PRODUCT MODAL -->
 <div id="sizeColorModal" class="modal">
   <div class="modal-content">
     <h3 id="modalProductName">Product</h3>
@@ -827,7 +821,6 @@
   </div>
 </div>
 
-<!-- STICKY NAV -->
 <div class="sticky-nav" id="stickyNav">
   <div class="sticky-nav-links">
     <a href="#" class="sticky-tshirts">T-SHIRTS</a>
@@ -840,7 +833,6 @@
   </div>
 </div>
 
-<!-- MAIN HEADER -->
 <div class="site-header">
   <div class="container header-inner">
     <div class="logo"><img src="fargo1.png" alt="MrYoungFargo" onerror="this.src='https://placehold.co/200x55?text=MrYoungFargo'"></div>
@@ -877,7 +869,6 @@
   <div id="hoodies-section"><div class="category-title"><i class="fas fa-hoodie"></i> HOODIES</div><div class="products-grid" id="hoodiesGrid"></div></div>
 </div>
 
-<!-- MUSIC BUTTON AT BOTTOM -->
 <div class="music-footer-btn">
   <a href="https://m.youtube.com/@MrYoungFargo_SA" target="_blank" class="listen-btn">
     <i class="fab fa-youtube"></i> LISTEN TO MY MUSIC
@@ -894,19 +885,16 @@
   <button class="checkout-btn" id="checkoutBtn">CHECKOUT →</button>
 </div>
 
-<!-- PAXI Hidden Fields -->
 <input type="hidden" id="paxi_store_name">
 <input type="hidden" id="paxi_store_address">
 <input type="hidden" id="paxi_store_code">
 <input type="hidden" id="delivery_amount" value="0">
 <input type="hidden" id="delivery_type" value="">
 
-<!-- PAXI SELECTOR BUTTON -->
 <button type="button" id="openStoreFinderBtn" style="background: #10b981; color: white; padding: 10px; border-radius: 30px; width: 90%; margin: 0 auto 20px; display: block; max-width: 400px; border: none; cursor: pointer;">
   📍 Select PAXI Pickup Point
 </button>
 
-<!-- PAXI MODAL -->
 <div id="storeFinderModal">
   <div class="modal-container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -931,14 +919,6 @@
   // BACKEND API URL
   // ==============================================================
   const API_URL = 'https://mryoungfargo-payment.onrender.com';
-  
-  // ==============================================================
-  // PRICES UPDATED
-  // ==============================================================
-  
-  // ==============================================================
-  // USER AUTHENTICATION
-  // ==============================================================
   
   let currentUser = null;
   let sessionToken = localStorage.getItem('session_token') || null;
@@ -1227,7 +1207,7 @@
   }
   
   // ==============================================================
-  // STORE DATA & FUNCTIONS (UPDATED PRICES)
+  // STORE DATA & FUNCTIONS
   // ==============================================================
   
   const colors = [
@@ -1399,19 +1379,91 @@
   document.getElementById('confirmDeliveryBtn')?.addEventListener('click', proceedToPaymentAfterDelivery);
   
   // ==============================================================
-  // OPEN CAGE API STORE FINDER (FREE, NO CARD REQUIRED)
+  // PHOTON API STORE FINDER - WORKING SOLUTION (FREE, NO API KEY)
   // ==============================================================
-  const OPENCAGE_API_KEY = 'ef9bd422a0fc46a782d525d105ac32f6';
-  
   let map = null;
   let markers = [];
   let currentStores = [];
   
-  // Store brands to search for
   const storeBrands = ["PEP", "PEP Home", "PEPcell", "Tekkie Town", "Shoe City"];
   
-  async function searchStoresWithOpenCage(location) {
-    if (!location) {
+  // First, get coordinates of the searched city using Nominatim (free, no key)
+  async function getCityCoordinates(cityName) {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityName + ', South Africa')}&format=json&limit=1`;
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data && data.length > 0) {
+      return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), displayName: data[0].display_name };
+    }
+    return null;
+  }
+  
+  // Then search for stores near that location using Photon API
+  async function searchStoresWithPhoton(lat, lon, cityName) {
+    const allStores = [];
+    
+    for (const brand of storeBrands) {
+      // Photon API search for POIs
+      const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(brand)}&lat=${lat}&lon=${lon}&limit=20&lang=en`;
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.features) {
+          data.features.forEach(feature => {
+            const props = feature.properties;
+            const coords = feature.geometry.coordinates;
+            const distance = calculateDistance(lat, lon, coords[1], coords[0]);
+            
+            // Only include stores within ~15km of the searched city
+            if (distance < 15) {
+              allStores.push({
+                id: feature.properties.osm_id || Math.random(),
+                name: props.name || brand,
+                address: props.street || props.city || props.name || brand,
+                lat: coords[1],
+                lon: coords[0],
+                code: props.postcode || '',
+                brand: brand,
+                distance: distance
+              });
+            }
+          });
+        }
+      } catch (e) {
+        console.error(`Error searching for ${brand}:`, e);
+      }
+    }
+    
+    // Remove duplicates by name+lat+lon
+    const unique = [];
+    const seen = new Set();
+    for (const store of allStores) {
+      const key = `${store.name}_${store.lat}_${store.lon}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(store);
+      }
+    }
+    
+    // Sort by distance
+    unique.sort((a, b) => a.distance - b.distance);
+    return unique;
+  }
+  
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+  
+  async function searchStoresByCity(cityName) {
+    if (!cityName) {
       alert('Please enter a town or city');
       return;
     }
@@ -1421,81 +1473,34 @@
     searchBtn.disabled = true;
     
     try {
-      // Step 1: Geocode the location using OpenCage
-      const geocodeUrl = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location + ', South Africa')}&key=${OPENCAGE_API_KEY}&limit=1&countrycode=za`;
-      const geoRes = await fetch(geocodeUrl);
-      const geoData = await geoRes.json();
-      
-      if (!geoData.results || geoData.results.length === 0) {
-        alert('Location not found. Please try a different town or city.');
+      // Get coordinates of the city
+      const cityCoords = await getCityCoordinates(cityName);
+      if (!cityCoords) {
+        alert(`Could not find coordinates for "${cityName}". Please try a different city name.`);
         return;
       }
       
-      const { lat, lng } = geoData.results[0].geometry;
-      const formattedLocation = geoData.results[0].formatted;
-      
-      // Step 2: Search for stores near that location
-      let allStores = [];
-      
-      for (const brand of storeBrands) {
-        const searchUrl = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(brand + ' near ' + location + ' South Africa')}&key=${OPENCAGE_API_KEY}&limit=20&boundary_country=za&proximity=${lat},${lng}&radius=10000`;
-        const storeRes = await fetch(searchUrl);
-        const storeData = await storeRes.json();
-        
-        if (storeData.results) {
-          storeData.results.forEach(result => {
-            // Check if result matches one of our brands
-            const brandMatch = storeBrands.some(b => 
-              result.formatted.toLowerCase().includes(b.toLowerCase()) ||
-              (result.components && (
-                (result.components.shop || '').toLowerCase().includes(b.toLowerCase()) ||
-                (result.components.brand || '').toLowerCase().includes(b.toLowerCase())
-              ))
-            );
-            
-            if (brandMatch || result.formatted.toLowerCase().includes('pep') || result.formatted.toLowerCase().includes('tekki') || result.formatted.toLowerCase().includes('shoe city')) {
-              allStores.push({
-                id: result.annotations?.OSM?.id || Math.random(),
-                name: result.components?.shop || result.components?.brand || brand,
-                address: result.formatted,
-                lat: result.geometry.lat,
-                lon: result.geometry.lng,
-                code: result.components?.postcode || ''
-              });
-            }
-          });
-        }
-      }
-      
-      // Remove duplicates
-      const uniqueStores = [];
-      const seen = new Set();
-      for (const store of allStores) {
-        const key = store.name + store.address;
-        if (!seen.has(key)) {
-          seen.add(key);
-          uniqueStores.push(store);
-        }
-      }
+      // Search for stores
+      const stores = await searchStoresWithPhoton(cityCoords.lat, cityCoords.lon, cityName);
       
       // Setup or update map
       if (map) {
-        map.setView([lat, lng], 13);
+        map.setView([cityCoords.lat, cityCoords.lon], 12);
       } else {
-        map = L.map('paxiMap').setView([lat, lng], 13);
+        map = L.map('paxiMap').setView([cityCoords.lat, cityCoords.lon], 12);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; OpenCage'
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
         }).addTo(map);
       }
       
-      displayStores(uniqueStores);
+      displayStores(stores, cityCoords.displayName);
       
-      if (uniqueStores.length === 0) {
-        alert(`No ${storeBrands.join(', ')} stores found near ${formattedLocation}. Try a different location or search for a nearby city.`);
+      if (stores.length === 0) {
+        alert(`No ${storeBrands.join(', ')} stores found near ${cityCoords.displayName}. Try a different city or a larger nearby town.`);
       }
       
     } catch (error) {
-      console.error('OpenCage error:', error);
+      console.error('Search error:', error);
       alert('Error searching for stores. Please try again.');
     } finally {
       searchBtn.innerText = 'Search';
@@ -1503,8 +1508,7 @@
     }
   }
   
-  function displayStores(stores) {
-    if (!map) return;
+  function displayStores(stores, cityName) {
     markers.forEach(m => map.removeLayer(m));
     markers = [];
     const container = document.getElementById('storeList');
@@ -1512,18 +1516,18 @@
     currentStores = stores;
     
     if (stores.length === 0) {
-      container.innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">No stores found in this area. Try a different location or search for a nearby city.</div>';
+      container.innerHTML = `<div style="color: #aaa; text-align: center; padding: 20px;">No stores found near ${cityName || 'this area'}. Try a different location or search for a nearby city.</div>`;
       return;
     }
     
     stores.forEach(store => {
       const marker = L.marker([store.lat, store.lon]).addTo(map);
-      marker.bindPopup(`<b>${store.name}</b><br>${store.address.substring(0, 150)}<br><button onclick="selectStore('${store.id}')">Select This Store</button>`);
+      marker.bindPopup(`<b>🏪 ${store.name}</b><br>📍 ${store.address}<br><button onclick="selectStore('${store.id}')">Select This Store</button>`);
       markers.push(marker);
       
       const div = document.createElement('div');
       div.className = 'store-item';
-      div.innerHTML = `<div class="store-name">🏪 ${store.name}</div><div class="store-address">📍 ${store.address.substring(0, 100)}</div>`;
+      div.innerHTML = `<div class="store-name">🏪 ${store.name}</div><div class="store-address">📍 ${store.address.substring(0, 100)}</div><div class="store-code">📏 ${store.distance.toFixed(1)} km away</div>`;
       div.onclick = () => selectStore(store.id);
       container.appendChild(div);
     });
@@ -1544,7 +1548,6 @@
       
       const isKingTown = store.address.toLowerCase().includes('king william') || 
                          store.name.toLowerCase().includes('king william') ||
-                         store.address.toLowerCase().includes('kingwilliam') ||
                          (store.address.toLowerCase().includes('king') && store.address.toLowerCase().includes('william'));
       
       if (isKingTown) {
@@ -1566,7 +1569,7 @@
     await proceedToPayment();
   });
   
-  // South African cities for autocomplete
+  // South African cities for autocomplete dropdown
   const southAfricanCities = [
     "Johannesburg", "Cape Town", "Durban", "Pretoria", "Gqeberha", "Port Elizabeth",
     "Bloemfontein", "Pietermaritzburg", "Polokwane", "Nelspruit", "Mbombela",
@@ -1587,8 +1590,8 @@
     "Ballito", "Stanger", "Richards Bay", "Empangeni", "Ulundi", "Nongoma",
     "Pongola", "Paulpietersburg", "Piet Retief", "Amsterdam", "Bethal",
     "Port Alfred", "Grahamstown", "Makhanda", "Butterworth", "Lady Frere",
-    "Cradock", "Middelburg Eastern Cape", "Somerset East", "Addo", "Jeffreys Bay",
-    "Plettenberg Bay", "Hermanus", "Saldanha", "Vredenburg", "Malmesbury"
+    "Cradock", "Somerset East", "Addo", "Jeffreys Bay", "Plettenberg Bay",
+    "Hermanus", "Saldanha", "Vredenburg", "Malmesbury", "Wellington"
   ];
   
   $(document).ready(function() {
@@ -1597,7 +1600,7 @@
       minLength: 2,
       select: function(event, ui) {
         $("#searchLocation").val(ui.item.value);
-        searchStoresWithOpenCage(ui.item.value);
+        searchStoresByCity(ui.item.value);
         return false;
       }
     });
@@ -1605,7 +1608,7 @@
   
   async function searchStores() {
     const location = document.getElementById('searchLocation').value.trim();
-    await searchStoresWithOpenCage(location);
+    await searchStoresByCity(location);
   }
   
   function openStoreFinder() {
