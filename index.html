@@ -635,6 +635,44 @@
       background: #2563eb;
     }
 
+    /* NEW STYLES FOR WHITE NOTIFICATION MODAL */
+    .notification-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 20002;
+      align-items: center;
+      justify-content: center;
+    }
+    .notification-modal.show { display: flex; }
+    .notification-content {
+      background: white;
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 340px;
+      width: 85%;
+      color: #1e2a3e;
+    }
+    .notification-content i { font-size: 48px; color: #10b981; margin-bottom: 16px; }
+    .notification-content h4 { font-size: 1.2rem; margin-bottom: 12px; font-weight: 700; }
+    .notification-content p { font-size: 0.9rem; margin: 8px 0; line-height: 1.4; }
+    .notification-close {
+      background: #3b82f6;
+      margin-top: 20px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 40px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+    }
+
     /* PAXI Modal */
     #storeFinderModal {
       display: none;
@@ -701,6 +739,16 @@
   </style>
 </head>
 <body>
+
+<!-- NEW NOTIFICATION MODAL: FREE COLLECTION (White background) -->
+<div id="freeCollectionNotif" class="notification-modal">
+  <div class="notification-content">
+    <i class="fas fa-check-circle"></i>
+    <h4>✅ FREE COLLECTION AT CLICKS KING WILLIAM'S TOWN!</h4>
+    <p>You will receive an email when order is ready for collection.</p>
+    <button class="notification-close" id="closeFreeCollectionBtn">Continue to Payment</button>
+  </div>
+</div>
 
 <!-- DELIVERY MODAL (WHITE) -->
 <div id="deliveryModal" class="delivery-modal">
@@ -1320,18 +1368,22 @@
     selectedDelivery = { type: 'speed', amount: 109.95 };
   });
   
-  document.getElementById('confirmDeliveryBtn')?.addEventListener('click', () => {
+  // --- MODIFIED: Removed the alert popup, added direct payment flow ---
+  async function proceedToPaymentAfterDelivery() {
     if (selectedDelivery) {
       deliveryAmount = selectedDelivery.amount;
       document.getElementById('delivery_amount').value = deliveryAmount;
       document.getElementById('delivery_type').value = selectedDelivery.type;
       hideDeliveryModal();
       updateCartUI();
-      alert(`✅ Delivery option selected: ${selectedDelivery.type === 'economy' ? 'Economy (R59.95)' : 'Speed (R109.95)'}`);
+      // Go straight to payment instead of showing alert
+      await proceedToPayment();
     } else {
       alert('Please select a delivery option');
     }
-  });
+  }
+  
+  document.getElementById('confirmDeliveryBtn')?.addEventListener('click', proceedToPaymentAfterDelivery);
   
   // ==============================================================
   // PAXI STORE FINDER MAP - WORKING VERSION
@@ -1414,7 +1466,9 @@
         isKingWilliamsTown = true;
         deliveryAmount = 0;
         document.getElementById('delivery_amount').value = 0;
-        alert(`✅ Free collection at Clicks Stone Towers, King William's Town!\nYour items will be ready for collection at Clicks Stone Towers.`);
+        // --- MODIFIED: Show new white modal instead of alert ---
+        const notifModal = document.getElementById('freeCollectionNotif');
+        notifModal.classList.add('show');
       } else {
         isKingWilliamsTown = false;
         showDeliveryModal();
@@ -1422,6 +1476,12 @@
       closeStoreFinder();
     }
   };
+  
+  // Close the free collection notification and proceed to payment
+  document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', async () => {
+    document.getElementById('freeCollectionNotif').classList.remove('show');
+    await proceedToPayment();
+  });
   
   async function searchStores() {
     const location = document.getElementById('searchLocation').value.trim();
@@ -1488,9 +1548,9 @@
   document.getElementById('searchLocation')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchStores(); });
   
   // ==============================================================
-  // CHECKOUT BUTTON - NO "PLEASE SELECT PAXI" POPUP
+  // CHECKOUT BUTTON - UPDATED to call the new proceedToPayment function
   // ==============================================================
-  document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
+  async function proceedToPayment() {
     if (!currentUser) {
       window.showAuthModal();
       return;
@@ -1504,7 +1564,6 @@
     const hasPhysicalItems = cart.some(item => item.id !== 99);
     
     if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
-      // Instead of alert, open the map modal
       openStoreFinder();
       return;
     }
@@ -1583,7 +1642,7 @@
       checkoutBtn.innerText = originalText;
       checkoutBtn.disabled = false;
     }
-  });
+  }
   
   async function checkForSuccessfulPayment() {
     const pendingOrderId = sessionStorage.getItem('pendingOrderId');
@@ -1610,6 +1669,24 @@
   document.getElementById("authToggleText")?.addEventListener("click", toggleAuthMode);
   document.getElementById("forgotPasswordBtn")?.addEventListener("click", showResetModal);
   document.getElementById("sendResetBtn")?.addEventListener("click", sendResetLink);
+  
+  // Make the main checkout button use the new function
+  document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
+    if (!currentUser) {
+      window.showAuthModal();
+      return;
+    }
+    if (cart.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+    const hasPhysicalItems = cart.some(item => item.id !== 99);
+    if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
+      openStoreFinder();
+      return;
+    }
+    await proceedToPayment();
+  });
   
   verifySession().then(() => {
     renderGrid(tshirts, "tshirtsGrid");
