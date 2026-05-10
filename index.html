@@ -7,6 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Added: jQuery UI for autocomplete suggestions -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -635,7 +637,7 @@
       background: #2563eb;
     }
 
-    /* NEW STYLES FOR WHITE NOTIFICATION MODAL */
+    /* NOTIFICATION MODAL - WHITE BACKGROUND */
     .notification-modal {
       display: none;
       position: fixed;
@@ -705,6 +707,23 @@
       border: 1px solid #2a2a4a;
       margin: 10px 0;
     }
+    /* Style for autocomplete suggestions */
+    .ui-autocomplete {
+      background: #1a1a2e;
+      border: 1px solid #3b82f6;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      color: white;
+      z-index: 10001;
+    }
+    .ui-autocomplete li {
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .ui-autocomplete li:hover {
+      background: #3b82f6;
+    }
     #storeFinderModal button {
       background: #3b82f6;
       border: none;
@@ -740,7 +759,7 @@
 </head>
 <body>
 
-<!-- NEW NOTIFICATION MODAL: FREE COLLECTION (White background) -->
+<!-- NOTIFICATION MODAL: FREE COLLECTION (White background) -->
 <div id="freeCollectionNotif" class="notification-modal">
   <div class="notification-content">
     <i class="fas fa-check-circle"></i>
@@ -908,6 +927,8 @@
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
 <script>
   // ==============================================================
@@ -1368,7 +1389,6 @@
     selectedDelivery = { type: 'speed', amount: 109.95 };
   });
   
-  // --- MODIFIED: Removed the alert popup, added direct payment flow ---
   async function proceedToPaymentAfterDelivery() {
     if (selectedDelivery) {
       deliveryAmount = selectedDelivery.amount;
@@ -1376,7 +1396,6 @@
       document.getElementById('delivery_type').value = selectedDelivery.type;
       hideDeliveryModal();
       updateCartUI();
-      // Go straight to payment instead of showing alert
       await proceedToPayment();
     } else {
       alert('Please select a delivery option');
@@ -1386,19 +1405,23 @@
   document.getElementById('confirmDeliveryBtn')?.addEventListener('click', proceedToPaymentAfterDelivery);
   
   // ==============================================================
-  // PAXI STORE FINDER MAP - WORKING VERSION
+  // PAXI STORE FINDER MAP - WITH IMPROVED STORE TYPES & SEARCH SUGGESTIONS
   // ==============================================================
   let map = null;
   let markers = [];
   let currentStores = [];
   
-  async function queryStores(lat, lng, radius = 5000) {
+  // Expanded store brands: PEP, PEP Home, PEP Cell, Tekkie Town, Shoe City
+  const storeBrands = ["PEP", "PEP Home", "PEPcell", "Tekkie Town", "Shoe City"];
+  const storeBrandQuery = storeBrands.map(b => `"${b}"`).join('|');
+  
+  async function queryStores(lat, lng, radius = 10000) {
     const overpassUrl = 'https://overpass-api.de/api/interpreter';
     const query = `
       [out:json];
       (
-        node["shop"]["brand"~"PEP|Tekkie Town|Shoe City|PEPcell"](around:${radius},${lat},${lng});
-        way["shop"]["brand"~"PEP|Tekkie Town|Shoe City|PEPcell"](around:${radius},${lat},${lng});
+        node["shop"]["brand"~"${storeBrandQuery}"](around:${radius},${lat},${lng});
+        way["shop"]["brand"~"${storeBrandQuery}"](around:${radius},${lat},${lng});
       );
       out body;
     `;
@@ -1407,7 +1430,7 @@
       const data = await response.json();
       return data.elements.map(el => ({
         id: el.id,
-        name: el.tags.name || el.tags.brand || 'PAXI Store',
+        name: el.tags.name || el.tags.brand || 'Store',
         address: el.tags['addr:full'] || el.tags['addr:street'] || el.tags['addr:city'] || 'Address not available',
         lat: el.lat || (el.center ? el.center.lat : lat),
         lon: el.lon || (el.center ? el.center.lon : lng),
@@ -1428,7 +1451,7 @@
     currentStores = stores;
     
     if (stores.length === 0) {
-      container.innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">No PAXI stores found in this area. Try a different location.</div>';
+      container.innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">No stores found in this area. Try a different location.</div>';
       return;
     }
     
@@ -1466,7 +1489,6 @@
         isKingWilliamsTown = true;
         deliveryAmount = 0;
         document.getElementById('delivery_amount').value = 0;
-        // --- MODIFIED: Show new white modal instead of alert ---
         const notifModal = document.getElementById('freeCollectionNotif');
         notifModal.classList.add('show');
       } else {
@@ -1477,14 +1499,46 @@
     }
   };
   
-  // Close the free collection notification and proceed to payment
   document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', async () => {
     document.getElementById('freeCollectionNotif').classList.remove('show');
     await proceedToPayment();
   });
   
-  async function searchStores() {
-    const location = document.getElementById('searchLocation').value.trim();
+  // Autocomplete suggestions for South African cities/towns
+  const southAfricanCities = [
+    "Johannesburg", "Cape Town", "Durban", "Pretoria", "Gqeberha", "Port Elizabeth",
+    "Bloemfontein", "Pietermaritzburg", "Polokwane", "Nelspruit", "Mbombela",
+    "Kimberley", "Rustenburg", "Middelburg", "Vereeniging", "Newcastle",
+    "East London", "Botshabelo", "Witbank", "Emalahleni", "Soweto", "Benoni",
+    "Tembisa", "Boksburg", "Krugersdorp", "Diepsloot", "Randburg", "Brakpan",
+    "Vanderbijlpark", "Centurion", "Roodepoort", "Springs", "Carletonville",
+    "Klerksdorp", "Potchefstroom", "Stellenbosch", "Paarl", "Worcester",
+    "George", "Knysna", "Mossel Bay", "Oudtshoorn", "Beaufort West",
+    "Upington", "Mthatha", "Queenstown", "King William's Town", "Bhisho",
+    "Graaff-Reinet", "Aliwal North", "Kroonstad", "Welkom", "Virginia",
+    "Sasolburg", "Heilbron", "Parys", "Fochville", "Orkney", "Stilfontein",
+    "Hartbeespoort", "Brits", "Thabazimbi", "Modimolle", "Lephalale",
+    "Musina", "Louis Trichardt", "Tzaneen", "Phalaborwa", "Hoedspruit",
+    "White River", "Barberton", "Ermelo", "Secunda", "Standerton", "Volksrust",
+    "Vryheid", "Dundee", "Ladysmith", "Estcourt", "Mooi River", "Howick",
+    "Kokstad", "Matatiele", "Harding", "Port Shepstone", "Margate", "Scottburgh",
+    "Ballito", "Stanger", "Richards Bay", "Empangeni", "Ulundi", "Nongoma",
+    "Pongola", "Paulpietersburg", "Piet Retief", "Amsterdam", "Ermelo", "Bethal"
+  ];
+  
+  $(document).ready(function() {
+    $("#searchLocation").autocomplete({
+      source: southAfricanCities,
+      minLength: 2,
+      select: function(event, ui) {
+        $("#searchLocation").val(ui.item.value);
+        searchStoresWithLocation(ui.item.value);
+        return false;
+      }
+    });
+  });
+  
+  async function searchStoresWithLocation(location) {
     if (!location) {
       alert('Please enter a town or city');
       return;
@@ -1513,7 +1567,7 @@
       
       const stores = await queryStores(lat, lon);
       displayStores(stores);
-      if (stores.length === 0) alert('No PAXI stores found near that location.');
+      if (stores.length === 0) alert('No stores found near that location.');
     } catch (error) {
       console.error(error);
       alert('Error searching. Please try again.');
@@ -1521,6 +1575,11 @@
       searchBtn.innerText = 'Search';
       searchBtn.disabled = false;
     }
+  }
+  
+  async function searchStores() {
+    const location = document.getElementById('searchLocation').value.trim();
+    await searchStoresWithLocation(location);
   }
   
   function openStoreFinder() {
@@ -1548,7 +1607,7 @@
   document.getElementById('searchLocation')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchStores(); });
   
   // ==============================================================
-  // CHECKOUT BUTTON - UPDATED to call the new proceedToPayment function
+  // CHECKOUT BUTTON
   // ==============================================================
   async function proceedToPayment() {
     if (!currentUser) {
@@ -1560,7 +1619,6 @@
       return;
     }
     
-    // Check if only mixtape is in cart (no physical items)
     const hasPhysicalItems = cart.some(item => item.id !== 99);
     
     if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
@@ -1670,7 +1728,6 @@
   document.getElementById("forgotPasswordBtn")?.addEventListener("click", showResetModal);
   document.getElementById("sendResetBtn")?.addEventListener("click", sendResetLink);
   
-  // Make the main checkout button use the new function
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (!currentUser) {
       window.showAuthModal();
