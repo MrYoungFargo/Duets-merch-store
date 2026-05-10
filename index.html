@@ -672,7 +672,7 @@
       width: 100%;
     }
 
-    /* STORE FINDER MODAL - SMALLER STYLES (Komoot/Photon map stays same) */
+    /* STORE FINDER MODAL STYLES */
     #storeFinderModal {
       display: none;
       position: fixed;
@@ -867,8 +867,8 @@
 <div id="freeCollectionNotif" class="notification-modal">
   <div class="notification-content">
     <i class="fas fa-check-circle"></i>
-    <h4>✅ FREE COLLECTION AT CLICKS KING WILLIAM'S TOWN!</h4>
-    <p>You will receive an email when order is ready for collection.</p>
+    <h4>✅ FREE COLLECTION AT CLICKS STONE TOWERS, KING WILLIAM'S TOWN!</h4>
+    <p>You will receive an email when your order is ready for collection.</p>
     <button class="notification-close" id="closeFreeCollectionBtn">Continue to Payment</button>
   </div>
 </div>
@@ -1044,7 +1044,7 @@
   const API_URL = 'https://mryoungfargo-payment.onrender.com';
   
   // ==============================================================
-  // USER AUTHENTICATION (FULL ORIGINAL WORKING CODE)
+  // USER AUTHENTICATION
   // ==============================================================
   
   let currentUser = null;
@@ -1053,6 +1053,11 @@
   let deliveryAmount = 0;
   let selectedPaxiStore = null;
   let isKingWilliamsTown = false;
+  
+  // Check if user has already purchased mixtape
+  function hasUserPurchasedMixtape() {
+    return currentUser && currentUser.hasPurchasedMixtape === true;
+  }
   
   function normalizeEmail(email) {
     return email ? email.toLowerCase().trim() : '';
@@ -1184,12 +1189,14 @@
     if (sessionToken && cart) await apiCall('/api/update-cart', { sessionToken, cart });
   }
   
+  // MODIFIED: Mixtape button - can add without login, but only once, and checks if already purchased
   function updateMixtapeButtons() {
     const buttonsContainer = document.getElementById('mixtapeButtons');
     if (!buttonsContainer) return;
     
     buttonsContainer.innerHTML = '';
     
+    // If user is logged in AND has purchased mixtape, show download button
     if (currentUser && currentUser.hasPurchasedMixtape === true) {
       buttonsContainer.innerHTML = `
         <button class="download-mixtape-btn" id="downloadMixtapeBtn"><i class="fas fa-download"></i> DOWNLOAD MIXTAPE (ZIP)</button>
@@ -1206,28 +1213,38 @@
           alert("You can listen to previews on YouTube via the bottom button.");
         });
       }
-    } else {
-      buttonsContainer.innerHTML = `
-        <button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button>
-        <a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
-      `;
-      const addBtn = document.getElementById('addToCartMixtapeBtn');
-      if (addBtn) {
-        addBtn.addEventListener('click', () => {
-          const existing = cart.find(i => i.id === 99);
-          if (existing) existing.qty++;
-          else cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
-          saveCartToLocal();
-          document.getElementById("cartSidebar").classList.add("open");
-        });
-      }
-      const listenBtn = document.getElementById('mixtapeListenBtn');
-      if (listenBtn) {
-        listenBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          alert("Add the mixtape to cart (R50) to purchase and download the full ZIP file.\n\nYou can listen to previews on YouTube via the bottom button.");
-        });
-      }
+      return;
+    }
+    
+    // Show add to cart button (can be added without login)
+    buttonsContainer.innerHTML = `
+      <button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button>
+      <a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
+    `;
+    
+    const addBtn = document.getElementById('addToCartMixtapeBtn');
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        // Check if mixtape already in cart (prevent duplicate)
+        const existing = cart.find(i => i.id === 99);
+        if (existing) {
+          alert("Mixtape is already in your cart. You can only purchase it once.");
+          return;
+        }
+        // Add mixtape to cart
+        cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
+        saveCartToLocal();
+        document.getElementById("cartSidebar").classList.add("open");
+        alert("DUETS Mixtape added to cart! Complete checkout to get your download link.");
+      });
+    }
+    
+    const listenBtn = document.getElementById('mixtapeListenBtn');
+    if (listenBtn) {
+      listenBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert("Add the mixtape to cart (R50) to purchase and download the full ZIP file.\n\nYou can listen to previews on YouTube via the bottom button.");
+      });
     }
   }
   
@@ -1490,7 +1507,6 @@
     selectedDelivery = { type: 'speed', amount: 109.95 };
   });
   
-  // MODIFIED: No alert, goes straight to payment
   document.getElementById('confirmDeliveryBtn')?.addEventListener('click', async () => {
     if (selectedDelivery) {
       deliveryAmount = selectedDelivery.amount;
@@ -1505,7 +1521,7 @@
   });
   
   // ==============================================================
-  // PHOTON (KOMOOT) STORE FINDER - WORKING VERSION
+  // PHOTON (KOMOOT) STORE FINDER
   // ==============================================================
   let map = null;
   let markers = [];
@@ -1655,6 +1671,7 @@
     }
   }
   
+  // MODIFIED: All King William's Town stores show free collection
   window.selectStore = function(storeId) {
     const store = currentStores.find(s => s.id == storeId);
     if (store) {
@@ -1663,7 +1680,9 @@
       document.getElementById('paxi_store_address').value = store.address;
       document.getElementById('paxi_store_code').value = store.code || '';
       
+      // Check if store is in King William's Town area
       const isKingTown = store.address.toLowerCase().includes('king william') || 
+                         store.address.toLowerCase().includes('qonce') ||
                          store.name.toLowerCase().includes('king william') ||
                          (store.address.toLowerCase().includes('king') && store.address.toLowerCase().includes('william'));
       
@@ -1671,7 +1690,9 @@
         isKingWilliamsTown = true;
         deliveryAmount = 0;
         document.getElementById('delivery_amount').value = 0;
-        document.getElementById('freeCollectionNotif').classList.add('show');
+        // Show white modal for free collection
+        const notifModal = document.getElementById('freeCollectionNotif');
+        notifModal.classList.add('show');
       } else {
         isKingWilliamsTown = false;
         showDeliveryModal();
@@ -1713,15 +1734,19 @@
     document.getElementById('paxi_store_address').value = storeAddress;
     document.getElementById('paxi_store_code').value = '';
     
-    isKingWilliamsTown = storeAddress.toLowerCase().includes('king william') || 
-                         storeName.toLowerCase().includes('king william') ||
-                         (storeAddress.toLowerCase().includes('king') && storeAddress.toLowerCase().includes('william'));
+    // Check if manually entered store is in King William's Town
+    const isKingTown = storeAddress.toLowerCase().includes('king william') || 
+                       storeAddress.toLowerCase().includes('qonce') ||
+                       storeName.toLowerCase().includes('king william') ||
+                       (storeAddress.toLowerCase().includes('king') && storeAddress.toLowerCase().includes('william'));
     
-    if (isKingWilliamsTown) {
+    if (isKingTown) {
+      isKingWilliamsTown = true;
       deliveryAmount = 0;
       document.getElementById('delivery_amount').value = 0;
       document.getElementById('freeCollectionNotif').classList.add('show');
     } else {
+      isKingWilliamsTown = false;
       showDeliveryModal();
     }
     
@@ -1741,7 +1766,7 @@
   const southAfricanCities = [
     "Johannesburg", "Cape Town", "Durban", "Pretoria", "Gqeberha", "Port Elizabeth",
     "Bloemfontein", "Pietermaritzburg", "Polokwane", "Nelspruit", "Mbombela",
-    "Kimberley", "Rustenburg", "East London", "King William's Town", "Bhisho",
+    "Kimberley", "Rustenburg", "East London", "King William's Town", "Bhisho", "Qonce",
     "George", "Knysna", "Mossel Bay", "Upington", "Mthatha", "Queenstown"
   ];
   
@@ -1790,6 +1815,7 @@
   // CHECKOUT BUTTON
   // ==============================================================
   async function proceedToPayment() {
+    // If user is not logged in, show auth modal first
     if (!currentUser) {
       window.showAuthModal();
       return;
@@ -1888,7 +1914,7 @@
       sessionStorage.removeItem('pendingOrderId');
       await refreshUserData();
       if (currentUser && currentUser.hasPurchasedMixtape) {
-        alert("Thank you! Your mixtape is now available for download.");
+        alert("Thank you! Your mixtape is now available for download. Check your email or visit your account.");
         updateMixtapeButtons();
       }
     }
