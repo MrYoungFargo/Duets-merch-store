@@ -672,37 +672,105 @@
       width: 100%;
     }
 
-    #storeFinderModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.95);
-      z-index: 10000;
-      overflow-y: auto;
-    }
+    /* MODIFIED: Smaller header and buttons */
     #storeFinderModal .modal-container {
       max-width: 1000px;
       margin: 20px auto;
       background: #1a1a2e;
       border-radius: 24px;
-      padding: 20px;
+      padding: 16px;
+    }
+    #storeFinderModal .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
     }
     #storeFinderModal h2 {
       color: white;
-      font-size: 1.3rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    #storeFinderModal .close-store-btn {
+      background: #e11d2c;
+      border: none;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 0.6rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
     }
     #storeFinderModal input {
-      width: 100%;
-      padding: 12px;
+      flex: 1;
+      padding: 8px 12px;
       border-radius: 40px;
       background: #0a0a1a;
       color: white;
       border: 1px solid #2a2a4a;
-      margin: 10px 0;
+      font-size: 0.7rem;
     }
+    #storeFinderModal .search-btn {
+      background: #3b82f6;
+      border: none;
+      color: white;
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #paxiMap {
+      height: 250px;
+      border-radius: 16px;
+      margin: 10px 0;
+      background: #0a0a2a;
+      width: 100%;
+    }
+    .store-list {
+      max-height: 280px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+    }
+    .store-item {
+      background: #0a0a1a;
+      margin-bottom: 8px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid #2a2a4a;
+      cursor: pointer;
+    }
+    .store-item:hover { background: #1a1a3a; }
+    .store-name { font-weight: bold; color: #3b82f6; font-size: 0.75rem; }
+    .store-address { font-size: 0.65rem; color: #aaa; margin-top: 4px; }
+    .store-code { font-size: 0.6rem; color: #10b981; margin-top: 4px; }
+    
+    .manual-store-btn {
+      background: #f59e0b;
+      border: none;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.7rem;
+      cursor: pointer;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .manual-store-btn:hover {
+      background: #d97706;
+    }
+    
     .ui-autocomplete {
       background: #1a1a2e;
       border: 1px solid #3b82f6;
@@ -715,41 +783,71 @@
     .ui-autocomplete li {
       padding: 8px 12px;
       cursor: pointer;
+      font-size: 0.7rem;
     }
     .ui-autocomplete li:hover {
       background: #3b82f6;
     }
-    #storeFinderModal button {
-      background: #3b82f6;
+    
+    /* Manual store modal */
+    .manual-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 20003;
+      align-items: center;
+      justify-content: center;
+    }
+    .manual-modal.show { display: flex; }
+    .manual-modal-content {
+      background: #1a1a2e;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 400px;
+      padding: 24px;
+      border: 1px solid #3b82f6;
+    }
+    .manual-modal-content h3 {
+      color: white;
+      font-size: 1rem;
+      margin-bottom: 16px;
+    }
+    .manual-modal-content input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      background: #0a0a1a;
+      border: 1px solid #2a2a4a;
+      border-radius: 12px;
+      color: white;
+      font-size: 0.8rem;
+    }
+    .manual-save-btn {
+      background: #10b981;
       border: none;
       color: white;
-      padding: 8px 20px;
-      border-radius: 40px;
-      cursor: pointer;
-    }
-    #paxiMap {
-      height: 400px;
-      border-radius: 16px;
-      margin: 15px 0;
-      background: #0a0a2a;
-      width: 100%;
-    }
-    .store-list {
-      max-height: 250px;
-      overflow-y: auto;
-    }
-    .store-item {
-      background: #0a0a1a;
-      margin-bottom: 10px;
       padding: 12px;
-      border-radius: 12px;
-      border: 1px solid #2a2a4a;
+      width: 100%;
+      border-radius: 40px;
+      font-weight: 600;
+      margin-top: 16px;
       cursor: pointer;
     }
-    .store-item:hover { background: #1a1a3a; }
-    .store-name { font-weight: bold; color: #3b82f6; }
-    .store-address { font-size: 12px; color: #aaa; margin-top: 4px; }
-    .store-code { font-size: 11px; color: #10b981; margin-top: 4px; }
+    .manual-cancel-btn {
+      background: #e11d2c;
+      border: none;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      border-radius: 40px;
+      font-weight: 600;
+      margin-top: 8px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -897,16 +995,30 @@
 
 <div id="storeFinderModal">
   <div class="modal-container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <div class="modal-header">
       <h2>📍 Select Collection Point</h2>
-      <button id="closeStoreFinderBtn" style="background: red;">✕ Close</button>
+      <button id="closeStoreFinderBtn" class="close-store-btn">✕ Close</button>
     </div>
-    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <div class="search-row">
       <input type="text" id="searchLocation" placeholder="🔍 Enter town, suburb or city" style="flex: 1;">
-      <button id="searchBtn">Search</button>
+      <button id="searchBtn" class="search-btn">Search</button>
     </div>
-    <div id="paxiMap" style="height: 400px; border-radius: 16px; margin: 15px 0; background: #0a0a2a;"></div>
+    <div id="paxiMap"></div>
     <div id="storeList" class="store-list"></div>
+    <button id="manualStoreBtn" class="manual-store-btn">
+      <i class="fas fa-pen-alt"></i> Can't find a store? Add manually
+    </button>
+  </div>
+</div>
+
+<!-- Manual Store Modal -->
+<div id="manualStoreModal" class="manual-modal">
+  <div class="manual-modal-content">
+    <h3>✏️ Add Store Manually</h3>
+    <input type="text" id="manualStoreName" placeholder="Store name (e.g., PEP Mdantsane)" autocomplete="off">
+    <input type="text" id="manualStoreAddress" placeholder="Store address / Town" autocomplete="off">
+    <button id="manualSaveBtn" class="manual-save-btn">Save & Use This Store</button>
+    <button id="manualCancelBtn" class="manual-cancel-btn">Cancel</button>
   </div>
 </div>
 
@@ -1379,7 +1491,7 @@
   document.getElementById('confirmDeliveryBtn')?.addEventListener('click', proceedToPaymentAfterDelivery);
   
   // ==============================================================
-  // PHOTON API STORE FINDER - WORKING SOLUTION (FREE, NO API KEY)
+  // STORE FINDER WITH PHOTON API + MANUAL ADD
   // ==============================================================
   let map = null;
   let markers = [];
@@ -1387,7 +1499,6 @@
   
   const storeBrands = ["PEP", "PEP Home", "PEPcell", "Tekkie Town", "Shoe City"];
   
-  // First, get coordinates of the searched city using Nominatim (free, no key)
   async function getCityCoordinates(cityName) {
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityName + ', South Africa')}&format=json&limit=1`;
     const response = await fetch(url);
@@ -1398,13 +1509,11 @@
     return null;
   }
   
-  // Then search for stores near that location using Photon API
   async function searchStoresWithPhoton(lat, lon, cityName) {
     const allStores = [];
     
     for (const brand of storeBrands) {
-      // Photon API search for POIs
-      const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(brand)}&lat=${lat}&lon=${lon}&limit=20&lang=en`;
+      const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(brand)}&lat=${lat}&lon=${lon}&limit=30&lang=en`;
       try {
         const response = await fetch(url);
         const data = await response.json();
@@ -1415,8 +1524,7 @@
             const coords = feature.geometry.coordinates;
             const distance = calculateDistance(lat, lon, coords[1], coords[0]);
             
-            // Only include stores within ~15km of the searched city
-            if (distance < 15) {
+            if (distance < 20) {
               allStores.push({
                 id: feature.properties.osm_id || Math.random(),
                 name: props.name || brand,
@@ -1435,7 +1543,6 @@
       }
     }
     
-    // Remove duplicates by name+lat+lon
     const unique = [];
     const seen = new Set();
     for (const store of allStores) {
@@ -1446,13 +1553,12 @@
       }
     }
     
-    // Sort by distance
     unique.sort((a, b) => a.distance - b.distance);
     return unique;
   }
   
   function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Earth's radius in km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -1473,17 +1579,14 @@
     searchBtn.disabled = true;
     
     try {
-      // Get coordinates of the city
       const cityCoords = await getCityCoordinates(cityName);
       if (!cityCoords) {
         alert(`Could not find coordinates for "${cityName}". Please try a different city name.`);
         return;
       }
       
-      // Search for stores
       const stores = await searchStoresWithPhoton(cityCoords.lat, cityCoords.lon, cityName);
       
-      // Setup or update map
       if (map) {
         map.setView([cityCoords.lat, cityCoords.lon], 12);
       } else {
@@ -1496,7 +1599,7 @@
       displayStores(stores, cityCoords.displayName);
       
       if (stores.length === 0) {
-        alert(`No ${storeBrands.join(', ')} stores found near ${cityCoords.displayName}. Try a different city or a larger nearby town.`);
+        alert(`No ${storeBrands.join(', ')} stores found near ${cityCoords.displayName}. Try a different city or use "Add manually" button.`);
       }
       
     } catch (error) {
@@ -1516,7 +1619,7 @@
     currentStores = stores;
     
     if (stores.length === 0) {
-      container.innerHTML = `<div style="color: #aaa; text-align: center; padding: 20px;">No stores found near ${cityName || 'this area'}. Try a different location or search for a nearby city.</div>`;
+      container.innerHTML = `<div style="color: #aaa; text-align: center; padding: 20px;">No stores found near ${cityName || 'this area'}<br>Click "Add manually" below to enter your store.</div>`;
       return;
     }
     
@@ -1564,12 +1667,66 @@
     }
   };
   
+  // Manual store add functionality
+  function showManualStoreModal() {
+    document.getElementById('manualStoreModal').classList.add('show');
+  }
+  
+  function closeManualStoreModal() {
+    document.getElementById('manualStoreModal').classList.remove('show');
+    document.getElementById('manualStoreName').value = '';
+    document.getElementById('manualStoreAddress').value = '';
+  }
+  
+  function saveManualStore() {
+    const storeName = document.getElementById('manualStoreName').value.trim();
+    const storeAddress = document.getElementById('manualStoreAddress').value.trim();
+    
+    if (!storeName || !storeAddress) {
+      alert('Please enter both store name and address');
+      return;
+    }
+    
+    selectedPaxiStore = {
+      id: 'manual_' + Date.now(),
+      name: storeName,
+      address: storeAddress,
+      lat: null,
+      lon: null,
+      code: '',
+      brand: 'Manual Entry'
+    };
+    
+    document.getElementById('paxi_store_name').value = storeName;
+    document.getElementById('paxi_store_address').value = storeAddress;
+    document.getElementById('paxi_store_code').value = '';
+    
+    isKingWilliamsTown = storeAddress.toLowerCase().includes('king william') || 
+                         storeName.toLowerCase().includes('king william') ||
+                         (storeAddress.toLowerCase().includes('king') && storeAddress.toLowerCase().includes('william'));
+    
+    if (isKingWilliamsTown) {
+      deliveryAmount = 0;
+      document.getElementById('delivery_amount').value = 0;
+      const notifModal = document.getElementById('freeCollectionNotif');
+      notifModal.classList.add('show');
+    } else {
+      showDeliveryModal();
+    }
+    
+    closeManualStoreModal();
+    closeStoreFinder();
+  }
+  
   document.getElementById('closeFreeCollectionBtn')?.addEventListener('click', async () => {
     document.getElementById('freeCollectionNotif').classList.remove('show');
     await proceedToPayment();
   });
   
-  // South African cities for autocomplete dropdown
+  document.getElementById('manualStoreBtn')?.addEventListener('click', showManualStoreModal);
+  document.getElementById('manualSaveBtn')?.addEventListener('click', saveManualStore);
+  document.getElementById('manualCancelBtn')?.addEventListener('click', closeManualStoreModal);
+  
   const southAfricanCities = [
     "Johannesburg", "Cape Town", "Durban", "Pretoria", "Gqeberha", "Port Elizabeth",
     "Bloemfontein", "Pietermaritzburg", "Polokwane", "Nelspruit", "Mbombela",
@@ -1589,9 +1746,7 @@
     "Kokstad", "Matatiele", "Harding", "Port Shepstone", "Margate", "Scottburgh",
     "Ballito", "Stanger", "Richards Bay", "Empangeni", "Ulundi", "Nongoma",
     "Pongola", "Paulpietersburg", "Piet Retief", "Amsterdam", "Bethal",
-    "Port Alfred", "Grahamstown", "Makhanda", "Butterworth", "Lady Frere",
-    "Cradock", "Somerset East", "Addo", "Jeffreys Bay", "Plettenberg Bay",
-    "Hermanus", "Saldanha", "Vredenburg", "Malmesbury", "Wellington"
+    "Port Alfred", "Grahamstown", "Makhanda", "Butterworth", "Lady Frere"
   ];
   
   $(document).ready(function() {
