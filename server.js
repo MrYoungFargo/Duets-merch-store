@@ -390,7 +390,7 @@ app.post('/forgot-password', async (req, res) => {
 
   const resetToken = crypto.randomBytes(32).toString('hex');
   global.resetTokens[email] = { token: resetToken, expires: Date.now() + 3600000 };
-  const resetLink = `https://mryoungfargo.github.io/MrYoungFargo/reset-password.html?token=${resetToken}&email=${encodeURIComponent(email)}`;
+  const resetLink = `https://mryoungfargo.github.io/MrYoungFargo/?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
   try {
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
