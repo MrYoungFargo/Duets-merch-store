@@ -647,7 +647,7 @@
       background: #2563eb;
     }
 
-    /* NOTIFICATION MODAL - WITH CLOSE X */
+    /* NOTIFICATION MODAL - WHITE BACKGROUND FOR MIXTAPE DOWNLOAD */
     .notification-modal {
       display: none;
       position: fixed;
@@ -697,7 +697,7 @@
       width: 100%;
     }
 
-    /* PAXI Modal - SMALLER FONTS & BUTTONS */
+    /* PAXI Modal - SMALLER */
     #storeFinderModal {
       display: none;
       position: fixed;
@@ -774,9 +774,6 @@
       width: 100%;
       font-size: 0.7rem;
     }
-    .manual-store-btn button:hover {
-      background: #d97706;
-    }
   </style>
 </head>
 <body>
@@ -789,6 +786,17 @@
     <h4>✅ FREE COLLECTION AT CLICKS STONE TOWERS, KING WILLIAM'S TOWN!</h4>
     <p>You will receive an email when order is ready for collection.</p>
     <button class="notification-close" id="closeFreeCollectionBtn">Continue to Payment</button>
+  </div>
+</div>
+
+<!-- MIXTAPE DOWNLOAD NOTIFICATION - WHITE BACKGROUND -->
+<div id="mixtapeDownloadNotif" class="notification-modal">
+  <div class="notification-content">
+    <button class="close-notification" id="closeMixtapeNotifBtn">&times;</button>
+    <i class="fas fa-download"></i>
+    <h4>🎵 MIXTAPE READY!</h4>
+    <p>Your DUETS mixtape has been added to your account. You can download it anytime from your profile.</p>
+    <button class="notification-close" id="closeMixtapeConfirmBtn">OK</button>
   </div>
 </div>
 
@@ -905,7 +913,6 @@
   <div id="hoodies-section"><div class="category-title"><i class="fas fa-hoodie"></i> HOODIES</div><div class="products-grid" id="hoodiesGrid"></div></div>
 </div>
 
-<!-- MUSIC BUTTON AT BOTTOM -->
 <div class="music-footer-btn">
   <a href="https://m.youtube.com/@MrYoungFargo_SA" target="_blank" class="listen-btn">
     <i class="fab fa-youtube"></i> LISTEN TO MY MUSIC
@@ -922,19 +929,16 @@
   <button class="checkout-btn" id="checkoutBtn">CHECKOUT →</button>
 </div>
 
-<!-- PAXI Hidden Fields -->
 <input type="hidden" id="paxi_store_name">
 <input type="hidden" id="paxi_store_address">
 <input type="hidden" id="paxi_store_code">
 <input type="hidden" id="delivery_amount" value="0">
 <input type="hidden" id="delivery_type" value="">
 
-<!-- PAXI SELECTOR BUTTON -->
 <button type="button" id="openStoreFinderBtn" style="background: #10b981; color: white; padding: 10px; border-radius: 30px; width: 90%; margin: 0 auto 20px; display: block; max-width: 400px; border: none; cursor: pointer;">
   📍 Select PAXI Pickup Point
 </button>
 
-<!-- PAXI MODAL -->
 <div id="storeFinderModal">
   <div class="modal-container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -982,6 +986,9 @@
       currentUser = result.user;
       if (result.user.cart) cart = result.user.cart;
       else cart = [];
+      // Ensure mixtape quantity is always 1
+      const mixtapeIndex = cart.findIndex(i => i.id === 99);
+      if (mixtapeIndex !== -1 && cart[mixtapeIndex].qty > 1) cart[mixtapeIndex].qty = 1;
       updateCartUI();
       updateUserUI();
       updateMixtapeButtons();
@@ -999,6 +1006,8 @@
       currentUser = result.user; sessionToken = result.sessionToken;
       localStorage.setItem('session_token', sessionToken);
       cart = result.user.cart || [];
+      const mixtapeIndex = cart.findIndex(i => i.id === 99);
+      if (mixtapeIndex !== -1 && cart[mixtapeIndex].qty > 1) cart[mixtapeIndex].qty = 1;
       updateCartUI(); updateUserUI(); updateMixtapeButtons();
       window.closeAuthModal();
       return true;
@@ -1028,8 +1037,8 @@
       container.innerHTML = `<button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button>
         <a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>`;
       document.getElementById('addToCartMixtapeBtn')?.addEventListener('click', () => {
-        const exists = cart.find(i => i.id === 99);
-        if (!exists) {
+        const existing = cart.find(i => i.id === 99);
+        if (!existing) {
           cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
           saveCartToLocal();
           document.getElementById("cartSidebar").classList.add("open");
@@ -1053,7 +1062,12 @@
     }
   }
 
-  function saveCartToLocal() { updateCartUI(); if (sessionToken) saveCartToServer(); }
+  function saveCartToLocal() { 
+    const mixtapeIndex = cart.findIndex(i => i.id === 99);
+    if (mixtapeIndex !== -1 && cart[mixtapeIndex].qty > 1) cart[mixtapeIndex].qty = 1;
+    updateCartUI(); 
+    if (sessionToken) saveCartToServer(); 
+  }
 
   function updateCartUI() {
     const count = cart.reduce((s,i)=>s+i.qty,0);
@@ -1087,12 +1101,18 @@
     if(!size){alert("Select size"); return false;}
     if(!color && product.id!==99){alert("Select color"); return false;}
     const existing = cart.find(i=>i.id===product.id && i.size===size && i.color===color);
-    if(existing) existing.qty++;
-    else cart.push({ id:product.id, name:product.name, price:product.price, size:size||'Digital', color:color||'N/A', qty:1 });
+    if(product.id===99){
+      if(cart.some(i=>i.id===99)){ alert("Mixtape already in cart. You can only purchase one."); return false; }
+      cart.push({ id:product.id, name:product.name, price:product.price, size:size||'Digital', color:color||'N/A', qty:1 });
+    } else {
+      if(existing) existing.qty++;
+      else cart.push({ id:product.id, name:product.name, price:product.price, size:size, color:color, qty:1 });
+    }
     saveCartToLocal();
     document.getElementById("cartSidebar").classList.add("open");
     return true;
   }
+  
   function showModal(p) {
     currentProduct=p; selectedSize=null; selectedColor=null;
     document.getElementById("modalProductName").innerText=p.name;
@@ -1197,13 +1217,11 @@
     }
   }
 
-  // Delivery Modal Logic
   function showDeliveryModal(){ document.getElementById('deliveryModal').classList.add('show'); }
   function hideDeliveryModal(){ document.getElementById('deliveryModal').classList.remove('show'); }
   document.getElementById('economyOption')?.addEventListener('click',()=>{ document.getElementById('economyOption').classList.add('selected'); document.getElementById('speedOption').classList.remove('selected'); selectedDelivery={ type:'economy', amount:59.95 }; });
   document.getElementById('speedOption')?.addEventListener('click',()=>{ document.getElementById('speedOption').classList.add('selected'); document.getElementById('economyOption').classList.remove('selected'); selectedDelivery={ type:'speed', amount:109.95 }; });
   
-  // Payment AFTER delivery selection
   async function proceedToPaymentAfterDelivery() {
     if(selectedDelivery){
       deliveryAmount=selectedDelivery.amount;
@@ -1215,7 +1233,6 @@
   }
   document.getElementById('confirmDeliveryBtn')?.addEventListener('click', proceedToPaymentAfterDelivery);
   
-  // CHECKOUT: ALWAYS leads to pickup point selection
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (!currentUser) { window.showAuthModal(); return; }
     if (cart.length === 0) { alert("Cart is empty"); return; }
@@ -1241,16 +1258,16 @@
     }catch(e){ alert("Connection error"); }
   }
 
-  // Close X buttons
   document.getElementById('closeDeliveryXBtn')?.addEventListener('click',()=>hideDeliveryModal());
   document.getElementById('closeFreeCollectionXBtn')?.addEventListener('click',()=>document.getElementById('freeCollectionNotif').classList.remove('show'));
   document.getElementById('closeFreeCollectionBtn')?.addEventListener('click',async()=>{ document.getElementById('freeCollectionNotif').classList.remove('show'); await proceedToPayment(); });
+  document.getElementById('closeMixtapeNotifBtn')?.addEventListener('click',()=>document.getElementById('mixtapeDownloadNotif').classList.remove('show'));
+  document.getElementById('closeMixtapeConfirmBtn')?.addEventListener('click',()=>document.getElementById('mixtapeDownloadNotif').classList.remove('show'));
   document.getElementById('openStoreFinderBtn')?.addEventListener('click',openStoreFinder);
   document.getElementById('closeStoreFinderBtn')?.addEventListener('click',closeStoreFinder);
   document.getElementById('searchBtn')?.addEventListener('click',()=>searchStoresWithLocation(document.getElementById('searchLocation').value));
   document.getElementById('manualStoreBtn')?.addEventListener('click',manualStoreEntry);
   
-  // Auth
   window.showAuthModal=function(){ document.getElementById('authModal').classList.add('show'); window.isLoginMode=true; document.getElementById('authTitle').innerText='LOGIN'; document.getElementById('authSubmitBtn').innerText='LOGIN'; document.getElementById('authToggleText').innerText='Create an account'; };
   window.closeAuthModal=function(){ document.getElementById('authModal').classList.remove('show'); };
   document.getElementById('closeAuthBtn')?.addEventListener('click',window.closeAuthModal);
