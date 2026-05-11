@@ -736,6 +736,20 @@
     .store-name { font-weight: bold; color: #3b82f6; }
     .store-address { font-size: 12px; color: #aaa; margin-top: 4px; }
     .store-code { font-size: 11px; color: #10b981; margin-top: 4px; }
+    .manual-store-btn {
+      margin-top: 12px;
+      text-align: center;
+    }
+    .manual-store-btn button {
+      background: #f59e0b;
+      color: #1a1a2e;
+      font-weight: bold;
+      width: 100%;
+    }
+    .manual-store-btn button:hover {
+      background: #d97706;
+      transform: translateY(-1px);
+    }
   </style>
 </head>
 <body>
@@ -904,6 +918,10 @@
     </div>
     <div id="paxiMap" style="height: 400px; border-radius: 16px; margin: 15px 0; background: #0a0a2a;"></div>
     <div id="storeList" class="store-list"></div>
+    <!-- ADDED: "Can't find a store? Add manually" button -->
+    <div class="manual-store-btn">
+      <button id="manualStoreBtn">📝 Can't find a store? Add manually</button>
+    </div>
   </div>
 </div>
 
@@ -1546,10 +1564,35 @@
     document.getElementById('storeFinderModal').style.display = 'none';
   }
   
+  // Manual store entry fallback
+  function manualStoreEntry() {
+    const address = prompt("Please enter the store address manually (e.g., 'PEP, Main Road, Cape Town'):");
+    if (address && address.trim()) {
+      selectedPaxiStore = { id: 'manual', name: 'Manually entered store', address: address, code: '' };
+      document.getElementById('paxi_store_name').value = selectedPaxiStore.name;
+      document.getElementById('paxi_store_address').value = address;
+      document.getElementById('paxi_store_code').value = '';
+      const isKingTown = address.toLowerCase().includes('king william') || address.toLowerCase().includes('kingwilliam');
+      if (isKingTown) {
+        isKingWilliamsTown = true;
+        deliveryAmount = 0;
+        document.getElementById('delivery_amount').value = 0;
+        document.getElementById('freeCollectionNotif').classList.add('show');
+      } else {
+        isKingWilliamsTown = false;
+        showDeliveryModal();
+      }
+      closeStoreFinder();
+    } else {
+      alert("No address entered. Please try again or select a store from the map.");
+    }
+  }
+  
   document.getElementById('openStoreFinderBtn')?.addEventListener('click', openStoreFinder);
   document.getElementById('closeStoreFinderBtn')?.addEventListener('click', closeStoreFinder);
   document.getElementById('searchBtn')?.addEventListener('click', searchStores);
   document.getElementById('searchLocation')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchStores(); });
+  document.getElementById('manualStoreBtn')?.addEventListener('click', manualStoreEntry);
   
   // ==============================================================
   // CHECKOUT BUTTON
