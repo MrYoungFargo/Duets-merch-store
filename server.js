@@ -390,7 +390,9 @@ app.post('/forgot-password', async (req, res) => {
 
   const resetToken = crypto.randomBytes(32).toString('hex');
   global.resetTokens[email] = { token: resetToken, expires: Date.now() + 3600000 };
-  const resetLink = `https://mryoungfargo.github.io/MrYoungFargo/reset-password.html?token=${resetToken}&email=${encodeURIComponent(email)}`;
+  
+  // CHANGE THIS URL to your main site (NOT reset-password.html)
+  const resetLink = `https://mryoungfargo.github.io/MrYoungFargo/?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
   try {
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
@@ -400,7 +402,15 @@ app.post('/forgot-password', async (req, res) => {
         sender: { name: 'MrYoungFargo', email: 'noreply@mryoungfargo.com' },
         to: [{ email }],
         subject: 'Reset your MrYoungFargo password',
-        htmlContent: `<div><h2>Reset Your Password</h2><a href="${resetLink}">Click here to reset your password</a><p>This link expires in 1 hour.</p></div>`
+        htmlContent: `
+          <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; text-align: center;">
+            <h2 style="color: #3b82f6;">Reset Your Password</h2>
+            <p>Click the button below to reset your password. This link expires in 1 hour.</p>
+            <a href="${resetLink}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 30px; margin: 20px 0;">Reset Password</a>
+            <p>Or copy this link: <br>${resetLink}</p>
+            <p>If you didn't request this, please ignore this email.</p>
+          </div>
+        `
       })
     });
     const data = await response.json();
@@ -412,15 +422,6 @@ app.post('/forgot-password', async (req, res) => {
   }
 });
 
-app.post('/reset-password', (req, res) => {
-  const { email, token, newPassword } = req.body;
-  if (!global.resetTokens[email] || global.resetTokens[email].token !== token || global.resetTokens[email].expires < Date.now()) {
-    return res.json({ success: false, error: 'Invalid or expired reset token' });
-  }
-  delete global.resetTokens[email];
-  res.json({ success: true, message: 'Password can now be reset' });
-});
-
 // ==============================================================
 // IKHOKHA PAYMENT ENDPOINTS
 // ==============================================================
@@ -430,7 +431,7 @@ function jsStringEscape(str) {
   return str.replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 }
 
-function createPayloadToSign(urlPath, body) {
+function createPaloadToSign(urlPath, body) {
   const basePath = new URL(urlPath).pathname;
   const payload = basePath + body;
   return jsStringEscape(payload);
