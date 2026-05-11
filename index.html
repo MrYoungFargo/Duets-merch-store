@@ -36,13 +36,100 @@
       pointer-events: none;
     }
 
-    .site-header, .hero, .container, .mixtape-section, footer, .cart-overlay, .modal, .auth-modal, .reset-modal, .music-footer-btn, .delivery-modal {
+    .site-header, .hero, .container, .mixtape-section, footer, .cart-overlay, .modal, .auth-modal, .reset-modal, .music-footer-btn, .delivery-modal, .store-finder-page {
       position: relative;
       z-index: 10;
     }
 
     :root { --purple: #7f2aeb; --green: #10b981; --red: #e11d2c; --blue: #3b82f6; }
     .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+    /* Store Finder Page Styles */
+    .store-finder-page {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0a0a1a;
+      z-index: 10000;
+      overflow-y: auto;
+    }
+    .store-finder-page.active { display: block; }
+    .store-finder-container {
+      max-width: 900px;
+      margin: 20px auto;
+      background: #1a1a2e;
+      border-radius: 24px;
+      padding: 20px;
+    }
+    .store-finder-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .store-finder-header h2 { color: white; font-size: 1.2rem; font-weight: 600; }
+    .close-finder-btn {
+      background: #e11d2c;
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .search-area {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .search-area input {
+      flex: 1;
+      padding: 10px 15px;
+      border-radius: 40px;
+      background: #0a0a1a;
+      color: white;
+      border: 1px solid #2a2a4a;
+      font-size: 0.9rem;
+    }
+    .search-area button {
+      background: #3b82f6;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    #finderMap { height: 350px; border-radius: 16px; margin: 15px 0; background: #0a0a2a; width: 100%; }
+    .store-list-area { max-height: 250px; overflow-y: auto; }
+    .store-card {
+      background: #0a0a1a;
+      margin-bottom: 10px;
+      padding: 12px 15px;
+      border-radius: 12px;
+      border: 1px solid #2a2a4a;
+      cursor: pointer;
+    }
+    .store-card:hover { background: #1a1a3a; }
+    .store-card-name { font-weight: bold; color: #3b82f6; font-size: 0.9rem; }
+    .store-card-address { font-size: 11px; color: #aaa; margin-top: 5px; }
+    .manual-store-btn {
+      margin-top: 15px;
+      text-align: center;
+    }
+    .manual-store-btn button {
+      background: #f59e0b;
+      color: #1a1a2e;
+      font-weight: bold;
+      width: 100%;
+      padding: 10px;
+      border-radius: 40px;
+      border: none;
+      cursor: pointer;
+    }
 
     .site-header {
       background: linear-gradient(135deg, #000000, #0a2a5a, #000000, #0a2a5a);
@@ -153,15 +240,11 @@
       font-weight: 600;
       font-size: 0.65rem;
       cursor: pointer;
-      transition: all 0.2s;
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
-    .download-mixtape-btn:hover {
-      background: #059669;
-      transform: translateY(-1px);
-    }
+    .download-mixtape-btn:hover { background: #059669; transform: translateY(-1px); }
 
     .sticky-nav {
       position: fixed;
@@ -244,27 +327,12 @@
       text-decoration: none;
       border: none;
     }
-    .buy-btn {
-      background: var(--blue);
-      color: white;
-      box-shadow: 0 2px 8px rgba(59,130,246,0.3);
-    }
-    .buy-btn:hover {
-      background: #2563eb;
-      transform: translateY(-1px);
-    }
-    .listen-btn-mix {
-      background: #ff0000;
-      color: white;
-    }
-    .listen-btn-mix:hover {
-      background: #cc0000;
-      transform: translateY(-1px);
-    }
+    .buy-btn { background: var(--blue); color: white; box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
+    .buy-btn:hover { background: #2563eb; transform: translateY(-1px); }
+    .listen-btn-mix { background: #ff0000; color: white; }
+    .listen-btn-mix:hover { background: #cc0000; transform: translateY(-1px); }
 
     .category-title { font-size: 0.65rem; font-weight: 700; margin: 16px 0 8px 0; border-left: 2px solid white; padding-left: 8px; color: white; }
-    .category-title i { margin-right: 4px; color: white; font-size: 0.6rem; }
-
     .products-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -299,25 +367,9 @@
       border-radius: 12px;
       box-shadow: 0 5px 12px rgba(0,0,0,0.25);
     }
-    .no-img { font-size: 0.9rem; color: #888; }
-
     .product-info { padding: 8px 6px 6px; }
-    .product-title {
-      font-size: 0.55rem;
-      font-weight: 700;
-      margin-bottom: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      color: white;
-    }
-    .product-price { 
-      font-size: 0.65rem; 
-      font-weight: 800; 
-      color: var(--green); 
-      margin: 2px 0; 
-    }
-    
+    .product-title { font-size: 0.55rem; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
+    .product-price { font-size: 0.65rem; font-weight: 800; color: var(--green); margin: 2px 0; }
     .add-to-cart-btn {
       background: var(--blue);
       border: none;
@@ -332,21 +384,13 @@
       align-items: center;
       justify-content: center;
       gap: 3px;
-      white-space: nowrap;
       transition: all 0.2s;
     }
-    .add-to-cart-btn:hover {
-      background: #2563eb;
-      transform: scale(0.98);
-    }
-    .add-to-cart-btn i { font-size: 0.4rem; }
+    .add-to-cart-btn:hover { background: #2563eb; transform: scale(0.98); }
 
     footer { text-align: center; padding: 12px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 15px; font-size: 0.45rem; color: rgba(255,255,255,0.6); }
 
-    .music-footer-btn {
-      text-align: center;
-      margin: 30px 0 20px;
-    }
+    .music-footer-btn { text-align: center; margin: 30px 0 20px; }
     .listen-btn {
       background: #ff0000;
       border: none;
@@ -356,18 +400,13 @@
       border-radius: 50px;
       color: white;
       cursor: pointer;
-      transition: all 0.3s;
       display: inline-flex;
       align-items: center;
       gap: 10px;
       text-decoration: none;
       box-shadow: 0 2px 10px rgba(255,0,0,0.3);
     }
-    .listen-btn i { font-size: 0.85rem; }
-    .listen-btn:hover {
-      transform: translateY(-2px);
-      background: #cc0000;
-    }
+    .listen-btn:hover { transform: translateY(-2px); background: #cc0000; }
 
     .cart-overlay {
       position: fixed; top: 0; right: -320px; width: 280px; max-width: 80vw; height: 100%;
@@ -389,7 +428,6 @@
       cursor: pointer;
       font-size: 0.5rem;
       color: white;
-      transition: all 0.2s;
     }
     .checkout-btn:hover { background: #2563eb; transform: scale(0.98); }
     .remove-item { background: var(--red); border: none; color: white; padding: 2px 5px; border-radius: 20px; font-size: 0.4rem; cursor: pointer; }
@@ -413,22 +451,12 @@
     .modal-color-btn { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
     .modal-color-btn.selected, .modal-color-btn:hover { border-color: var(--blue); transform: scale(1.05); }
     .modal-confirm {
-      background: var(--blue);
-      color: white;
-      padding: 5px 0;
-      width: 100%;
-      border-radius: 30px;
-      font-weight: 600;
-      margin-top: 6px;
-      cursor: pointer;
-      font-size: 0.55rem;
-      border: none;
-      transition: all 0.2s;
+      background: var(--blue); color: white; padding: 5px 0; width: 100%; border-radius: 30px;
+      font-weight: 600; margin-top: 6px; cursor: pointer; font-size: 0.55rem; border: none;
     }
-    .modal-confirm:hover { background: #2563eb; transform: scale(0.98); }
     .modal-close { background: none; border: none; color: #999; margin-top: 4px; cursor: pointer; font-size: 0.45rem; }
 
-    .auth-modal {
+    .auth-modal, .reset-modal, .delivery-modal, .notification-modal {
       display: none;
       position: fixed;
       top: 0;
@@ -440,90 +468,8 @@
       align-items: center;
       justify-content: center;
     }
-    .auth-modal.show { display: flex; }
-    .auth-modal-content {
-      background: linear-gradient(135deg, #1a1a2e, #0a0a1a);
-      border-radius: 20px;
-      width: 90%;
-      max-width: 350px;
-      padding: 25px 20px;
-      text-align: center;
-      border: 1px solid rgba(255,255,255,0.2);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-      position: relative;
-    }
-    .auth-modal-content h2 { color: white; font-size: 1.2rem; margin-bottom: 20px; }
-    .input-group {
-      position: relative;
-      margin: 8px 0;
-    }
-    .auth-modal-content input {
-      width: 100%;
-      padding: 12px;
-      padding-right: 40px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 12px;
-      color: white;
-      font-size: 0.8rem;
-      outline: none;
-    }
-    .auth-modal-content input:focus { border-color: var(--blue); }
-    .toggle-password {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: #aaa;
-      font-size: 1rem;
-    }
-    .toggle-password:hover { color: white; }
-    .auth-btn {
-      background: var(--blue);
-      border: none;
-      color: white;
-      padding: 12px;
-      width: 100%;
-      border-radius: 40px;
-      font-weight: 600;
-      margin-top: 15px;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .auth-btn:hover { background: #2563eb; }
-    .forgot-link { text-align: right; margin-top: 5px; font-size: 0.6rem; }
-    .forgot-link span { color: var(--blue); cursor: pointer; text-decoration: underline; }
-    .auth-toggle { margin-top: 15px; font-size: 0.7rem; color: #aaa; }
-    .auth-toggle span { color: var(--blue); cursor: pointer; text-decoration: underline; }
-    .close-auth {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-      z-index: 10;
-      line-height: 1;
-    }
-    .close-auth:hover { color: #ff8888; }
-
-    .reset-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 3001;
-      align-items: center;
-      justify-content: center;
-    }
-    .reset-modal.show { display: flex; }
-    .reset-modal-content {
+    .auth-modal.show, .reset-modal.show, .delivery-modal.show, .notification-modal.show { display: flex; }
+    .auth-modal-content, .reset-modal-content, .delivery-modal-content, .notification-content {
       background: linear-gradient(135deg, #1a1a2e, #0a0a1a);
       border-radius: 20px;
       width: 90%;
@@ -533,161 +479,52 @@
       border: 1px solid rgba(255,255,255,0.2);
       position: relative;
     }
-    .reset-modal-content h2 { color: white; font-size: 1.2rem; margin-bottom: 20px; }
-    .reset-modal-content input {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 12px;
-      color: white;
-      font-size: 0.8rem;
-    }
-    .close-reset {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-      line-height: 1;
-    }
-    .close-reset:hover { color: #ff8888; }
-
-    .delivery-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 10001;
-      align-items: center;
-      justify-content: center;
-    }
-    .delivery-modal.show { display: flex; }
-    .delivery-modal-content {
-      background: white;
-      border-radius: 24px;
-      width: 90%;
-      max-width: 400px;
-      padding: 24px 20px;
-      text-align: center;
-      color: #1a1a2e;
-      position: relative;
-    }
-    .delivery-modal-content h3 { color: #1a1a2e; font-size: 1.3rem; margin-bottom: 15px; }
-    .close-delivery {
+    .delivery-modal-content { background: white; color: #1a1a2e; }
+    .notification-content { background: white; color: #1e2a3e; }
+    .close-auth, .close-reset, .close-delivery, .close-notification {
       position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #999;
     }
-    .close-delivery:hover { color: #e11d2c; }
+    .close-delivery:hover, .close-notification:hover { color: #e11d2c; }
+    .auth-modal-content h2, .reset-modal-content h2 { color: white; font-size: 1.2rem; margin-bottom: 20px; }
+    .auth-modal-content input, .reset-modal-content input {
+      width: 100%; padding: 12px; margin: 8px 0; background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: white; font-size: 0.8rem;
+    }
+    .auth-btn {
+      background: var(--blue); border: none; color: white; padding: 12px; width: 100%;
+      border-radius: 40px; font-weight: 600; margin-top: 15px; cursor: pointer;
+    }
     .delivery-option {
-      background: #f0f0f0; border-radius: 16px; padding: 16px; margin: 12px 0; cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+      background: #f0f0f0; border-radius: 16px; padding: 16px; margin: 12px 0; cursor: pointer;
+      border: 2px solid transparent;
     }
-    .delivery-option:hover { background: #e0e0e0; transform: translateY(-2px); }
     .delivery-option.selected { border-color: #3b82f6; background: #e8f0fe; }
-    .delivery-name { font-weight: 700; font-size: 1.1rem; margin-bottom: 5px; }
+    .delivery-name { font-weight: 700; font-size: 1.1rem; }
     .delivery-price { color: #10b981; font-weight: 800; font-size: 1.2rem; }
-    .delivery-time { font-size: 0.75rem; color: #666; margin-top: 5px; }
     .delivery-confirm {
-      background: #3b82f6; color: white; border: none; padding: 14px; width: 100%; border-radius: 40px; font-weight: 700; font-size: 1rem; margin-top: 20px; cursor: pointer;
+      background: #3b82f6; color: white; border: none; padding: 14px; width: 100%;
+      border-radius: 40px; font-weight: 700; font-size: 1rem; margin-top: 20px; cursor: pointer;
     }
-    .delivery-confirm:hover { background: #2563eb; }
-
-    .notification-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.85);
-      z-index: 20002;
-      align-items: center;
-      justify-content: center;
-    }
-    .notification-modal.show { display: flex; }
-    .notification-content {
-      background: white;
-      border-radius: 24px;
-      padding: 28px 24px;
-      text-align: center;
-      max-width: 340px;
-      width: 85%;
-      color: #1e2a3e;
-      position: relative;
-    }
-    .close-notification {
-      position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #999;
-    }
-    .close-notification:hover { color: #e11d2c; }
-    .notification-content i { font-size: 48px; color: #10b981; margin-bottom: 16px; }
-    .notification-content h4 { font-size: 1.2rem; margin-bottom: 12px; font-weight: 700; }
-    .notification-content p { font-size: 0.9rem; margin: 8px 0; line-height: 1.4; }
-    .notification-close {
-      background: #3b82f6; margin-top: 20px; padding: 10px 16px; border: none; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; width: 100%;
-    }
-
-    #storeFinderModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.95);
-      z-index: 10000;
-      overflow-y: auto;
-    }
-    #storeFinderModal .modal-container {
-      max-width: 900px;
-      margin: 20px auto;
-      background: #1a1a2e;
-      border-radius: 24px;
-      padding: 16px;
-    }
-    #storeFinderModal h2 { color: white; font-size: 0.9rem; font-weight: 600; white-space: nowrap; }
-    #storeFinderModal input {
-      width: 100%; padding: 8px; border-radius: 30px; background: #0a0a1a; color: white; border: 1px solid #2a2a4a; margin: 6px 0; font-size: 0.7rem;
-    }
-    #storeFinderModal button {
-      background: #3b82f6; border: none; color: white; padding: 5px 12px; border-radius: 30px; cursor: pointer; font-size: 0.7rem;
-    }
-    #paxiMap { height: 280px; border-radius: 16px; margin: 12px 0; background: #0a0a2a; width: 100%; }
-    .store-list { max-height: 200px; overflow-y: auto; }
-    .store-item {
-      background: #0a0a1a; margin-bottom: 8px; padding: 10px; border-radius: 12px; border: 1px solid #2a2a4a; cursor: pointer;
-    }
-    .store-item:hover { background: #1a1a3a; }
-    .store-name { font-weight: bold; color: #3b82f6; font-size: 0.8rem; }
-    .store-address { font-size: 10px; color: #aaa; margin-top: 4px; }
-    .manual-store-btn { margin-top: 12px; text-align: center; }
-    .manual-store-btn button { background: #f59e0b; color: #1a1a2e; font-weight: bold; width: 100%; font-size: 0.7rem; }
   </style>
 </head>
 <body>
 
-<div id="freeCollectionNotif" class="notification-modal">
-  <div class="notification-content">
-    <button class="close-notification" id="closeFreeCollectionXBtn">&times;</button>
-    <i class="fas fa-check-circle"></i>
-    <h4>✅ FREE COLLECTION AT CLICKS STONE TOWERS, KING WILLIAM'S TOWN!</h4>
-    <p>You will receive an email when order is ready for collection.</p>
-    <button class="notification-close" id="closeFreeCollectionBtn">Continue to Payment</button>
-  </div>
-</div>
-
-<div id="mixtapeDownloadNotif" class="notification-modal">
-  <div class="notification-content">
-    <button class="close-notification" id="closeMixtapeNotifBtn">&times;</button>
-    <i class="fas fa-download"></i>
-    <h4>🎵 MIXTAPE READY!</h4>
-    <p>Your DUETS mixtape has been added to your account.</p>
-    <button class="notification-close" id="closeMixtapeConfirmBtn">OK</button>
+<!-- STORE FINDER PAGE (Full page, not popup) -->
+<div id="storeFinderPage" class="store-finder-page">
+  <div class="store-finder-container">
+    <div class="store-finder-header">
+      <h2>📍 Select Collection Point</h2>
+      <button class="close-finder-btn" id="closeFinderPageBtn">✕ Close</button>
+    </div>
+    <div class="search-area">
+      <input type="text" id="finderSearchLocation" placeholder="🔍 Enter town, suburb or city">
+      <button id="finderSearchBtn">Search</button>
+    </div>
+    <div id="finderMap"></div>
+    <div id="finderStoreList" class="store-list-area"></div>
+    <div class="manual-store-btn">
+      <button id="finderManualStoreBtn">📝 Can't find a store? Add manually</button>
+    </div>
   </div>
 </div>
 
@@ -695,7 +532,6 @@
   <div class="delivery-modal-content">
     <button class="close-delivery" id="closeDeliveryXBtn">&times;</button>
     <h3>🚚 Select Delivery Option</h3>
-    <p style="font-size: 0.8rem; margin-bottom: 15px;">We use PAXI's courier service</p>
     <div id="economyOption" class="delivery-option">
       <div class="delivery-name">Economy Delivery</div>
       <div class="delivery-price">R59.95</div>
@@ -710,28 +546,23 @@
   </div>
 </div>
 
+<div id="freeCollectionNotif" class="notification-modal">
+  <div class="notification-content">
+    <button class="close-notification" id="closeFreeCollectionXBtn">&times;</button>
+    <i class="fas fa-check-circle"></i>
+    <h4>✅ FREE COLLECTION AT CLICKS STONE TOWERS, KING WILLIAM'S TOWN!</h4>
+    <button class="delivery-confirm" id="closeFreeCollectionBtn" style="margin-top:10px;">Continue to Payment</button>
+  </div>
+</div>
+
 <div id="authModal" class="auth-modal">
   <div class="auth-modal-content">
     <button class="close-auth" id="closeAuthBtn">&times;</button>
     <h2 id="authTitle">LOGIN</h2>
-    <input type="text" id="authEmail" placeholder="Email" autocomplete="email">
-    <div class="input-group">
-      <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password">
-      <span class="toggle-password" id="togglePasswordBtn"><i class="fas fa-eye-slash" id="passwordIcon"></i></span>
-    </div>
+    <input type="text" id="authEmail" placeholder="Email">
+    <input type="password" id="authPassword" placeholder="Password">
     <button class="auth-btn" id="authSubmitBtn">LOGIN</button>
-    <div class="forgot-link"><span id="forgotPasswordBtn">Forgot password?</span></div>
     <div class="auth-toggle"><span id="authToggleText">Create an account</span></div>
-  </div>
-</div>
-
-<div id="resetModal" class="reset-modal">
-  <div class="reset-modal-content">
-    <button class="close-reset" id="closeResetBtn">&times;</button>
-    <h2>RESET PASSWORD</h2>
-    <input type="email" id="resetEmail" placeholder="Enter your email">
-    <button class="auth-btn" id="sendResetBtn">SEND RESET LINK</button>
-    <div id="resetMessage" style="font-size:0.7rem; margin-top:10px; color:#aaa;"></div>
   </div>
 </div>
 
@@ -810,24 +641,6 @@
 <input type="hidden" id="delivery_amount" value="0">
 <input type="hidden" id="delivery_type" value="">
 
-<button type="button" id="openStoreFinderBtn" style="background: #10b981; color: white; padding: 10px; border-radius: 30px; width: 90%; margin: 0 auto 20px; display: block; max-width: 400px; border: none; cursor: pointer;">📍 Select PAXI Pickup Point</button>
-
-<div id="storeFinderModal">
-  <div class="modal-container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-      <h2>📍 Select Collection Point</h2>
-      <button id="closeStoreFinderBtn" style="background: #e11d2c; padding: 4px 12px;">✕ Close</button>
-    </div>
-    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-      <input type="text" id="searchLocation" placeholder="🔍 Enter town, suburb or city" style="flex: 1;">
-      <button id="searchBtn" style="padding: 4px 12px;">Search</button>
-    </div>
-    <div id="paxiMap"></div>
-    <div id="storeList" class="store-list"></div>
-    <div class="manual-store-btn"><button id="manualStoreBtn" style="padding: 6px;">📝 Can't find a store? Add manually</button></div>
-  </div>
-</div>
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
   const API_URL = 'https://mryoungfargo-payment.onrender.com';
@@ -835,25 +648,27 @@
   let sessionToken = localStorage.getItem('session_token') || null;
   let cart = [];
   let deliveryAmount = 0, selectedPaxiStore = null, isKingWilliamsTown = false, selectedDelivery = null;
-  let map = null, markers = [], currentStores = [];
+  let finderMap = null, finderMarkers = [], currentStores = [];
 
   function normalizeEmail(e) { return e ? e.toLowerCase().trim() : ''; }
+  
   async function apiCall(endpoint, data) {
     try { const res = await fetch(`${API_URL}${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); return await res.json(); }
     catch(e) { return { success: false, error: 'Connection error' }; }
   }
 
   async function verifySession() {
-    if (!sessionToken) { renderContent(); return; }
-    const result = await apiCall('/api/verify', { sessionToken });
-    if (result.success && result.user) {
-      currentUser = result.user;
-      cart = result.user.cart || [];
-      const mixtapeIdx = cart.findIndex(i => i.id === 99);
-      if (mixtapeIdx !== -1 && cart[mixtapeIdx].qty > 1) cart[mixtapeIdx].qty = 1;
-      updateCartUI(); updateUserUI(); updateMixtapeButtons();
-    } else { localStorage.removeItem('session_token'); sessionToken = null; currentUser = null; cart = []; updateCartUI(); updateUserUI(); updateMixtapeButtons(); }
-    renderContent();
+    if (sessionToken) {
+      const result = await apiCall('/api/verify', { sessionToken });
+      if (result.success && result.user) {
+        currentUser = result.user;
+        cart = result.user.cart || [];
+        const mixtapeIdx = cart.findIndex(i => i.id === 99);
+        if (mixtapeIdx !== -1 && cart[mixtapeIdx].qty > 1) cart[mixtapeIdx].qty = 1;
+        updateCartUI(); updateUserUI(); updateMixtapeButtons();
+      } else { localStorage.removeItem('session_token'); sessionToken = null; currentUser = null; cart = []; updateCartUI(); updateUserUI(); updateMixtapeButtons(); }
+    }
+    renderProducts();
   }
 
   async function login(email, password) {
@@ -889,7 +704,7 @@
     } else {
       container.innerHTML = `<button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button><a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>`;
       document.getElementById('addToCartMixtapeBtn')?.addEventListener('click', () => {
-        if (cart.some(i => i.id === 99)) { alert("Mixtape already in cart. You can only purchase one."); return; }
+        if (cart.some(i => i.id === 99)) { alert("Mixtape already in cart."); return; }
         cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
         saveCartToLocal();
         document.getElementById("cartSidebar").classList.add("open");
@@ -967,20 +782,19 @@
     colors.forEach(c=>{ let btn=document.createElement("div"); btn.className="modal-color-btn"; btn.style.backgroundColor=c.bg; btn.title=c.name; btn.onclick=()=>{ document.querySelectorAll(".modal-color-btn").forEach(b=>b.classList.remove("selected")); btn.classList.add("selected"); selectedColor=c.value; }; cDiv.appendChild(btn); });
     document.getElementById("sizeColorModal").classList.add("show");
   }
-  function renderGrid(products, containerId) {
-    const container=document.getElementById(containerId);
-    if(!container) return;
-    container.innerHTML="";
-    products.forEach(prod=>{
-      let card=document.createElement("div"); card.className="product-card";
-      card.innerHTML=`<div class="product-img"><img src="${prod.image}" alt="${prod.name}" onerror="this.parentElement.innerHTML='<div class=\\'no-img\\'><i class=\\'fas fa-tshirt\\'></i></div>'"></div><div class="product-info"><div class="product-title">${prod.name}</div><div class="product-price">R${prod.price.toFixed(2)}</div><button class="add-to-cart-btn" data-id="${prod.id}"><i class="fas fa-cart-plus"></i> ADD TO CART</button></div>`;
-      container.appendChild(card);
-    });
-    container.querySelectorAll(".add-to-cart-btn").forEach(btn=>btn.addEventListener("click",(e)=>{e.stopPropagation(); const id=parseInt(btn.dataset.id); const product=allProducts.find(p=>p.id===id); showModal(product); }));
-    container.querySelectorAll(".product-card").forEach(card=>card.addEventListener("click",()=>{ let btn=card.querySelector(".add-to-cart-btn"); if(btn){ let id=parseInt(btn.dataset.id); showModal(allProducts.find(p=>p.id===id)); } }));
+  function renderProducts() {
+    const tContainer = document.getElementById("tshirtsGrid"); const sContainer = document.getElementById("sweatersGrid"); const hContainer = document.getElementById("hoodiesGrid");
+    if(tContainer){ tContainer.innerHTML=""; tshirts.forEach(prod=>{ let card=document.createElement("div"); card.className="product-card"; card.innerHTML=`<div class="product-img"><img src="${prod.image}" onerror="this.parentElement.innerHTML='<div class=\\'no-img\\'><i class=\\'fas fa-tshirt\\'></i></div>'"></div><div class="product-info"><div class="product-title">${prod.name}</div><div class="product-price">R${prod.price}</div><button class="add-to-cart-btn" data-id="${prod.id}">ADD TO CART</button></div>`; tContainer.appendChild(card); }); }
+    if(sContainer){ sContainer.innerHTML=""; sweaters.forEach(prod=>{ let card=document.createElement("div"); card.className="product-card"; card.innerHTML=`<div class="product-img"><img src="${prod.image}" onerror="this.parentElement.innerHTML='<div class=\\'no-img\\'><i class=\\'fas fa-vest\\'></i></div>'"></div><div class="product-info"><div class="product-title">${prod.name}</div><div class="product-price">R${prod.price}</div><button class="add-to-cart-btn" data-id="${prod.id}">ADD TO CART</button></div>`; sContainer.appendChild(card); }); }
+    if(hContainer){ hContainer.innerHTML=""; hoodies.forEach(prod=>{ let card=document.createElement("div"); card.className="product-card"; card.innerHTML=`<div class="product-img"><img src="${prod.image}" onerror="this.parentElement.innerHTML='<div class=\\'no-img\\'><i class=\\'fas fa-hoodie\\'></i></div>'"></div><div class="product-info"><div class="product-title">${prod.name}</div><div class="product-price">R${prod.price}</div><button class="add-to-cart-btn" data-id="${prod.id}">ADD TO CART</button></div>`; hContainer.appendChild(card); }); }
+    document.querySelectorAll(".add-to-cart-btn").forEach(btn=>btn.addEventListener("click",(e)=>{e.stopPropagation(); const id=parseInt(btn.dataset.id); const product=allProducts.find(p=>p.id===id); showModal(product); }));
   }
 
-  async function queryStores(lat,lng,radius=10000){
+  // Store finder functions - leads DIRECTLY to iKhokha
+  function showStoreFinderPage() { document.getElementById('storeFinderPage').classList.add('active'); initFinderMap(); }
+  function hideStoreFinderPage() { document.getElementById('storeFinderPage').classList.remove('active'); }
+  
+  async function queryFinderStores(lat,lng,radius=10000){
     const query=`[out:json];(node["shop"]["brand"~"PEP|Tekkie Town|Shoe City|PEPcell"](around:${radius},${lat},${lng});way["shop"]["brand"~"PEP|Tekkie Town|Shoe City|PEPcell"](around:${radius},${lat},${lng}););out body;`;
     try{
       const res=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:query});
@@ -988,56 +802,66 @@
       return data.elements.map(el=>({ id:el.id, name:el.tags.name||el.tags.brand||'Store', address:el.tags['addr:full']||el.tags['addr:street']||el.tags['addr:city']||'Address not available', lat:el.lat||(el.center?el.center.lat:lat), lon:el.lon||(el.center?el.center.lon:lng), code:el.tags.ref||'' }));
     }catch(e){ return []; }
   }
-  function displayStores(stores){
-    if(!map)return;
-    markers.forEach(m=>map.removeLayer(m)); markers=[];
-    const container=document.getElementById('storeList'); container.innerHTML=''; currentStores=stores;
+  
+  function displayFinderStores(stores){
+    if(!finderMap)return;
+    finderMarkers.forEach(m=>finderMap.removeLayer(m)); finderMarkers=[];
+    const container=document.getElementById('finderStoreList'); container.innerHTML=''; currentStores=stores;
     if(!stores.length){ container.innerHTML='<div style="color:#aaa;text-align:center;padding:20px;">No stores found.</div>'; return; }
     stores.forEach(store=>{
-      let m=L.marker([store.lat,store.lon]).addTo(map);
-      m.bindPopup(`<b>${store.name}</b><br>${store.address}<br><button onclick="window.selectStore('${store.id}')">Select</button>`);
-      markers.push(m);
-      let div=document.createElement('div'); div.className='store-item';
-      div.innerHTML=`<div class="store-name">${store.name}</div><div class="store-address">${store.address}</div>`;
-      div.onclick=()=>window.selectStore(store.id);
+      let m=L.marker([store.lat,store.lon]).addTo(finderMap);
+      m.bindPopup(`<b>${store.name}</b><br>${store.address}`);
+      finderMarkers.push(m);
+      let div=document.createElement('div'); div.className='store-card';
+      div.innerHTML=`<div class="store-card-name">${store.name}</div><div class="store-card-address">${store.address}</div>`;
+      div.onclick=()=>selectFinderStore(store);
       container.appendChild(div);
     });
-    if(markers.length) map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
+    if(finderMarkers.length) finderMap.fitBounds(L.featureGroup(finderMarkers).getBounds().pad(0.2));
   }
-  window.selectStore=function(storeId){
-    let store=currentStores.find(s=>s.id==storeId);
-    if(store){
-      selectedPaxiStore=store;
-      document.getElementById('paxi_store_name').value=store.name;
-      document.getElementById('paxi_store_address').value=store.address;
-      document.getElementById('paxi_store_code').value=store.code||'';
-      let isKing=store.address.toLowerCase().includes('king william')||store.name.toLowerCase().includes('king william');
-      if(isKing){
-        isKingWilliamsTown=true; deliveryAmount=0;
-        document.getElementById('delivery_amount').value=0;
-        document.getElementById('freeCollectionNotif').classList.add('show');
-      } else { isKingWilliamsTown=false; showDeliveryModal(); }
-      closeStoreFinder();
+  
+  function selectFinderStore(store){
+    selectedPaxiStore=store;
+    document.getElementById('paxi_store_name').value=store.name;
+    document.getElementById('paxi_store_address').value=store.address;
+    document.getElementById('paxi_store_code').value=store.code||'';
+    let isKing=store.address.toLowerCase().includes('king william')||store.name.toLowerCase().includes('king william');
+    if(isKing){
+      isKingWilliamsTown=true; deliveryAmount=0;
+      document.getElementById('delivery_amount').value=0;
+      hideStoreFinderPage();
+      document.getElementById('freeCollectionNotif').classList.add('show');
+    } else {
+      isKingWilliamsTown=false;
+      hideStoreFinderPage();
+      showDeliveryModal();
     }
-  };
-  async function searchStoresWithLocation(location){
+  }
+  
+  async function searchFinderStores(){
+    let location=document.getElementById('finderSearchLocation').value.trim();
     if(!location){ alert('Enter location'); return; }
-    let searchBtn=document.getElementById('searchBtn'); searchBtn.innerText='Searching...'; searchBtn.disabled=true;
+    let searchBtn=document.getElementById('finderSearchBtn');
+    searchBtn.innerText='Searching...'; searchBtn.disabled=true;
     try{
       let geoRes=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location+', South Africa')}&limit=1`);
       let geoData=await geoRes.json();
       if(!geoData.length){ alert('Location not found'); return; }
       let {lat,lon}=geoData[0];
-      if(map) map.setView([lat,lon],12);
-      else{ map=L.map('paxiMap').setView([lat,lon],12); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OSM'}).addTo(map); }
-      let stores=await queryStores(lat,lon);
-      displayStores(stores);
+      if(finderMap) finderMap.setView([lat,lon],12);
+      else{ finderMap=L.map('finderMap').setView([lat,lon],12); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OSM'}).addTo(finderMap); }
+      let stores=await queryFinderStores(lat,lon);
+      displayFinderStores(stores);
       if(!stores.length) alert('No stores found.');
     }catch(e){ alert('Error searching'); } finally{ searchBtn.innerText='Search'; searchBtn.disabled=false; }
   }
-  function openStoreFinder(){ document.getElementById('storeFinderModal').style.display='block'; setTimeout(()=>{ if(!map){ map=L.map('paxiMap').setView([-28.9,24.8],5); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OSM'}).addTo(map); }else map.invalidateSize(); },200); }
-  function closeStoreFinder(){ document.getElementById('storeFinderModal').style.display='none'; }
-  function manualStoreEntry(){
+  
+  function initFinderMap(){
+    if(finderMap) finderMap.invalidateSize();
+    else{ finderMap=L.map('finderMap').setView([-28.9,24.8],5); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OSM'}).addTo(finderMap); }
+  }
+  
+  function manualFinderStore(){
     let addr=prompt("Enter store address:");
     if(addr){
       selectedPaxiStore={ id:'manual', name:'Manually entered store', address:addr, code:'' };
@@ -1048,15 +872,22 @@
       if(isKing){
         isKingWilliamsTown=true; deliveryAmount=0;
         document.getElementById('delivery_amount').value=0;
+        hideStoreFinderPage();
         document.getElementById('freeCollectionNotif').classList.add('show');
-      } else { isKingWilliamsTown=false; showDeliveryModal(); }
-      closeStoreFinder();
+      } else {
+        isKingWilliamsTown=false;
+        hideStoreFinderPage();
+        showDeliveryModal();
+      }
     }
   }
+
   function showDeliveryModal(){ document.getElementById('deliveryModal').classList.add('show'); }
   function hideDeliveryModal(){ document.getElementById('deliveryModal').classList.remove('show'); }
+  
   document.getElementById('economyOption')?.addEventListener('click',()=>{ document.getElementById('economyOption').classList.add('selected'); document.getElementById('speedOption').classList.remove('selected'); selectedDelivery={ type:'economy', amount:59.95 }; });
   document.getElementById('speedOption')?.addEventListener('click',()=>{ document.getElementById('speedOption').classList.add('selected'); document.getElementById('economyOption').classList.remove('selected'); selectedDelivery={ type:'speed', amount:109.95 }; });
+  
   async function proceedToPaymentAfterDelivery() {
     if(selectedDelivery){
       deliveryAmount=selectedDelivery.amount;
@@ -1067,16 +898,21 @@
     } else alert('Please select a delivery option');
   }
   document.getElementById('confirmDeliveryBtn')?.addEventListener('click', proceedToPaymentAfterDelivery);
+  document.getElementById('closeDeliveryXBtn')?.addEventListener('click',()=>hideDeliveryModal());
+  document.getElementById('closeFreeCollectionXBtn')?.addEventListener('click',()=>document.getElementById('freeCollectionNotif').classList.remove('show'));
+  document.getElementById('closeFreeCollectionBtn')?.addEventListener('click',async()=>{ document.getElementById('freeCollectionNotif').classList.remove('show'); await proceedToPayment(); });
+  
+  // CHECKOUT BUTTON - Opens store finder page
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
-    if (!currentUser) { showAuthModal(); return; }
     if (cart.length === 0) { alert("Cart is empty"); return; }
-    openStoreFinder();
+    showStoreFinderPage();
   });
+
   async function proceedToPayment(){
     if(!currentUser){ showAuthModal(); return; }
     if(cart.length===0){ alert("Cart empty"); return; }
     const hasPhysical = cart.some(i=>i.id!==99);
-    if(hasPhysical && !selectedPaxiStore && !isKingWilliamsTown){ openStoreFinder(); return; }
+    if(hasPhysical && !selectedPaxiStore && !isKingWilliamsTown){ showStoreFinderPage(); return; }
     let total = cart.reduce((s,i)=>s+(i.price*i.qty),0);
     if(hasPhysical && deliveryAmount>0) total+=deliveryAmount;
     const orderId = "ORDER_"+Date.now()+"_"+Math.random().toString(36).substr(2,6);
@@ -1091,25 +927,17 @@
     }catch(e){ alert("Connection error"); }
   }
 
-  document.getElementById('closeDeliveryXBtn')?.addEventListener('click',()=>hideDeliveryModal());
-  document.getElementById('closeFreeCollectionXBtn')?.addEventListener('click',()=>document.getElementById('freeCollectionNotif').classList.remove('show'));
-  document.getElementById('closeFreeCollectionBtn')?.addEventListener('click',async()=>{ document.getElementById('freeCollectionNotif').classList.remove('show'); await proceedToPayment(); });
-  document.getElementById('closeMixtapeNotifBtn')?.addEventListener('click',()=>document.getElementById('mixtapeDownloadNotif').classList.remove('show'));
-  document.getElementById('closeMixtapeConfirmBtn')?.addEventListener('click',()=>document.getElementById('mixtapeDownloadNotif').classList.remove('show'));
-  document.getElementById('openStoreFinderBtn')?.addEventListener('click',openStoreFinder);
-  document.getElementById('closeStoreFinderBtn')?.addEventListener('click',closeStoreFinder);
-  document.getElementById('searchBtn')?.addEventListener('click',()=>searchStoresWithLocation(document.getElementById('searchLocation').value));
-  document.getElementById('manualStoreBtn')?.addEventListener('click',manualStoreEntry);
+  document.getElementById('closeFinderPageBtn')?.addEventListener('click', hideStoreFinderPage);
+  document.getElementById('finderSearchBtn')?.addEventListener('click', searchFinderStores);
+  document.getElementById('finderManualStoreBtn')?.addEventListener('click', manualFinderStore);
   
   function showAuthModal(){ document.getElementById('authModal').classList.add('show'); window.isLoginMode=true; document.getElementById('authTitle').innerText='LOGIN'; document.getElementById('authSubmitBtn').innerText='LOGIN'; document.getElementById('authToggleText').innerText='Create an account'; }
   function closeAuthModal(){ document.getElementById('authModal').classList.remove('show'); }
   document.getElementById('closeAuthBtn')?.addEventListener('click',closeAuthModal);
   document.getElementById('globalAuthIconBtn')?.addEventListener('click', showAuthModal);
-  document.getElementById('authSubmitBtn')?.addEventListener('click',async()=>{ let em=document.getElementById('authEmail').value.trim(), pw=document.getElementById('authPassword').value.trim(); if(!em||!pw){ alert("Enter credentials"); return; } if(window.isLoginMode) await login(em,pw); else alert("Registration disabled for demo"); });
+  document.getElementById('authSubmitBtn')?.addEventListener('click',async()=>{ let em=document.getElementById('authEmail').value.trim(), pw=document.getElementById('authPassword').value.trim(); if(!em||!pw){ alert("Enter credentials"); return; } await login(em,pw); });
   document.getElementById('authToggleText')?.addEventListener('click',()=>{ window.isLoginMode=!window.isLoginMode; document.getElementById('authTitle').innerText=window.isLoginMode?'LOGIN':'SIGN UP'; document.getElementById('authSubmitBtn').innerText=window.isLoginMode?'LOGIN':'SIGN UP'; document.getElementById('authToggleText').innerText=window.isLoginMode?'Create an account':'Back to login'; });
-  document.getElementById('forgotPasswordBtn')?.addEventListener('click',()=>document.getElementById('resetModal').classList.add('show'));
-  document.getElementById('closeResetBtn')?.addEventListener('click',()=>document.getElementById('resetModal').classList.remove('show'));
-  document.getElementById('sendResetBtn')?.addEventListener('click',async()=>{ let em=document.getElementById('resetEmail').value.trim(); if(!em){ alert("Enter email"); return; } let res=await apiCall('/forgot-password',{email:em}); alert(res.success?"Reset link sent!":"Error"); if(res.success) document.getElementById('resetModal').classList.remove('show'); });
+  
   document.getElementById("cartIcon")?.addEventListener("click",()=>document.getElementById("cartSidebar").classList.add("open"));
   document.getElementById("stickyCartIcon")?.addEventListener("click",()=>document.getElementById("cartSidebar").classList.add("open"));
   document.getElementById("closeCartBtn")?.addEventListener("click",()=>document.getElementById("cartSidebar").classList.remove("open"));
@@ -1118,9 +946,6 @@
   function closeModal(){ document.getElementById("sizeColorModal").classList.remove("show"); }
   window.addEventListener("scroll",()=>{ if(window.scrollY>60) document.getElementById("stickyNav").classList.add("show"); else document.getElementById("stickyNav").classList.remove("show"); });
   
-  function renderContent() {
-    renderGrid(tshirts,"tshirtsGrid"); renderGrid(sweaters,"sweatersGrid"); renderGrid(hoodies,"hoodiesGrid");
-  }
   verifySession();
 </script>
 </body>
