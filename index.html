@@ -44,7 +44,6 @@
     :root { --purple: #7f2aeb; --green: #10b981; --red: #e11d2c; --blue: #3b82f6; }
     .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
 
-    /* Store Finder Page Styles */
     .store-finder-page {
       display: none;
       position: fixed;
@@ -509,7 +508,6 @@
 </head>
 <body>
 
-<!-- STORE FINDER PAGE (Full page, not popup) -->
 <div id="storeFinderPage" class="store-finder-page">
   <div class="store-finder-container">
     <div class="store-finder-header">
@@ -790,7 +788,13 @@
     document.querySelectorAll(".add-to-cart-btn").forEach(btn=>btn.addEventListener("click",(e)=>{e.stopPropagation(); const id=parseInt(btn.dataset.id); const product=allProducts.find(p=>p.id===id); showModal(product); }));
   }
 
-  // Store finder functions - leads DIRECTLY to iKhokha
+  // Check if cart only contains digital mixtape (id 99)
+  function isOnlyDigitalMixtape() {
+    if (cart.length === 0) return false;
+    return cart.every(item => item.id === 99);
+  }
+
+  // STORE FINDER (only for physical items)
   function showStoreFinderPage() { document.getElementById('storeFinderPage').classList.add('active'); initFinderMap(); }
   function hideStoreFinderPage() { document.getElementById('storeFinderPage').classList.remove('active'); }
   
@@ -902,19 +906,32 @@
   document.getElementById('closeFreeCollectionXBtn')?.addEventListener('click',()=>document.getElementById('freeCollectionNotif').classList.remove('show'));
   document.getElementById('closeFreeCollectionBtn')?.addEventListener('click',async()=>{ document.getElementById('freeCollectionNotif').classList.remove('show'); await proceedToPayment(); });
   
-  // CHECKOUT BUTTON - Opens store finder page
+  // CHECKOUT BUTTON LOGIC: if only mixtape -> go directly to payment, else show store finder
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (cart.length === 0) { alert("Cart is empty"); return; }
-    showStoreFinderPage();
+    
+    // Check if cart contains only digital mixtape (no physical items)
+    if (isOnlyDigitalMixtape()) {
+      // Digital only: go straight to payment
+      if (!currentUser) { showAuthModal(); return; }
+      await proceedToPayment();
+    } else {
+      // Has physical items: show store finder
+      showStoreFinderPage();
+    }
   });
 
   async function proceedToPayment(){
     if(!currentUser){ showAuthModal(); return; }
     if(cart.length===0){ alert("Cart empty"); return; }
+    
+    // For physical items: require pickup point
     const hasPhysical = cart.some(i=>i.id!==99);
     if(hasPhysical && !selectedPaxiStore && !isKingWilliamsTown){ showStoreFinderPage(); return; }
+    
     let total = cart.reduce((s,i)=>s+(i.price*i.qty),0);
     if(hasPhysical && deliveryAmount>0) total+=deliveryAmount;
+    
     const orderId = "ORDER_"+Date.now()+"_"+Math.random().toString(36).substr(2,6);
     try{
       let saveRes=await fetch(`${API_URL}/api/save-order`,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ sessionToken, orderId, items:cart, total, customerEmail:currentUser.email, paxi_store_name:document.getElementById('paxi_store_name').value, paxi_store_address:document.getElementById('paxi_store_address').value, paxi_store_code:document.getElementById('paxi_store_code').value, delivery_amount:deliveryAmount, delivery_type:document.getElementById('delivery_type').value })});
