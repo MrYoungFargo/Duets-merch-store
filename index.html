@@ -36,13 +36,77 @@
       pointer-events: none;
     }
 
-    .site-header, .hero, .container, .mixtape-section, footer, .cart-overlay, .modal, .auth-modal, .reset-modal, .music-footer-btn, .delivery-modal, .store-finder-page {
+    .site-header, .hero, .container, .mixtape-section, footer, .cart-overlay, .modal, .auth-modal, .reset-modal, .music-footer-btn, .delivery-modal, .store-finder-page, .legal-modal {
       position: relative;
       z-index: 10;
     }
 
     :root { --purple: #7f2aeb; --green: #10b981; --red: #e11d2c; --blue: #3b82f6; }
     .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+    /* Legal Modal Styles - White Popup */
+    .legal-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 20000;
+      align-items: center;
+      justify-content: center;
+    }
+    .legal-modal.show { display: flex; }
+    .legal-modal-content {
+      background: white;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 24px;
+      color: #1a1a2e;
+      position: relative;
+    }
+    .legal-modal-content h2 {
+      color: #1a1a2e;
+      font-size: 1.3rem;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #3b82f6;
+      padding-bottom: 8px;
+    }
+    .legal-modal-content h3 {
+      color: #1a1a2e;
+      font-size: 1rem;
+      margin: 16px 0 8px 0;
+    }
+    .legal-modal-content p {
+      font-size: 0.8rem;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    .legal-modal-content ul {
+      margin-left: 20px;
+      margin-bottom: 12px;
+    }
+    .legal-modal-content li {
+      font-size: 0.8rem;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    .close-legal {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: #999;
+    }
+    .close-legal:hover { color: #e11d2c; }
 
     .store-finder-page {
       display: none;
@@ -387,7 +451,28 @@
     }
     .add-to-cart-btn:hover { background: #2563eb; transform: scale(0.98); }
 
-    footer { text-align: center; padding: 12px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 15px; font-size: 0.45rem; color: rgba(255,255,255,0.6); }
+    footer {
+      text-align: center;
+      padding: 20px 12px 12px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: 15px;
+      font-size: 0.45rem;
+      color: rgba(255,255,255,0.6);
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.5rem;
+      cursor: pointer;
+    }
+    .footer-links a:hover { color: white; text-decoration: underline; }
 
     .music-footer-btn { text-align: center; margin: 30px 0 20px; }
     .listen-btn {
@@ -508,6 +593,54 @@
 </head>
 <body>
 
+<!-- Legal Modals (White Popups) -->
+<div id="termsModal" class="legal-modal">
+  <div class="legal-modal-content">
+    <button class="close-legal" onclick="closeLegalModal('termsModal')">&times;</button>
+    <h2>Terms of Service</h2>
+    <p><strong>Effective Date: 01 May 2026</strong></p>
+    <p>Welcome to MrYoungFargo (mryoungfargo.com). By accessing or using our website and purchasing products, you agree to be bound by these Terms of Service.</p>
+    <h3>1. General</h3>
+    <p>These terms apply to all users, visitors, and customers. We reserve the right to update these terms at any time.</p>
+    <h3>2. Products and Pricing</h3>
+    <p>Prices are in ZAR and include VAT. We reserve the right to change prices.</p>
+    <h3>3. Orders</h3>
+    <p>We may refuse or cancel any order for reasons including product unavailability or pricing errors.</p>
+    <h3>4. Shipping</h3>
+    <p>Shipping via Pep Paxi. Risk passes to you upon collection.</p>
+    <h3>5. Returns</h3>
+    <p>30-day returns on unused clothing with tags. Contact mryoungfargo@gmail.com</p>
+    <h3>6. Payment</h3>
+    <p>Payments via card, EFT, or Google Pay. Full payment required before processing.</p>
+    <h3>7. Governing Law</h3>
+    <p>South African law applies.</p>
+    <h3>8. Contact</h3>
+    <p>mryoungfargo@gmail.com</p>
+  </div>
+</div>
+
+<div id="shippingModal" class="legal-modal">
+  <div class="legal-modal-content">
+    <button class="close-legal" onclick="closeLegalModal('shippingModal')">&times;</button>
+    <h2>Shipping Policy</h2>
+    <p><strong>Carrier:</strong> Pep Paxi exclusively.</p>
+    <p><strong>Processing:</strong> Up to 7 business days.</p>
+    <p><strong>Delivery:</strong> 3-9 working days after dispatch.</p>
+    <p><strong>Tracking:</strong> Sent via SMS/email. Collect from nearest Pep Store.</p>
+  </div>
+</div>
+
+<div id="privacyModal" class="legal-modal">
+  <div class="legal-modal-content">
+    <button class="close-legal" onclick="closeLegalModal('privacyModal')">&times;</button>
+    <h2>Privacy Policy</h2>
+    <p><strong>Effective: 01 May 2026</strong></p>
+    <p>We collect name, email, address, phone, order history. Used only for order fulfillment and communication.</p>
+    <p>We do not sell your data. Shared only with Pep Paxi and payment processors.</p>
+    <p>Under POPIA, you may access or delete your data by emailing mryoungfargo@gmail.com</p>
+  </div>
+</div>
+
 <div id="storeFinderPage" class="store-finder-page">
   <div class="store-finder-container">
     <div class="store-finder-header">
@@ -623,7 +756,14 @@
   <a href="https://m.youtube.com/@MrYoungFargo_SA" target="_blank" class="listen-btn"><i class="fab fa-youtube"></i> LISTEN TO MY MUSIC</a>
 </div>
 
-<footer><p>© 2025 MrYoungFargo — All Rights Reserved</p></footer>
+<footer>
+  <div class="footer-links">
+    <a onclick="showLegalModal('termsModal')">Terms of Service</a>
+    <a onclick="showLegalModal('shippingModal')">Shipping Policy</a>
+    <a onclick="showLegalModal('privacyModal')">Privacy Policy</a>
+  </div>
+  <p>© 2026 MrYoungFargo — All Rights Reserved</p>
+</footer>
 
 <div id="cartSidebar" class="cart-overlay">
   <button class="close-cart" id="closeCartBtn">&times;</button>
@@ -647,6 +787,11 @@
   let cart = [];
   let deliveryAmount = 0, selectedPaxiStore = null, isKingWilliamsTown = false, selectedDelivery = null;
   let finderMap = null, finderMarkers = [], currentStores = [];
+
+  function showLegalModal(id) { document.getElementById(id).classList.add('show'); }
+  function closeLegalModal(id) { document.getElementById(id).classList.remove('show'); }
+  window.showLegalModal = showLegalModal;
+  window.closeLegalModal = closeLegalModal;
 
   function normalizeEmail(e) { return e ? e.toLowerCase().trim() : ''; }
   
@@ -698,7 +843,7 @@
     const hasPurchased = currentUser && currentUser.hasPurchasedMixtape === true;
     if (hasPurchased) {
       container.innerHTML = `<button class="download-mixtape-btn" id="downloadMixtapeBtn"><i class="fas fa-download"></i> DOWNLOAD MIXTAPE (ZIP)</button><a href="#" id="mixtapeListenBtn2" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>`;
-      document.getElementById('downloadMixtapeBtn')?.addEventListener('click', () => window.location.href = 'duets.zip');
+      document.getElementById('downloadMixtapeBtn')?.addEventListener('click', () => { window.location.href = 'DUETS_MIXTAPE.zip'; });
     } else {
       container.innerHTML = `<button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button><a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>`;
       document.getElementById('addToCartMixtapeBtn')?.addEventListener('click', () => {
@@ -788,13 +933,11 @@
     document.querySelectorAll(".add-to-cart-btn").forEach(btn=>btn.addEventListener("click",(e)=>{e.stopPropagation(); const id=parseInt(btn.dataset.id); const product=allProducts.find(p=>p.id===id); showModal(product); }));
   }
 
-  // Check if cart only contains digital mixtape (id 99)
   function isOnlyDigitalMixtape() {
     if (cart.length === 0) return false;
     return cart.every(item => item.id === 99);
   }
 
-  // STORE FINDER (only for physical items)
   function showStoreFinderPage() { document.getElementById('storeFinderPage').classList.add('active'); initFinderMap(); }
   function hideStoreFinderPage() { document.getElementById('storeFinderPage').classList.remove('active'); }
   
@@ -906,17 +1049,12 @@
   document.getElementById('closeFreeCollectionXBtn')?.addEventListener('click',()=>document.getElementById('freeCollectionNotif').classList.remove('show'));
   document.getElementById('closeFreeCollectionBtn')?.addEventListener('click',async()=>{ document.getElementById('freeCollectionNotif').classList.remove('show'); await proceedToPayment(); });
   
-  // CHECKOUT BUTTON LOGIC: if only mixtape -> go directly to payment, else show store finder
   document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
     if (cart.length === 0) { alert("Cart is empty"); return; }
-    
-    // Check if cart contains only digital mixtape (no physical items)
     if (isOnlyDigitalMixtape()) {
-      // Digital only: go straight to payment
       if (!currentUser) { showAuthModal(); return; }
       await proceedToPayment();
     } else {
-      // Has physical items: show store finder
       showStoreFinderPage();
     }
   });
@@ -924,14 +1062,10 @@
   async function proceedToPayment(){
     if(!currentUser){ showAuthModal(); return; }
     if(cart.length===0){ alert("Cart empty"); return; }
-    
-    // For physical items: require pickup point
     const hasPhysical = cart.some(i=>i.id!==99);
     if(hasPhysical && !selectedPaxiStore && !isKingWilliamsTown){ showStoreFinderPage(); return; }
-    
     let total = cart.reduce((s,i)=>s+(i.price*i.qty),0);
     if(hasPhysical && deliveryAmount>0) total+=deliveryAmount;
-    
     const orderId = "ORDER_"+Date.now()+"_"+Math.random().toString(36).substr(2,6);
     try{
       let saveRes=await fetch(`${API_URL}/api/save-order`,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ sessionToken, orderId, items:cart, total, customerEmail:currentUser.email, paxi_store_name:document.getElementById('paxi_store_name').value, paxi_store_address:document.getElementById('paxi_store_address').value, paxi_store_code:document.getElementById('paxi_store_code').value, delivery_amount:deliveryAmount, delivery_type:document.getElementById('delivery_type').value })});
