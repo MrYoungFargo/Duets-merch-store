@@ -36,213 +36,13 @@
       pointer-events: none;
     }
 
-    .site-header, .hero, .container, .mixtape-section, footer, .cart-overlay, .modal, .auth-modal, .reset-modal, .music-footer-btn, .delivery-modal, .store-finder-page, .legal-modal, .white-alert-modal {
+    .site-header, .hero, .container, .mixtape-section, footer, .cart-overlay, .modal, .auth-modal, .reset-modal, .music-footer-btn, .delivery-modal {
       position: relative;
       z-index: 10;
     }
 
     :root { --purple: #7f2aeb; --green: #10b981; --red: #e11d2c; --blue: #3b82f6; }
     .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
-
-    /* White Alert Modal */
-    .white-alert-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 30000;
-      align-items: center;
-      justify-content: center;
-    }
-    .white-alert-modal.show { display: flex; }
-    .white-alert-content {
-      background: white;
-      border-radius: 24px;
-      width: 90%;
-      max-width: 320px;
-      padding: 28px 24px;
-      text-align: center;
-      color: #1a1a2e;
-      position: relative;
-    }
-    .white-alert-content i { font-size: 48px; color: #f59e0b; margin-bottom: 16px; }
-    .white-alert-content h4 { font-size: 1.2rem; margin-bottom: 12px; font-weight: 700; }
-    .white-alert-content p { font-size: 0.9rem; margin: 8px 0; line-height: 1.4; }
-    .white-alert-close {
-      background: #3b82f6;
-      margin-top: 20px;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 40px;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-    }
-    .close-white-alert {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      background: none;
-      border: none;
-      font-size: 1.3rem;
-      cursor: pointer;
-      color: #999;
-    }
-    .close-white-alert:hover { color: #e11d2c; }
-
-    /* Legal Modal Styles - White Popup */
-    .legal-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 20000;
-      align-items: center;
-      justify-content: center;
-    }
-    .legal-modal.show { display: flex; }
-    .legal-modal-content {
-      background: white;
-      border-radius: 24px;
-      width: 90%;
-      max-width: 500px;
-      max-height: 80vh;
-      overflow-y: auto;
-      padding: 24px;
-      color: #1a1a2e;
-      position: relative;
-    }
-    .legal-modal-content h2 {
-      color: #1a1a2e;
-      font-size: 1.3rem;
-      margin-bottom: 16px;
-      border-bottom: 2px solid #3b82f6;
-      padding-bottom: 8px;
-    }
-    .legal-modal-content h3 {
-      color: #1a1a2e;
-      font-size: 1rem;
-      margin: 16px 0 8px 0;
-    }
-    .legal-modal-content p {
-      font-size: 0.8rem;
-      line-height: 1.4;
-      margin-bottom: 8px;
-      color: #333;
-    }
-    .legal-modal-content ul {
-      margin-left: 20px;
-      margin-bottom: 12px;
-    }
-    .legal-modal-content li {
-      font-size: 0.8rem;
-      color: #333;
-      margin-bottom: 4px;
-    }
-    .close-legal {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      background: none;
-      border: none;
-      font-size: 1.4rem;
-      cursor: pointer;
-      color: #999;
-    }
-    .close-legal:hover { color: #e11d2c; }
-
-    .store-finder-page {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #0a0a1a;
-      z-index: 10000;
-      overflow-y: auto;
-    }
-    .store-finder-page.active { display: block; }
-    .store-finder-container {
-      max-width: 900px;
-      margin: 20px auto;
-      background: #1a1a2e;
-      border-radius: 24px;
-      padding: 20px;
-    }
-    .store-finder-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-    .store-finder-header h2 { color: white; font-size: 1.2rem; font-weight: 600; }
-    .close-finder-btn {
-      background: #e11d2c;
-      border: none;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-    .search-area {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-    .search-area input {
-      flex: 1;
-      padding: 10px 15px;
-      border-radius: 40px;
-      background: #0a0a1a;
-      color: white;
-      border: 1px solid #2a2a4a;
-      font-size: 0.9rem;
-    }
-    .search-area button {
-      background: #3b82f6;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 40px;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-    #finderMap { height: 350px; border-radius: 16px; margin: 15px 0; background: #0a0a2a; width: 100%; }
-    .store-list-area { max-height: 250px; overflow-y: auto; }
-    .store-card {
-      background: #0a0a1a;
-      margin-bottom: 10px;
-      padding: 12px 15px;
-      border-radius: 12px;
-      border: 1px solid #2a2a4a;
-      cursor: pointer;
-    }
-    .store-card:hover { background: #1a1a3a; }
-    .store-card-name { font-weight: bold; color: #3b82f6; font-size: 0.9rem; }
-    .store-card-address { font-size: 11px; color: #aaa; margin-top: 5px; }
-    .manual-store-btn {
-      margin-top: 15px;
-      text-align: center;
-    }
-    .manual-store-btn button {
-      background: #f59e0b;
-      color: #1a1a2e;
-      font-weight: bold;
-      width: 100%;
-      padding: 10px;
-      border-radius: 40px;
-      border: none;
-      cursor: pointer;
-    }
 
     .site-header {
       background: linear-gradient(135deg, #000000, #0a2a5a, #000000, #0a2a5a);
@@ -353,11 +153,15 @@
       font-weight: 600;
       font-size: 0.65rem;
       cursor: pointer;
+      transition: all 0.2s;
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
-    .download-mixtape-btn:hover { background: #059669; transform: translateY(-1px); }
+    .download-mixtape-btn:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
 
     .sticky-nav {
       position: fixed;
@@ -440,12 +244,27 @@
       text-decoration: none;
       border: none;
     }
-    .buy-btn { background: var(--blue); color: white; box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
-    .buy-btn:hover { background: #2563eb; transform: translateY(-1px); }
-    .listen-btn-mix { background: #ff0000; color: white; }
-    .listen-btn-mix:hover { background: #cc0000; transform: translateY(-1px); }
+    .buy-btn {
+      background: var(--blue);
+      color: white;
+      box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+    }
+    .buy-btn:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+    .listen-btn-mix {
+      background: #ff0000;
+      color: white;
+    }
+    .listen-btn-mix:hover {
+      background: #cc0000;
+      transform: translateY(-1px);
+    }
 
     .category-title { font-size: 0.65rem; font-weight: 700; margin: 16px 0 8px 0; border-left: 2px solid white; padding-left: 8px; color: white; }
+    .category-title i { margin-right: 4px; color: white; font-size: 0.6rem; }
+
     .products-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -480,9 +299,25 @@
       border-radius: 12px;
       box-shadow: 0 5px 12px rgba(0,0,0,0.25);
     }
+    .no-img { font-size: 0.9rem; color: #888; }
+
     .product-info { padding: 8px 6px 6px; }
-    .product-title { font-size: 0.55rem; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
-    .product-price { font-size: 0.65rem; font-weight: 800; color: var(--green); margin: 2px 0; }
+    .product-title {
+      font-size: 0.55rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: white;
+    }
+    .product-price { 
+      font-size: 0.65rem; 
+      font-weight: 800; 
+      color: var(--green); 
+      margin: 2px 0; 
+    }
+    
     .add-to-cart-btn {
       background: var(--blue);
       border: none;
@@ -497,34 +332,21 @@
       align-items: center;
       justify-content: center;
       gap: 3px;
+      white-space: nowrap;
       transition: all 0.2s;
     }
-    .add-to-cart-btn:hover { background: #2563eb; transform: scale(0.98); }
+    .add-to-cart-btn:hover {
+      background: #2563eb;
+      transform: scale(0.98);
+    }
+    .add-to-cart-btn i { font-size: 0.4rem; }
 
-    footer {
+    footer { text-align: center; padding: 12px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 15px; font-size: 0.45rem; color: rgba(255,255,255,0.6); }
+
+    .music-footer-btn {
       text-align: center;
-      padding: 20px 12px 12px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      margin-top: 15px;
-      font-size: 0.45rem;
-      color: rgba(255,255,255,0.6);
+      margin: 30px 0 20px;
     }
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-    .footer-links a {
-      color: rgba(255,255,255,0.7);
-      text-decoration: none;
-      font-size: 0.5rem;
-      cursor: pointer;
-    }
-    .footer-links a:hover { color: white; text-decoration: underline; }
-
-    .music-footer-btn { text-align: center; margin: 30px 0 20px; }
     .listen-btn {
       background: #ff0000;
       border: none;
@@ -534,13 +356,18 @@
       border-radius: 50px;
       color: white;
       cursor: pointer;
+      transition: all 0.3s;
       display: inline-flex;
       align-items: center;
       gap: 10px;
       text-decoration: none;
       box-shadow: 0 2px 10px rgba(255,0,0,0.3);
     }
-    .listen-btn:hover { transform: translateY(-2px); background: #cc0000; }
+    .listen-btn i { font-size: 0.85rem; }
+    .listen-btn:hover {
+      transform: translateY(-2px);
+      background: #cc0000;
+    }
 
     .cart-overlay {
       position: fixed; top: 0; right: -320px; width: 280px; max-width: 80vw; height: 100%;
@@ -562,6 +389,7 @@
       cursor: pointer;
       font-size: 0.5rem;
       color: white;
+      transition: all 0.2s;
     }
     .checkout-btn:hover { background: #2563eb; transform: scale(0.98); }
     .remove-item { background: var(--red); border: none; color: white; padding: 2px 5px; border-radius: 20px; font-size: 0.4rem; cursor: pointer; }
@@ -585,12 +413,22 @@
     .modal-color-btn { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
     .modal-color-btn.selected, .modal-color-btn:hover { border-color: var(--blue); transform: scale(1.05); }
     .modal-confirm {
-      background: var(--blue); color: white; padding: 5px 0; width: 100%; border-radius: 30px;
-      font-weight: 600; margin-top: 6px; cursor: pointer; font-size: 0.55rem; border: none;
+      background: var(--blue);
+      color: white;
+      padding: 5px 0;
+      width: 100%;
+      border-radius: 30px;
+      font-weight: 600;
+      margin-top: 6px;
+      cursor: pointer;
+      font-size: 0.55rem;
+      border: none;
+      transition: all 0.2s;
     }
+    .modal-confirm:hover { background: #2563eb; transform: scale(0.98); }
     .modal-close { background: none; border: none; color: #999; margin-top: 4px; cursor: pointer; font-size: 0.45rem; }
 
-    .auth-modal, .reset-modal, .delivery-modal, .notification-modal {
+    .auth-modal {
       display: none;
       position: fixed;
       top: 0;
@@ -602,8 +440,8 @@
       align-items: center;
       justify-content: center;
     }
-    .auth-modal.show, .reset-modal.show, .delivery-modal.show, .notification-modal.show { display: flex; }
-    .auth-modal-content, .reset-modal-content, .delivery-modal-content, .notification-content {
+    .auth-modal.show { display: flex; }
+    .auth-modal-content {
       background: linear-gradient(135deg, #1a1a2e, #0a0a1a);
       border-radius: 20px;
       width: 90%;
@@ -611,23 +449,26 @@
       padding: 25px 20px;
       text-align: center;
       border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
       position: relative;
     }
-    .delivery-modal-content { background: white; color: #1a1a2e; }
-    .notification-content { background: white; color: #1e2a3e; }
-    .close-auth, .close-reset, .close-delivery, .close-notification {
-      position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #999;
-    }
-    .close-delivery:hover, .close-notification:hover { color: #e11d2c; }
-    .auth-modal-content h2, .reset-modal-content h2 { color: white; font-size: 1.2rem; margin-bottom: 20px; }
+    .auth-modal-content h2 { color: white; font-size: 1.2rem; margin-bottom: 20px; }
     .input-group {
       position: relative;
       margin: 8px 0;
     }
-    .auth-modal-content input, .reset-modal-content input {
-      width: 100%; padding: 12px; padding-right: 40px; background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: white; font-size: 0.8rem;
+    .auth-modal-content input {
+      width: 100%;
+      padding: 12px;
+      padding-right: 40px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      color: white;
+      font-size: 0.8rem;
+      outline: none;
     }
+    .auth-modal-content input:focus { border-color: var(--blue); }
     .toggle-password {
       position: absolute;
       right: 12px;
@@ -638,139 +479,259 @@
       font-size: 1rem;
     }
     .toggle-password:hover { color: white; }
+    .auth-btn {
+      background: var(--blue);
+      border: none;
+      color: white;
+      padding: 12px;
+      width: 100%;
+      border-radius: 40px;
+      font-weight: 600;
+      margin-top: 15px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .auth-btn:hover { background: #2563eb; }
     .forgot-link { text-align: right; margin-top: 5px; font-size: 0.6rem; }
     .forgot-link span { color: var(--blue); cursor: pointer; text-decoration: underline; }
-    .auth-btn {
-      background: var(--blue); border: none; color: white; padding: 12px; width: 100%;
-      border-radius: 40px; font-weight: 600; margin-top: 15px; cursor: pointer;
+    .auth-toggle { margin-top: 15px; font-size: 0.7rem; color: #aaa; }
+    .auth-toggle span { color: var(--blue); cursor: pointer; text-decoration: underline; }
+    .close-auth {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 10;
+      line-height: 1;
+    }
+    .close-auth:hover { color: #ff8888; }
+
+    .reset-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 3001;
+      align-items: center;
+      justify-content: center;
+    }
+    .reset-modal.show { display: flex; }
+    .reset-modal-content {
+      background: linear-gradient(135deg, #1a1a2e, #0a0a1a);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 350px;
+      padding: 25px 20px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.2);
+      position: relative;
+    }
+    .reset-modal-content h2 { color: white; font-size: 1.2rem; margin-bottom: 20px; }
+    .reset-modal-content input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      color: white;
+      font-size: 0.8rem;
+    }
+    .close-reset {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .close-reset:hover { color: #ff8888; }
+
+    /* DELIVERY MODAL - WHITE BACKGROUND */
+    .delivery-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 10001;
+      align-items: center;
+      justify-content: center;
+    }
+    .delivery-modal.show {
+      display: flex;
+    }
+    .delivery-modal-content {
+      background: white;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 400px;
+      padding: 24px 20px;
+      text-align: center;
+      color: #1a1a2e;
+    }
+    .delivery-modal-content h3 {
+      color: #1a1a2e;
+      font-size: 1.3rem;
+      margin-bottom: 15px;
     }
     .delivery-option {
-      background: #f0f0f0; border-radius: 16px; padding: 16px; margin: 12px 0; cursor: pointer;
+      background: #f0f0f0;
+      border-radius: 16px;
+      padding: 16px;
+      margin: 12px 0;
+      cursor: pointer;
+      transition: all 0.2s;
       border: 2px solid transparent;
     }
-    .delivery-option.selected { border-color: #3b82f6; background: #e8f0fe; }
-    .delivery-name { font-weight: 700; font-size: 1.1rem; }
-    .delivery-price { color: #10b981; font-weight: 800; font-size: 1.2rem; }
-    .delivery-confirm {
-      background: #3b82f6; color: white; border: none; padding: 14px; width: 100%;
-      border-radius: 40px; font-weight: 700; font-size: 1rem; margin-top: 20px; cursor: pointer;
+    .delivery-option:hover {
+      background: #e0e0e0;
+      transform: translateY(-2px);
     }
+    .delivery-option.selected {
+      border-color: #3b82f6;
+      background: #e8f0fe;
+    }
+    .delivery-name {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+    .delivery-price {
+      color: #10b981;
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+    .delivery-time {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 5px;
+    }
+    .delivery-confirm {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 14px;
+      width: 100%;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    .delivery-confirm:hover {
+      background: #2563eb;
+    }
+
+    /* PAXI Modal */
+    #storeFinderModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 10000;
+      overflow-y: auto;
+    }
+    #storeFinderModal .modal-container {
+      max-width: 1000px;
+      margin: 20px auto;
+      background: #1a1a2e;
+      border-radius: 24px;
+      padding: 20px;
+    }
+    #storeFinderModal h2 {
+      color: white;
+      font-size: 1.3rem;
+    }
+    #storeFinderModal input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 40px;
+      background: #0a0a1a;
+      color: white;
+      border: 1px solid #2a2a4a;
+      margin: 10px 0;
+    }
+    #storeFinderModal button {
+      background: #3b82f6;
+      border: none;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 40px;
+      cursor: pointer;
+    }
+    #paxiMap {
+      height: 400px;
+      border-radius: 16px;
+      margin: 15px 0;
+      background: #0a0a2a;
+      width: 100%;
+    }
+    .store-list {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+    .store-item {
+      background: #0a0a1a;
+      margin-bottom: 10px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #2a2a4a;
+      cursor: pointer;
+    }
+    .store-item:hover { background: #1a1a3a; }
+    .store-name { font-weight: bold; color: #3b82f6; }
+    .store-address { font-size: 12px; color: #aaa; margin-top: 4px; }
+    .store-code { font-size: 11px; color: #10b981; margin-top: 4px; }
   </style>
 </head>
 <body>
 
-<!-- White Alert Modal (replaces browser alert) -->
-<div id="whiteAlertModal" class="white-alert-modal">
-  <div class="white-alert-content">
-    <button class="close-white-alert" id="closeWhiteAlertBtn">&times;</button>
-    <i class="fas fa-exclamation-triangle"></i>
-    <h4>Mixtape already in cart</h4>
-    <p>You can only add one mixtape to your cart.</p>
-    <button class="white-alert-close" id="whiteAlertConfirmBtn">OK</button>
-  </div>
-</div>
-
-<!-- Legal Modals (White Popups) -->
-<div id="termsModal" class="legal-modal">
-  <div class="legal-modal-content">
-    <button class="close-legal" onclick="closeLegalModal('termsModal')">&times;</button>
-    <h2>Terms of Service</h2>
-    <p><strong>Effective Date: 01 May 2026</strong></p>
-    <p>Welcome to MrYoungFargo (mryoungfargo.com). By accessing or using our website and purchasing products, you agree to be bound by these Terms of Service.</p>
-    <h3>1. General</h3>
-    <p>These terms apply to all users, visitors, and customers. We reserve the right to update these terms at any time.</p>
-    <h3>2. Products and Pricing</h3>
-    <p>Prices are in ZAR and include VAT. We reserve the right to change prices.</p>
-    <h3>3. Orders</h3>
-    <p>We may refuse or cancel any order for reasons including product unavailability or pricing errors.</p>
-    <h3>4. Shipping</h3>
-    <p>Shipping via Pep Paxi. Risk passes to you upon collection.</p>
-    <h3>5. Returns</h3>
-    <p>30-day returns on unused clothing with tags. Contact mryoungfargo@gmail.com</p>
-    <h3>6. Payment</h3>
-    <p>Payments via card, EFT, or Google Pay. Full payment required before processing.</p>
-    <h3>7. Governing Law</h3>
-    <p>South African law applies.</p>
-    <h3>8. Contact</h3>
-    <p>mryoungfargo@gmail.com</p>
-  </div>
-</div>
-
-<div id="shippingModal" class="legal-modal">
-  <div class="legal-modal-content">
-    <button class="close-legal" onclick="closeLegalModal('shippingModal')">&times;</button>
-    <h2>Shipping Policy</h2>
-    <p><strong>Carrier:</strong> Pep Paxi exclusively.</p>
-    <p><strong>Processing:</strong> Up to 7 business days.</p>
-    <p><strong>Delivery:</strong> 3-9 working days after dispatch.</p>
-    <p><strong>Tracking:</strong> Sent via SMS/email. Collect from nearest Pep Store.</p>
-  </div>
-</div>
-
-<div id="privacyModal" class="legal-modal">
-  <div class="legal-modal-content">
-    <button class="close-legal" onclick="closeLegalModal('privacyModal')">&times;</button>
-    <h2>Privacy Policy</h2>
-    <p><strong>Effective: 01 May 2026</strong></p>
-    <p>We collect name, email, address, phone, order history. Used only for order fulfillment and communication.</p>
-    <p>We do not sell your data. Shared only with Pep Paxi and payment processors.</p>
-    <p>Under POPIA, you may access or delete your data by emailing mryoungfargo@gmail.com</p>
-  </div>
-</div>
-
-<div id="storeFinderPage" class="store-finder-page">
-  <div class="store-finder-container">
-    <div class="store-finder-header">
-      <h2>📍 Select Collection Point</h2>
-      <button class="close-finder-btn" id="closeFinderPageBtn">✕ Close</button>
-    </div>
-    <div class="search-area">
-      <input type="text" id="finderSearchLocation" placeholder="🔍 Enter town, suburb or city">
-      <button id="finderSearchBtn">Search</button>
-    </div>
-    <div id="finderMap"></div>
-    <div id="finderStoreList" class="store-list-area"></div>
-    <div class="manual-store-btn">
-      <button id="finderManualStoreBtn">📝 Can't find a store? Add manually</button>
-    </div>
-  </div>
-</div>
-
+<!-- DELIVERY MODAL (WHITE) -->
 <div id="deliveryModal" class="delivery-modal">
   <div class="delivery-modal-content">
-    <button class="close-delivery" id="closeDeliveryXBtn">&times;</button>
     <h3>🚚 Select Delivery Option</h3>
+    <p style="font-size: 0.8rem; margin-bottom: 15px;">We use PAXI's courier service</p>
     <div id="economyOption" class="delivery-option">
       <div class="delivery-name">Economy Delivery</div>
       <div class="delivery-price">R59.95</div>
-      <div class="delivery-time">7–9 Business Days + 3-5 days printing</div>
+      <div class="delivery-time">7–9 Business Days + 3-5 days printing (10-14 business days total)</div>
     </div>
     <div id="speedOption" class="delivery-option">
       <div class="delivery-name">Speed Delivery</div>
       <div class="delivery-price">R109.95</div>
-      <div class="delivery-time">3–5 Business Days + 3-5 days printing</div>
+      <div class="delivery-time">3–5 Business Days + 3-5 days printing (6-10 business days total)</div>
     </div>
     <button class="delivery-confirm" id="confirmDeliveryBtn">Confirm Selection</button>
   </div>
 </div>
 
-<div id="freeCollectionNotif" class="notification-modal">
-  <div class="notification-content">
-    <button class="close-notification" id="closeFreeCollectionXBtn">&times;</button>
-    <i class="fas fa-check-circle"></i>
-    <h4>✅ FREE COLLECTION AT CLICKS STONE TOWERS, KING WILLIAM'S TOWN!</h4>
-    <button class="delivery-confirm" id="closeFreeCollectionBtn" style="margin-top:10px;">Continue to Payment</button>
-  </div>
-</div>
-
+<!-- AUTH MODAL -->
 <div id="authModal" class="auth-modal">
   <div class="auth-modal-content">
     <button class="close-auth" id="closeAuthBtn">&times;</button>
     <h2 id="authTitle">LOGIN</h2>
-    <input type="text" id="authEmail" placeholder="Email">
+    <input type="text" id="authEmail" placeholder="Email" autocomplete="email">
     <div class="input-group">
-      <input type="password" id="authPassword" placeholder="Password">
-      <span class="toggle-password" id="togglePasswordBtn"><i class="fas fa-eye-slash" id="passwordIcon"></i></span>
+      <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password">
+      <span class="toggle-password" id="togglePasswordBtn">
+        <i class="fas fa-eye-slash" id="passwordIcon"></i>
+      </span>
     </div>
     <button class="auth-btn" id="authSubmitBtn">LOGIN</button>
     <div class="forgot-link"><span id="forgotPasswordBtn">Forgot password?</span></div>
@@ -778,6 +739,7 @@
   </div>
 </div>
 
+<!-- RESET PASSWORD MODAL -->
 <div id="resetModal" class="reset-modal">
   <div class="reset-modal-content">
     <button class="close-reset" id="closeResetBtn">&times;</button>
@@ -788,6 +750,7 @@
   </div>
 </div>
 
+<!-- PRODUCT MODAL -->
 <div id="sizeColorModal" class="modal">
   <div class="modal-content">
     <h3 id="modalProductName">Product</h3>
@@ -801,15 +764,20 @@
   </div>
 </div>
 
+<!-- STICKY NAV -->
 <div class="sticky-nav" id="stickyNav">
   <div class="sticky-nav-links">
     <a href="#" class="sticky-tshirts">T-SHIRTS</a>
     <a href="#" class="sticky-sweaters">SWEATERS</a>
     <a href="#" class="sticky-hoodies">HOODIES</a>
   </div>
-  <div class="sticky-cart" id="stickyCartIcon"><i class="fas fa-bag-shopping"></i><span class="cart-count-sticky" id="stickyCartCount">0</span></div>
+  <div class="sticky-cart" id="stickyCartIcon">
+    <i class="fas fa-bag-shopping"></i>
+    <span class="cart-count-sticky" id="stickyCartCount">0</span>
+  </div>
 </div>
 
+<!-- MAIN HEADER -->
 <div class="site-header">
   <div class="container header-inner">
     <div class="logo"><img src="fargo1.png" alt="MrYoungFargo" onerror="this.src='https://placehold.co/200x55?text=MrYoungFargo'"></div>
@@ -818,7 +786,9 @@
       <a href="#" class="nav-sweaters">SWEATERS</a>
       <a href="#" class="nav-hoodies">HOODIES</a>
       <div class="cart-icon" id="cartIcon"><i class="fas fa-bag-shopping"></i><span class="cart-count" id="cartCount">0</span></div>
-      <div id="userSection"><div class="auth-icon-btn" id="globalAuthIconBtn"><i class="fas fa-user"></i></div></div>
+      <div id="userSection">
+        <div class="auth-icon-btn" id="globalAuthIconBtn"><i class="fas fa-user"></i></div>
+      </div>
     </div>
   </div>
 </div>
@@ -834,6 +804,7 @@
       <button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button>
       <a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
     </div>
+    <div id="mixtapeDownloadArea"></div>
   </div>
 </div>
 
@@ -843,18 +814,14 @@
   <div id="hoodies-section"><div class="category-title"><i class="fas fa-hoodie"></i> HOODIES</div><div class="products-grid" id="hoodiesGrid"></div></div>
 </div>
 
+<!-- MUSIC BUTTON AT BOTTOM -->
 <div class="music-footer-btn">
-  <a href="https://m.youtube.com/@MrYoungFargo_SA" target="_blank" class="listen-btn"><i class="fab fa-youtube"></i> LISTEN TO MY MUSIC</a>
+  <a href="https://m.youtube.com/@MrYoungFargo_SA" target="_blank" class="listen-btn">
+    <i class="fab fa-youtube"></i> LISTEN TO MY MUSIC
+  </a>
 </div>
 
-<footer>
-  <div class="footer-links">
-    <a onclick="showLegalModal('termsModal')">Terms of Service</a>
-    <a onclick="showLegalModal('shippingModal')">Shipping Policy</a>
-    <a onclick="showLegalModal('privacyModal')">Privacy Policy</a>
-  </div>
-  <p>© 2026 MrYoungFargo — All Rights Reserved</p>
-</footer>
+<footer><p>© 2025 MrYoungFargo — All Rights Reserved</p></footer>
 
 <div id="cartSidebar" class="cart-overlay">
   <button class="close-cart" id="closeCartBtn">&times;</button>
@@ -864,360 +831,793 @@
   <button class="checkout-btn" id="checkoutBtn">CHECKOUT →</button>
 </div>
 
+<!-- PAXI Hidden Fields -->
 <input type="hidden" id="paxi_store_name">
 <input type="hidden" id="paxi_store_address">
 <input type="hidden" id="paxi_store_code">
 <input type="hidden" id="delivery_amount" value="0">
 <input type="hidden" id="delivery_type" value="">
 
+<!-- PAXI SELECTOR BUTTON -->
+<button type="button" id="openStoreFinderBtn" style="background: #10b981; color: white; padding: 10px; border-radius: 30px; width: 90%; margin: 0 auto 20px; display: block; max-width: 400px; border: none; cursor: pointer;">
+  📍 Select PAXI Pickup Point
+</button>
+
+<!-- PAXI MODAL -->
+<div id="storeFinderModal">
+  <div class="modal-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <h2>📍 Select Collection Point</h2>
+      <button id="closeStoreFinderBtn" style="background: red;">✕ Close</button>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <input type="text" id="searchLocation" placeholder="🔍 Enter town, suburb or city" style="flex: 1;">
+      <button id="searchBtn">Search</button>
+    </div>
+    <div id="paxiMap" style="height: 400px; border-radius: 16px; margin: 15px 0; background: #0a0a2a;"></div>
+    <div id="storeList" class="store-list"></div>
+  </div>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
+  // ==============================================================
+  // BACKEND API URL
+  // ==============================================================
   const API_URL = 'https://mryoungfargo-payment.onrender.com';
+  
+  // ==============================================================
+  // PRICES UPDATED
+  // ==============================================================
+  // T-shirts: R150, Sweaters: R280, Hoodies: R300
+  
+  // ==============================================================
+  // USER AUTHENTICATION
+  // ==============================================================
+  
   let currentUser = null;
   let sessionToken = localStorage.getItem('session_token') || null;
   let cart = [];
-  let deliveryAmount = 0, selectedPaxiStore = null, isKingWilliamsTown = false, selectedDelivery = null;
-  let finderMap = null, finderMarkers = [], currentStores = [];
-
-  function showWhiteAlert(message, title = "Notice") {
-    const modal = document.getElementById('whiteAlertModal');
-    const titleEl = modal.querySelector('h4');
-    const msgEl = modal.querySelector('p');
-    titleEl.innerText = title;
-    msgEl.innerText = message;
-    modal.classList.add('show');
+  let deliveryAmount = 0;
+  let selectedPaxiStore = null;
+  let isKingWilliamsTown = false;
+  
+  function normalizeEmail(email) {
+    return email ? email.toLowerCase().trim() : '';
   }
-  function closeWhiteAlert() { document.getElementById('whiteAlertModal').classList.remove('show'); }
-  document.getElementById('closeWhiteAlertBtn')?.addEventListener('click', closeWhiteAlert);
-  document.getElementById('whiteAlertConfirmBtn')?.addEventListener('click', closeWhiteAlert);
-
-  function showLegalModal(id) { document.getElementById(id).classList.add('show'); }
-  function closeLegalModal(id) { document.getElementById(id).classList.remove('show'); }
-  window.showLegalModal = showLegalModal;
-  window.closeLegalModal = closeLegalModal;
-
-  function normalizeEmail(e) { return e ? e.toLowerCase().trim() : ''; }
+  
+  window.showAuthModal = function() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.classList.add('show');
+    document.getElementById('authTitle').innerText = 'LOGIN';
+    document.getElementById('authSubmitBtn').innerText = 'LOGIN';
+    document.getElementById('authToggleText').innerText = 'Create an account';
+    window.isLoginMode = true;
+    document.getElementById('authEmail').value = '';
+    document.getElementById('authPassword').value = '';
+    const pwdInput = document.getElementById('authPassword');
+    if (pwdInput) pwdInput.setAttribute('type', 'password');
+    const pwdIcon = document.getElementById('passwordIcon');
+    if (pwdIcon) {
+      pwdIcon.classList.remove('fa-eye');
+      pwdIcon.classList.add('fa-eye-slash');
+    }
+  };
+  
+  window.closeAuthModal = function() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.classList.remove('show');
+  };
+  
+  const globalAuthBtn = document.getElementById('globalAuthIconBtn');
+  if (globalAuthBtn) {
+    globalAuthBtn.addEventListener('click', function() {
+      window.showAuthModal();
+    });
+  }
   
   async function apiCall(endpoint, data) {
-    try { const res = await fetch(`${API_URL}${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); return await res.json(); }
-    catch(e) { return { success: false, error: 'Connection error' }; }
+    try {
+      const response = await fetch(`${API_URL}${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Connection error' };
+    }
   }
-
-  async function verifySession() {
+  
+  async function refreshUserData() {
     if (sessionToken) {
       const result = await apiCall('/api/verify', { sessionToken });
       if (result.success && result.user) {
         currentUser = result.user;
-        cart = result.user.cart || [];
-        const mixtapeIdx = cart.findIndex(i => i.id === 99);
-        if (mixtapeIdx !== -1 && cart[mixtapeIdx].qty > 1) cart[mixtapeIdx].qty = 1;
-        updateCartUI(); updateUserUI(); updateMixtapeButtons();
-      } else { localStorage.removeItem('session_token'); sessionToken = null; currentUser = null; cart = []; updateCartUI(); updateUserUI(); updateMixtapeButtons(); }
+        updateMixtapeButtons();
+        updateUserUI();
+      }
     }
-    renderProducts();
   }
-
-  async function login(email, password) {
-    const result = await apiCall('/api/login', { email: normalizeEmail(email), password });
+  
+  async function verifySession() {
+    if (!sessionToken) return;
+    const result = await apiCall('/api/verify', { sessionToken });
+    if (result.success && result.user) {
+      currentUser = result.user;
+      if (result.user.cart && result.user.cart.length > 0 && cart.length === 0) {
+        cart = result.user.cart;
+        updateCartUI();
+      }
+      updateUserUI();
+      updateMixtapeButtons();
+    } else {
+      localStorage.removeItem('session_token');
+      sessionToken = null;
+      currentUser = null;
+      updateUserUI();
+      updateMixtapeButtons();
+    }
+  }
+  
+  async function register(email, password) {
+    const normalizedEmail = normalizeEmail(email);
+    const result = await apiCall('/api/register', { email: normalizedEmail, password });
     if (result.success) {
-      currentUser = result.user; sessionToken = result.sessionToken;
-      localStorage.setItem('session_token', sessionToken);
-      cart = result.user.cart || [];
-      const mixtapeIdx = cart.findIndex(i => i.id === 99);
-      if (mixtapeIdx !== -1 && cart[mixtapeIdx].qty > 1) cart[mixtapeIdx].qty = 1;
-      updateCartUI(); updateUserUI(); updateMixtapeButtons();
-      closeAuthModal();
-      return true;
-    } else { showWhiteAlert(result.error || 'Login failed', 'Login Error'); return false; }
+      return await login(normalizedEmail, password);
+    } else {
+      alert(result.error || 'Registration failed');
+      return false;
+    }
   }
-
+  
+  async function login(email, password) {
+    const normalizedEmail = normalizeEmail(email);
+    const result = await apiCall('/api/login', { email: normalizedEmail, password });
+    if (result.success) {
+      currentUser = result.user;
+      sessionToken = result.sessionToken;
+      localStorage.setItem('session_token', sessionToken);
+      
+      if (cart.length > 0 && result.user.cart) {
+        for (let localItem of cart) {
+          const existing = result.user.cart.find(i => i.id === localItem.id && i.size === localItem.size && i.color === localItem.color);
+          if (existing) existing.qty += localItem.qty;
+          else result.user.cart.push(localItem);
+        }
+        cart = result.user.cart;
+        await saveCartToServer();
+      } else if (result.user.cart && result.user.cart.length > 0) {
+        cart = result.user.cart;
+      }
+      updateCartUI();
+      updateUserUI();
+      updateMixtapeButtons();
+      window.closeAuthModal();
+      return true;
+    } else {
+      alert(result.error || 'Login failed');
+      return false;
+    }
+  }
+  
   async function logout() {
     if (sessionToken) await apiCall('/api/logout', { sessionToken });
-    currentUser = null; sessionToken = null;
+    currentUser = null;
+    sessionToken = null;
     localStorage.removeItem('session_token');
-    cart = []; updateCartUI(); updateUserUI(); updateMixtapeButtons();
-  }
-
-  async function saveCartToServer() { if (sessionToken && cart) await apiCall('/api/update-cart', { sessionToken, cart }); }
-
-  function updateMixtapeButtons() {
-    const container = document.getElementById('mixtapeButtons');
-    if (!container) return;
-    const hasPurchased = currentUser && currentUser.hasPurchasedMixtape === true;
-    if (hasPurchased) {
-      container.innerHTML = `<button class="download-mixtape-btn" id="downloadMixtapeBtn"><i class="fas fa-download"></i> DOWNLOAD MIXTAPE (ZIP)</button><a href="#" id="mixtapeListenBtn2" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>`;
-      document.getElementById('downloadMixtapeBtn')?.addEventListener('click', () => { window.location.href = 'DUETS_MIXTAPE.zip'; });
-    } else {
-      container.innerHTML = `<button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button><a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>`;
-      document.getElementById('addToCartMixtapeBtn')?.addEventListener('click', () => {
-        if (cart.some(i => i.id === 99)) { showWhiteAlert("You can only add one mixtape to your cart.", "Mixtape already in cart"); return; }
-        cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
-        saveCartToLocal();
-        document.getElementById("cartSidebar").classList.add("open");
-      });
-    }
-  }
-
-  function updateUserUI() {
-    const section = document.getElementById('userSection');
-    if (!section) return;
-    if (currentUser) {
-      const initials = currentUser.email.split('@')[0].substring(0,2).toUpperCase();
-      section.innerHTML = `<div class="user-section" id="userIconBtn"><span class="user-initials">${initials}</span></div><div class="user-dropdown" id="userDropdown"><div class="logout-item" id="logoutBtn">Logout</div></div>`;
-      document.getElementById('userIconBtn')?.addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown')?.classList.toggle('show'); });
-      document.getElementById('logoutBtn')?.addEventListener('click', () => logout());
-    } else {
-      section.innerHTML = `<div class="auth-icon-btn" id="dynamicAuthIconBtn"><i class="fas fa-user"></i></div>`;
-      document.getElementById('dynamicAuthIconBtn')?.addEventListener('click', () => showAuthModal());
-    }
-  }
-
-  function saveCartToLocal() {
-    const mixtapeIdx = cart.findIndex(i => i.id === 99);
-    if (mixtapeIdx !== -1 && cart[mixtapeIdx].qty > 1) cart[mixtapeIdx].qty = 1;
+    cart = [];
     updateCartUI();
-    if (sessionToken) saveCartToServer();
+    updateUserUI();
+    updateMixtapeButtons();
   }
-
+  
+  async function saveCartToServer() {
+    if (sessionToken && cart) await apiCall('/api/update-cart', { sessionToken, cart });
+  }
+  
+  function updateMixtapeButtons() {
+    const buttonsContainer = document.getElementById('mixtapeButtons');
+    if (!buttonsContainer) return;
+    
+    buttonsContainer.innerHTML = '';
+    
+    if (currentUser && currentUser.hasPurchasedMixtape === true) {
+      buttonsContainer.innerHTML = `
+        <button class="download-mixtape-btn" id="downloadMixtapeBtn"><i class="fas fa-download"></i> DOWNLOAD MIXTAPE (ZIP)</button>
+        <a href="#" id="mixtapeListenBtn2" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
+      `;
+      const downloadBtn = document.getElementById('downloadMixtapeBtn');
+      if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => window.location.href = 'duets.zip');
+      }
+      const listenBtn = document.getElementById('mixtapeListenBtn2');
+      if (listenBtn) {
+        listenBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          alert("You can listen to previews on YouTube via the bottom button.");
+        });
+      }
+    } else {
+      buttonsContainer.innerHTML = `
+        <button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button>
+        <a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>
+      `;
+      const addBtn = document.getElementById('addToCartMixtapeBtn');
+      if (addBtn) {
+        addBtn.addEventListener('click', () => {
+          const existing = cart.find(i => i.id === 99);
+          if (existing) existing.qty++;
+          else cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
+          saveCartToLocal();
+          document.getElementById("cartSidebar").classList.add("open");
+        });
+      }
+      const listenBtn = document.getElementById('mixtapeListenBtn');
+      if (listenBtn) {
+        listenBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          alert("Add the mixtape to cart (R50) to purchase and download the full ZIP file.\n\nYou can listen to previews on YouTube via the bottom button.");
+        });
+      }
+    }
+  }
+  
+  const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+  const passwordInput = document.getElementById('authPassword');
+  const passwordIcon = document.getElementById('passwordIcon');
+  
+  if (togglePasswordBtn) {
+    togglePasswordBtn.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      passwordIcon.classList.toggle('fa-eye');
+      passwordIcon.classList.toggle('fa-eye-slash');
+    });
+  }
+  
+  function getInitials(email) {
+    if (!email) return '';
+    const name = email.split('@')[0];
+    return name.substring(0, 2).toUpperCase();
+  }
+  
+  let dropdownElement = null;
+  
+  function updateUserUI() {
+    const userSection = document.getElementById('userSection');
+    if (!userSection) return;
+    
+    if (currentUser && currentUser.email) {
+      const initials = getInitials(currentUser.email);
+      userSection.innerHTML = `
+        <div class="user-section" id="userIconBtn">
+          <span class="user-initials">${initials}</span>
+        </div>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="logout-item" id="logoutBtn">Logout</div>
+        </div>
+      `;
+      const iconBtn = document.getElementById('userIconBtn');
+      dropdownElement = document.getElementById('userDropdown');
+      if (iconBtn) {
+        iconBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (dropdownElement) dropdownElement.classList.toggle('show');
+        });
+      }
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          logout();
+        });
+      }
+    } else {
+      userSection.innerHTML = `<div class="auth-icon-btn" id="dynamicAuthIconBtn"><i class="fas fa-user"></i></div>`;
+      const dynamicBtn = document.getElementById('dynamicAuthIconBtn');
+      if (dynamicBtn) {
+        dynamicBtn.addEventListener('click', function() {
+          window.showAuthModal();
+        });
+      }
+    }
+  }
+  
+  document.addEventListener('click', function() { if (dropdownElement) dropdownElement.classList.remove('show'); });
+  
+  window.isLoginMode = true;
+  
+  async function handleAuth() {
+    let email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value.trim();
+    if (!email || !password) { alert('Please enter email and password'); return; }
+    email = normalizeEmail(email);
+    if (window.isLoginMode) await login(email, password);
+    else await register(email, password);
+  }
+  
+  function toggleAuthMode() {
+    window.isLoginMode = !window.isLoginMode;
+    if (window.isLoginMode) {
+      document.getElementById('authTitle').innerText = 'LOGIN';
+      document.getElementById('authSubmitBtn').innerText = 'LOGIN';
+      document.getElementById('authToggleText').innerText = 'Create an account';
+    } else {
+      document.getElementById('authTitle').innerText = 'SIGN UP';
+      document.getElementById('authSubmitBtn').innerText = 'SIGN UP';
+      document.getElementById('authToggleText').innerText = 'Back to login';
+    }
+  }
+  
+  const resetModal = document.getElementById('resetModal');
+  function showResetModal() { resetModal.classList.add('show'); document.getElementById('resetEmail').value = ''; document.getElementById('resetMessage').innerHTML = ''; }
+  function closeResetModal() { resetModal.classList.remove('show'); }
+  
+  async function sendResetLink() {
+    let email = document.getElementById('resetEmail').value.trim();
+    const messageDiv = document.getElementById('resetMessage');
+    if (!email) { messageDiv.innerHTML = '<span style="color:#ff8888;">Please enter your email</span>'; return; }
+    email = normalizeEmail(email);
+    messageDiv.innerHTML = '<span style="color:#aaa;">Sending...</span>';
+    const result = await apiCall('/forgot-password', { email });
+    if (result.success) { messageDiv.innerHTML = '<span style="color:#10b981;">✓ Reset link sent! Check your email.</span>'; setTimeout(() => closeResetModal(), 3000); }
+    else { messageDiv.innerHTML = '<span style="color:#ff8888;">Error: ' + (result.error || 'Could not send email') + '</span>'; }
+  }
+  
+  // ==============================================================
+  // STORE DATA & FUNCTIONS (UPDATED PRICES)
+  // ==============================================================
+  
+  const colors = [
+    { name: "Red", value: "Red", bg: "#e11d2c" },
+    { name: "Black", value: "Black", bg: "#1a1a1a" },
+    { name: "Green", value: "Green", bg: "#10b981" },
+    { name: "Blue", value: "Blue", bg: "#3b82f6" }
+  ];
+  
+  // UPDATED PRICES: T-shirts R150, Sweaters R280, Hoodies R300
+  const tshirts = [
+    { id: 1, name: "Neon Duets T-Shirt", price: 150, image: "t-shirt1.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 2, name: "Duets Lover T-Shirt", price: 150, image: "t-shirt2.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 3, name: "Duets Glitch T-Shirt", price: 150, image: "t-shirt3.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 4, name: "Sabaring T-Shirt", price: 150, image: "t-shirt4.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 5, name: "Monalisa Sabaring T-Shirt", price: 150, image: "t-shirt5.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 12, name: "Faka T-Shirt", price: 150, image: "t-shirt6.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 13, name: "Chinese Faka T-Shirt", price: 150, image: "t-shirt7.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 16, name: "Real Nigga T-Shirt", price: 150, image: "t-shirt8.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 17, name: "Lil' Nigga T-Shirt", price: 150, image: "t-shirt9.png", sizes: ["XS","S","M","L","XL","XXL"] }
+  ];
+  
+  const sweaters = [
+    { id: 6, name: "Sabaring Sweater", price: 280, image: "sweater1.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 7, name: "Neon Duets Sweater", price: 280, image: "sweater2.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 8, name: "Duets Lover Sweater", price: 280, image: "sweater3.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 9, name: "Duets Glitch Sweater", price: 280, image: "sweater4.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 14, name: "Faka Sweater", price: 280, image: "sweater5.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 18, name: "Real Nigga Sweater", price: 280, image: "sweater6.png", sizes: ["XS","S","M","L","XL","XXL"] }
+  ];
+  
+  const hoodies = [
+    { id: 10, name: "Duets Lover Hoodie", price: 300, image: "hoodie1.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 11, name: "Duets Glitch Hoodie", price: 300, image: "hoodie2.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 15, name: "Faka Hoodie", price: 300, image: "hoodie3.png", sizes: ["XS","S","M","L","XL","XXL"] },
+    { id: 19, name: "Real Nigga Hoodie", price: 300, image: "hoodie4.png", sizes: ["XS","S","M","L","XL","XXL"] }
+  ];
+  
+  const allProducts = [...tshirts, ...sweaters, ...hoodies];
+  let currentProduct = null, selectedSize = null, selectedColor = null;
+  
+  function saveCartToLocal() { updateCartUI(); if (sessionToken) saveCartToServer(); }
+  
   function updateCartUI() {
-    const count = cart.reduce((s,i)=>s+i.qty,0);
+    const count = cart.reduce((s,i) => s + i.qty, 0);
     document.getElementById("cartCount").innerText = count;
     document.getElementById("stickyCartCount").innerText = count;
     const container = document.getElementById("cartItemsList");
-    let total = 0, html = "";
-    if (!cart.length) { container.innerHTML = "<p>Cart empty</p>"; document.getElementById("cartTotalPrice").innerText = "R0.00"; return; }
+    let total = 0;
+    if (cart.length === 0) { container.innerHTML = "<p style='text-align:center;color:gray;'>Cart empty</p>"; document.getElementById("cartTotalPrice").innerText = "R0.00"; return; }
+    let html = "";
     cart.forEach(item => {
-      total += item.price * item.qty;
-      html += `<div style="border-bottom:1px solid #333; padding:5px 0; display:flex; justify-content:space-between;"><div><strong>${item.name}</strong><br>${item.size || 'N/A'} / ${item.color || 'N/A'}<br>R${item.price} x ${item.qty}</div><button class="remove-item" data-id="${item.id}" data-size="${item.size}" data-color="${item.color}">Remove</button></div>`;
+      const itemTotal = item.price * item.qty;
+      total += itemTotal;
+      html += `<div style="border-bottom:1px solid #333; padding:5px 0; display:flex; justify-content:space-between;"><div><strong>${item.name}</strong><br>${item.size || 'N/A'} / ${item.color || 'N/A'}<br>R${item.price.toFixed(2)} x ${item.qty}</div><button class="remove-item" data-id="${item.id}" data-size="${item.size}" data-color="${item.color}">Remove</button></div>`;
     });
     container.innerHTML = html;
     document.getElementById("cartTotalPrice").innerText = `R${total.toFixed(2)}`;
-    document.querySelectorAll(".remove-item").forEach(btn => btn.addEventListener("click", () => {
-      const id = parseInt(btn.dataset.id), size = btn.dataset.size, color = btn.dataset.color;
-      cart = cart.filter(i => !(i.id === id && i.size === size && i.color === color));
-      saveCartToLocal();
-    }));
+    document.querySelectorAll(".remove-item").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = parseInt(btn.dataset.id), size = btn.dataset.size, color = btn.dataset.color;
+        cart = cart.filter(i => !(i.id === id && i.size === size && i.color === color));
+        saveCartToLocal();
+      });
+    });
   }
-
-  const colors = [{ name:"Red", value:"Red", bg:"#e11d2c"},{ name:"Black", value:"Black", bg:"#1a1a1a"},{ name:"Green", value:"Green", bg:"#10b981"},{ name:"Blue", value:"Blue", bg:"#3b82f6"}];
-  const tshirts = [{ id:1, name:"Neon Duets T-Shirt", price:150, image:"t-shirt1.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:2, name:"Duets Lover T-Shirt", price:150, image:"t-shirt2.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:3, name:"Duets Glitch T-Shirt", price:150, image:"t-shirt3.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:4, name:"Sabaring T-Shirt", price:150, image:"t-shirt4.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:5, name:"Monalisa Sabaring T-Shirt", price:150, image:"t-shirt5.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:12, name:"Faka T-Shirt", price:150, image:"t-shirt6.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:13, name:"Chinese Faka T-Shirt", price:150, image:"t-shirt7.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:16, name:"Real Nigga T-Shirt", price:150, image:"t-shirt8.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:17, name:"Lil' Nigga T-Shirt", price:150, image:"t-shirt9.png", sizes:["XS","S","M","L","XL","XXL"]}];
-  const sweaters = [{ id:6, name:"Sabaring Sweater", price:280, image:"sweater1.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:7, name:"Neon Duets Sweater", price:280, image:"sweater2.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:8, name:"Duets Lover Sweater", price:280, image:"sweater3.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:9, name:"Duets Glitch Sweater", price:280, image:"sweater4.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:14, name:"Faka Sweater", price:280, image:"sweater5.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:18, name:"Real Nigga Sweater", price:280, image:"sweater6.png", sizes:["XS","S","M","L","XL","XXL"]}];
-  const hoodies = [{ id:10, name:"Duets Lover Hoodie", price:300, image:"hoodie1.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:11, name:"Duets Glitch Hoodie", price:300, image:"hoodie2.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:15, name:"Faka Hoodie", price:300, image:"hoodie3.png", sizes:["XS","S","M","L","XL","XXL"]},{ id:19, name:"Real Nigga Hoodie", price:300, image:"hoodie4.png", sizes:["XS","S","M","L","XL","XXL"]}];
-  const allProducts = [...tshirts,...sweaters,...hoodies];
-  let currentProduct=null, selectedSize=null, selectedColor=null;
-
-  function addToCart(product,size,color) {
-    if(!size){ showWhiteAlert("Please select a size.", "Size Required"); return false; }
-    if(!color && product.id!==99){ showWhiteAlert("Please select a color.", "Color Required"); return false; }
-    if(product.id===99 && cart.some(i=>i.id===99)){ showWhiteAlert("You can only add one mixtape to your cart.", "Mixtape already in cart"); return false; }
-    const existing = cart.find(i=>i.id===product.id && i.size===size && i.color===color);
-    if(existing) existing.qty++;
-    else cart.push({ id:product.id, name:product.name, price:product.price, size:size||'Digital', color:color||'N/A', qty:1 });
+  
+  function addToCart(product, size, color) {
+    if (!size) { alert("Select size"); return false; }
+    if (!color && product.id !== 99) { alert("Select color"); return false; }
+    const existing = cart.find(i => i.id === product.id && i.size === size && i.color === color);
+    if (existing) existing.qty++;
+    else cart.push({ id: product.id, name: product.name, price: product.price, size: size || 'Digital', color: color || 'N/A', qty: 1 });
     saveCartToLocal();
     document.getElementById("cartSidebar").classList.add("open");
     return true;
   }
   
-  function showModal(p) {
-    currentProduct=p; selectedSize=null; selectedColor=null;
-    document.getElementById("modalProductName").innerText=p.name;
-    document.getElementById("modalProductPrice").innerText=`R${p.price.toFixed(2)}`;
-    const sDiv=document.getElementById("modalSizes"); sDiv.innerHTML="";
-    p.sizes.forEach(s=>{ let btn=document.createElement("div"); btn.className="modal-size-btn"; btn.innerText=s; btn.onclick=()=>{ document.querySelectorAll(".modal-size-btn").forEach(b=>b.classList.remove("selected")); btn.classList.add("selected"); selectedSize=s; }; sDiv.appendChild(btn); });
-    const cDiv=document.getElementById("modalColors"); cDiv.innerHTML="";
-    colors.forEach(c=>{ let btn=document.createElement("div"); btn.className="modal-color-btn"; btn.style.backgroundColor=c.bg; btn.title=c.name; btn.onclick=()=>{ document.querySelectorAll(".modal-color-btn").forEach(b=>b.classList.remove("selected")); btn.classList.add("selected"); selectedColor=c.value; }; cDiv.appendChild(btn); });
+  function showModal(product) {
+    currentProduct = product; selectedSize = null; selectedColor = null;
+    document.getElementById("modalProductName").innerText = product.name;
+    document.getElementById("modalProductPrice").innerText = `R${product.price.toFixed(2)}`;
+    const sizesDiv = document.getElementById("modalSizes");
+    sizesDiv.innerHTML = "";
+    product.sizes.forEach(s => {
+      const btn = document.createElement("div"); btn.className = "modal-size-btn"; btn.innerText = s;
+      btn.onclick = () => { document.querySelectorAll(".modal-size-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedSize = s; };
+      sizesDiv.appendChild(btn);
+    });
+    const colorsDiv = document.getElementById("modalColors");
+    colorsDiv.innerHTML = "";
+    colors.forEach(c => {
+      const btn = document.createElement("div"); btn.className = "modal-color-btn"; btn.style.backgroundColor = c.bg; btn.title = c.name;
+      btn.onclick = () => { document.querySelectorAll(".modal-color-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedColor = c.value; };
+      colorsDiv.appendChild(btn);
+    });
     document.getElementById("sizeColorModal").classList.add("show");
   }
-  function renderProducts() {
-    const tContainer = document.getElementById("tshirtsGrid"); const sContainer = document.getElementById("sweatersGrid"); const hContainer = document.getElementById("hoodiesGrid");
-    if(tContainer){ tContainer.innerHTML=""; tshirts.forEach(prod=>{ let card=document.createElement("div"); card.className="product-card"; card.innerHTML=`<div class="product-img"><img src="${prod.image}" onerror="this.parentElement.innerHTML='<div class=\\'no-img\\'><i class=\\'fas fa-tshirt\\'></i></div>'"></div><div class="product-info"><div class="product-title">${prod.name}</div><div class="product-price">R${prod.price}</div><button class="add-to-cart-btn" data-id="${prod.id}">ADD TO CART</button></div>`; tContainer.appendChild(card); }); }
-    if(sContainer){ sContainer.innerHTML=""; sweaters.forEach(prod=>{ let card=document.createElement("div"); card.className="product-card"; card.innerHTML=`<div class="product-img"><img src="${prod.image}" onerror="this.parentElement.innerHTML='<div class=\\'no-img\\'><i class=\\'fas fa-vest\\'></i></div>'"></div><div class="product-info"><div class="product-title">${prod.name}</div><div class="product-price">R${prod.price}</div><button class="add-to-cart-btn" data-id="${prod.id}">ADD TO CART</button></div>`; sContainer.appendChild(card); }); }
-    if(hContainer){ hContainer.innerHTML=""; hoodies.forEach(prod=>{ let card=document.createElement("div"); card.className="product-card"; card.innerHTML=`<div class="product-img"><img src="${prod.image}" onerror="this.parentElement.innerHTML='<div class=\\'no-img\\'><i class=\\'fas fa-hoodie\\'></i></div>'"></div><div class="product-info"><div class="product-title">${prod.name}</div><div class="product-price">R${prod.price}</div><button class="add-to-cart-btn" data-id="${prod.id}">ADD TO CART</button></div>`; hContainer.appendChild(card); }); }
-    document.querySelectorAll(".add-to-cart-btn").forEach(btn=>btn.addEventListener("click",(e)=>{e.stopPropagation(); const id=parseInt(btn.dataset.id); const product=allProducts.find(p=>p.id===id); showModal(product); }));
-  }
-
-  function isOnlyDigitalMixtape() {
-    if (cart.length === 0) return false;
-    return cart.every(item => item.id === 99);
-  }
-
-  function showStoreFinderPage() { document.getElementById('storeFinderPage').classList.add('active'); initFinderMap(); }
-  function hideStoreFinderPage() { document.getElementById('storeFinderPage').classList.remove('active'); }
   
-  async function queryFinderStores(lat,lng,radius=10000){
-    const query=`[out:json];(node["shop"]["brand"~"PEP|Tekkie Town|Shoe City|PEPcell"](around:${radius},${lat},${lng});way["shop"]["brand"~"PEP|Tekkie Town|Shoe City|PEPcell"](around:${radius},${lat},${lng}););out body;`;
-    try{
-      const res=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:query});
-      const data=await res.json();
-      return data.elements.map(el=>({ id:el.id, name:el.tags.name||el.tags.brand||'Store', address:el.tags['addr:full']||el.tags['addr:street']||el.tags['addr:city']||'Address not available', lat:el.lat||(el.center?el.center.lat:lat), lon:el.lon||(el.center?el.center.lon:lng), code:el.tags.ref||'' }));
-    }catch(e){ return []; }
-  }
+  function closeModal() { document.getElementById("sizeColorModal").classList.remove("show"); }
+  function confirmAdd() { if (!selectedSize) { alert("Select size"); return; } if (!selectedColor) { alert("Select color"); return; } addToCart(currentProduct, selectedSize, selectedColor); closeModal(); }
   
-  function displayFinderStores(stores){
-    if(!finderMap)return;
-    finderMarkers.forEach(m=>finderMap.removeLayer(m)); finderMarkers=[];
-    const container=document.getElementById('finderStoreList'); container.innerHTML=''; currentStores=stores;
-    if(!stores.length){ container.innerHTML='<div style="color:#aaa;text-align:center;padding:20px;">No stores found.</div>'; return; }
-    stores.forEach(store=>{
-      let m=L.marker([store.lat,store.lon]).addTo(finderMap);
-      m.bindPopup(`<b>${store.name}</b><br>${store.address}`);
-      finderMarkers.push(m);
-      let div=document.createElement('div'); div.className='store-card';
-      div.innerHTML=`<div class="store-card-name">${store.name}</div><div class="store-card-address">${store.address}</div>`;
-      div.onclick=()=>selectFinderStore(store);
-      container.appendChild(div);
+  function renderGrid(products, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+    products.forEach(prod => {
+      const card = document.createElement("div"); card.className = "product-card";
+      card.innerHTML = `<div class="product-img"><img src="${prod.image}" alt="${prod.name}" onerror="this.parentElement.innerHTML='<div class=\\'no-img\\'><i class=\\'fas fa-tshirt\\'></i></div>'"></div><div class="product-info"><div class="product-title">${prod.name}</div><div class="product-price">R${prod.price.toFixed(2)}</div><button class="add-to-cart-btn" data-id="${prod.id}"><i class="fas fa-cart-plus"></i> ADD TO CART</button></div>`;
+      container.appendChild(card);
     });
-    if(finderMarkers.length) finderMap.fitBounds(L.featureGroup(finderMarkers).getBounds().pad(0.2));
+    container.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => { e.stopPropagation(); const id = parseInt(btn.dataset.id); const product = allProducts.find(p => p.id === id); showModal(product); });
+    });
+    container.querySelectorAll(".product-card").forEach(card => {
+      card.addEventListener("click", (e) => { if (e.target.closest(".add-to-cart-btn")) return; const btn = card.querySelector(".add-to-cart-btn"); if (btn) { const id = parseInt(btn.dataset.id); const product = allProducts.find(p => p.id === id); showModal(product); } });
+    });
   }
   
-  function selectFinderStore(store){
-    selectedPaxiStore=store;
-    document.getElementById('paxi_store_name').value=store.name;
-    document.getElementById('paxi_store_address').value=store.address;
-    document.getElementById('paxi_store_code').value=store.code||'';
-    let isKing=store.address.toLowerCase().includes('king william')||store.name.toLowerCase().includes('king william');
-    if(isKing){
-      isKingWilliamsTown=true; deliveryAmount=0;
-      document.getElementById('delivery_amount').value=0;
-      hideStoreFinderPage();
-      document.getElementById('freeCollectionNotif').classList.add('show');
+  window.addEventListener("scroll", () => { const sticky = document.getElementById("stickyNav"); if (window.scrollY > 60) sticky.classList.add("show"); else sticky.classList.remove("show"); });
+  
+  function setupNav() {
+    const links = [
+      { class: ".nav-tshirts", id: "tshirts-section" }, { class: ".nav-sweaters", id: "sweaters-section" }, { class: ".nav-hoodies", id: "hoodies-section" },
+      { class: ".sticky-tshirts", id: "tshirts-section" }, { class: ".sticky-sweaters", id: "sweaters-section" }, { class: ".sticky-hoodies", id: "hoodies-section" }
+    ];
+    links.forEach(l => { document.querySelectorAll(l.class).forEach(el => { el.addEventListener("click", (e) => { e.preventDefault(); document.getElementById(l.id).scrollIntoView({ behavior: "smooth" }); }); }); });
+  }
+  
+  // ==============================================================
+  // DELIVERY MODAL
+  // ==============================================================
+  let selectedDelivery = null;
+  
+  function showDeliveryModal() {
+    const modal = document.getElementById('deliveryModal');
+    modal.classList.add('show');
+  }
+  
+  function hideDeliveryModal() {
+    const modal = document.getElementById('deliveryModal');
+    modal.classList.remove('show');
+  }
+  
+  document.getElementById('economyOption')?.addEventListener('click', () => {
+    document.getElementById('economyOption').classList.add('selected');
+    document.getElementById('speedOption').classList.remove('selected');
+    selectedDelivery = { type: 'economy', amount: 59.95 };
+  });
+  
+  document.getElementById('speedOption')?.addEventListener('click', () => {
+    document.getElementById('speedOption').classList.add('selected');
+    document.getElementById('economyOption').classList.remove('selected');
+    selectedDelivery = { type: 'speed', amount: 109.95 };
+  });
+  
+  document.getElementById('confirmDeliveryBtn')?.addEventListener('click', () => {
+    if (selectedDelivery) {
+      deliveryAmount = selectedDelivery.amount;
+      document.getElementById('delivery_amount').value = deliveryAmount;
+      document.getElementById('delivery_type').value = selectedDelivery.type;
+      hideDeliveryModal();
+      updateCartUI();
+      alert(`✅ Delivery option selected: ${selectedDelivery.type === 'economy' ? 'Economy (R59.95)' : 'Speed (R109.95)'}`);
     } else {
-      isKingWilliamsTown=false;
-      hideStoreFinderPage();
-      showDeliveryModal();
+      alert('Please select a delivery option');
+    }
+  });
+  
+  // ==============================================================
+  // PAXI STORE FINDER MAP - WORKING VERSION
+  // ==============================================================
+  let map = null;
+  let markers = [];
+  let currentStores = [];
+  
+  async function queryStores(lat, lng, radius = 5000) {
+    const overpassUrl = 'https://overpass-api.de/api/interpreter';
+    const query = `
+      [out:json];
+      (
+        node["shop"]["brand"~"PEP|Tekkie Town|Shoe City|PEPcell"](around:${radius},${lat},${lng});
+        way["shop"]["brand"~"PEP|Tekkie Town|Shoe City|PEPcell"](around:${radius},${lat},${lng});
+      );
+      out body;
+    `;
+    try {
+      const response = await fetch(overpassUrl, { method: 'POST', body: query });
+      const data = await response.json();
+      return data.elements.map(el => ({
+        id: el.id,
+        name: el.tags.name || el.tags.brand || 'PAXI Store',
+        address: el.tags['addr:full'] || el.tags['addr:street'] || el.tags['addr:city'] || 'Address not available',
+        lat: el.lat || (el.center ? el.center.lat : lat),
+        lon: el.lon || (el.center ? el.center.lon : lng),
+        code: el.tags.ref || ''
+      }));
+    } catch (error) {
+      console.error('Overpass error:', error);
+      return [];
     }
   }
   
-  async function searchFinderStores(){
-    let location=document.getElementById('finderSearchLocation').value.trim();
-    if(!location){ alert('Enter location'); return; }
-    let searchBtn=document.getElementById('finderSearchBtn');
-    searchBtn.innerText='Searching...'; searchBtn.disabled=true;
-    try{
-      let geoRes=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location+', South Africa')}&limit=1`);
-      let geoData=await geoRes.json();
-      if(!geoData.length){ alert('Location not found'); return; }
-      let {lat,lon}=geoData[0];
-      if(finderMap) finderMap.setView([lat,lon],12);
-      else{ finderMap=L.map('finderMap').setView([lat,lon],12); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OSM'}).addTo(finderMap); }
-      let stores=await queryFinderStores(lat,lon);
-      displayFinderStores(stores);
-      if(!stores.length) alert('No stores found.');
-    }catch(e){ alert('Error searching'); } finally{ searchBtn.innerText='Search'; searchBtn.disabled=false; }
+  function displayStores(stores) {
+    if (!map) return;
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+    const container = document.getElementById('storeList');
+    container.innerHTML = '';
+    currentStores = stores;
+    
+    if (stores.length === 0) {
+      container.innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">No PAXI stores found in this area. Try a different location.</div>';
+      return;
+    }
+    
+    stores.forEach(store => {
+      const marker = L.marker([store.lat, store.lon]).addTo(map);
+      marker.bindPopup(`<b>${store.name}</b><br>${store.address}<br><button onclick="selectStore('${store.id}')">Select</button>`);
+      markers.push(marker);
+      
+      const div = document.createElement('div');
+      div.className = 'store-item';
+      div.innerHTML = `<div class="store-name">${store.name}</div><div class="store-address">${store.address}</div>`;
+      div.onclick = () => selectStore(store.id);
+      container.appendChild(div);
+    });
+    
+    if (markers.length > 0) {
+      const group = L.featureGroup(markers);
+      map.fitBounds(group.getBounds().pad(0.2));
+    }
   }
   
-  function initFinderMap(){
-    if(finderMap) finderMap.invalidateSize();
-    else{ finderMap=L.map('finderMap').setView([-28.9,24.8],5); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OSM'}).addTo(finderMap); }
-  }
-  
-  function manualFinderStore(){
-    let addr=prompt("Enter store address:");
-    if(addr){
-      selectedPaxiStore={ id:'manual', name:'Manually entered store', address:addr, code:'' };
-      document.getElementById('paxi_store_name').value=selectedPaxiStore.name;
-      document.getElementById('paxi_store_address').value=addr;
-      document.getElementById('paxi_store_code').value='';
-      let isKing=addr.toLowerCase().includes('king william');
-      if(isKing){
-        isKingWilliamsTown=true; deliveryAmount=0;
-        document.getElementById('delivery_amount').value=0;
-        hideStoreFinderPage();
-        document.getElementById('freeCollectionNotif').classList.add('show');
+  window.selectStore = function(storeId) {
+    const store = currentStores.find(s => s.id == storeId);
+    if (store) {
+      selectedPaxiStore = store;
+      document.getElementById('paxi_store_name').value = store.name;
+      document.getElementById('paxi_store_address').value = store.address;
+      document.getElementById('paxi_store_code').value = store.code || '';
+      
+      const isKingTown = store.address.toLowerCase().includes('king william') || 
+                         store.name.toLowerCase().includes('king william') ||
+                         store.address.toLowerCase().includes('kingwilliam');
+      
+      if (isKingTown) {
+        isKingWilliamsTown = true;
+        deliveryAmount = 0;
+        document.getElementById('delivery_amount').value = 0;
+        alert(`✅ Free collection at Clicks Stone Towers, King William's Town!\nYour items will be ready for collection at Clicks Stone Towers.`);
       } else {
-        isKingWilliamsTown=false;
-        hideStoreFinderPage();
+        isKingWilliamsTown = false;
         showDeliveryModal();
+      }
+      closeStoreFinder();
+    }
+  };
+  
+  async function searchStores() {
+    const location = document.getElementById('searchLocation').value.trim();
+    if (!location) {
+      alert('Please enter a town or city');
+      return;
+    }
+    const searchBtn = document.getElementById('searchBtn');
+    searchBtn.innerText = 'Searching...';
+    searchBtn.disabled = true;
+    try {
+      const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location + ', South Africa')}&limit=1`;
+      const geoRes = await fetch(geoUrl);
+      const geoData = await geoRes.json();
+      if (!geoData.length) {
+        alert('Location not found');
+        return;
+      }
+      const { lat, lon } = geoData[0];
+      
+      if (map) {
+        map.setView([lat, lon], 12);
+      } else {
+        map = L.map('paxiMap').setView([lat, lon], 12);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+        }).addTo(map);
+      }
+      
+      const stores = await queryStores(lat, lon);
+      displayStores(stores);
+      if (stores.length === 0) alert('No PAXI stores found near that location.');
+    } catch (error) {
+      console.error(error);
+      alert('Error searching. Please try again.');
+    } finally {
+      searchBtn.innerText = 'Search';
+      searchBtn.disabled = false;
+    }
+  }
+  
+  function openStoreFinder() {
+    const modal = document.getElementById('storeFinderModal');
+    modal.style.display = 'block';
+    setTimeout(() => {
+      if (!map) {
+        map = L.map('paxiMap').setView([-28.9, 24.8], 5);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+        }).addTo(map);
+      } else {
+        map.invalidateSize();
+      }
+    }, 200);
+  }
+  
+  function closeStoreFinder() {
+    document.getElementById('storeFinderModal').style.display = 'none';
+  }
+  
+  document.getElementById('openStoreFinderBtn')?.addEventListener('click', openStoreFinder);
+  document.getElementById('closeStoreFinderBtn')?.addEventListener('click', closeStoreFinder);
+  document.getElementById('searchBtn')?.addEventListener('click', searchStores);
+  document.getElementById('searchLocation')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchStores(); });
+  
+  // ==============================================================
+  // CHECKOUT BUTTON - NO "PLEASE SELECT PAXI" POPUP
+  // ==============================================================
+  document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
+    if (!currentUser) {
+      window.showAuthModal();
+      return;
+    }
+    if (cart.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+    
+    // Check if only mixtape is in cart (no physical items)
+    const hasPhysicalItems = cart.some(item => item.id !== 99);
+    
+    if (hasPhysicalItems && !selectedPaxiStore && !isKingWilliamsTown) {
+      // Instead of alert, open the map modal
+      openStoreFinder();
+      return;
+    }
+    
+    const orderId = "ORDER_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
+    let total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+    
+    if (hasPhysicalItems && deliveryAmount > 0) {
+      total += deliveryAmount;
+    }
+    
+    const checkoutBtn = document.getElementById("checkoutBtn");
+    const originalText = checkoutBtn.innerText;
+    checkoutBtn.innerText = "⏳ SAVING ORDER...";
+    checkoutBtn.disabled = true;
+    
+    const timeoutId = setTimeout(() => {
+      if (checkoutBtn.disabled) {
+        checkoutBtn.innerText = "CHECKOUT →";
+        checkoutBtn.disabled = false;
+        alert("Request timed out. Please try again.");
+      }
+    }, 30000);
+    
+    try {
+      const saveResponse = await fetch(`${API_URL}/api/save-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionToken: sessionToken,
+          orderId: orderId,
+          items: cart,
+          total: total,
+          customerEmail: currentUser.email,
+          paxi_store_name: document.getElementById('paxi_store_name').value,
+          paxi_store_address: document.getElementById('paxi_store_address').value,
+          paxi_store_code: document.getElementById('paxi_store_code').value,
+          delivery_amount: deliveryAmount,
+          delivery_type: document.getElementById('delivery_type').value
+        })
+      });
+      
+      const saveData = await saveResponse.json();
+      
+      if (!saveData.success) {
+        clearTimeout(timeoutId);
+        alert("Failed to save order: " + (saveData.error || "Unknown error"));
+        checkoutBtn.innerText = originalText;
+        checkoutBtn.disabled = false;
+        return;
+      }
+      
+      checkoutBtn.innerText = "⏳ CREATING PAYMENT...";
+      
+      const paymentResponse = await fetch(`${API_URL}/create-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total, orderId: orderId })
+      });
+      
+      const paymentData = await paymentResponse.json();
+      
+      if (paymentData.success && paymentData.paymentUrl) {
+        clearTimeout(timeoutId);
+        sessionStorage.setItem('pendingOrderId', orderId);
+        window.location.href = paymentData.paymentUrl;
+      } else {
+        clearTimeout(timeoutId);
+        alert("Payment error: " + (paymentData.error || "Could not create payment link"));
+        checkoutBtn.innerText = originalText;
+        checkoutBtn.disabled = false;
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+      alert("Connection error. Please try again.");
+      checkoutBtn.innerText = originalText;
+      checkoutBtn.disabled = false;
+    }
+  });
+  
+  async function checkForSuccessfulPayment() {
+    const pendingOrderId = sessionStorage.getItem('pendingOrderId');
+    if (pendingOrderId) {
+      sessionStorage.removeItem('pendingOrderId');
+      await refreshUserData();
+      if (currentUser && currentUser.hasPurchasedMixtape) {
+        alert("Thank you! Your mixtape is now available for download.");
+        updateMixtapeButtons();
       }
     }
   }
-
-  function showDeliveryModal(){ document.getElementById('deliveryModal').classList.add('show'); }
-  function hideDeliveryModal(){ document.getElementById('deliveryModal').classList.remove('show'); }
   
-  document.getElementById('economyOption')?.addEventListener('click',()=>{ document.getElementById('economyOption').classList.add('selected'); document.getElementById('speedOption').classList.remove('selected'); selectedDelivery={ type:'economy', amount:59.95 }; });
-  document.getElementById('speedOption')?.addEventListener('click',()=>{ document.getElementById('speedOption').classList.add('selected'); document.getElementById('economyOption').classList.remove('selected'); selectedDelivery={ type:'speed', amount:109.95 }; });
+  document.getElementById("cartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
+  document.getElementById("stickyCartIcon")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.add("open"));
+  document.getElementById("closeCartBtn")?.addEventListener("click", () => document.getElementById("cartSidebar").classList.remove("open"));
+  document.getElementById("modalConfirmBtn")?.addEventListener("click", confirmAdd);
+  document.getElementById("modalCloseBtn")?.addEventListener("click", closeModal);
+  window.addEventListener("click", (e) => { if (e.target === document.getElementById("sizeColorModal")) closeModal(); });
   
-  async function proceedToPaymentAfterDelivery() {
-    if(selectedDelivery){
-      deliveryAmount=selectedDelivery.amount;
-      document.getElementById('delivery_amount').value=deliveryAmount;
-      document.getElementById('delivery_type').value=selectedDelivery.type;
-      hideDeliveryModal();
-      await proceedToPayment();
-    } else alert('Please select a delivery option');
-  }
-  document.getElementById('confirmDeliveryBtn')?.addEventListener('click', proceedToPaymentAfterDelivery);
-  document.getElementById('closeDeliveryXBtn')?.addEventListener('click',()=>hideDeliveryModal());
-  document.getElementById('closeFreeCollectionXBtn')?.addEventListener('click',()=>document.getElementById('freeCollectionNotif').classList.remove('show'));
-  document.getElementById('closeFreeCollectionBtn')?.addEventListener('click',async()=>{ document.getElementById('freeCollectionNotif').classList.remove('show'); await proceedToPayment(); });
+  document.getElementById("closeAuthBtn")?.addEventListener("click", window.closeAuthModal);
+  document.getElementById("closeResetBtn")?.addEventListener("click", closeResetModal);
+  document.getElementById("authSubmitBtn")?.addEventListener("click", handleAuth);
+  document.getElementById("authToggleText")?.addEventListener("click", toggleAuthMode);
+  document.getElementById("forgotPasswordBtn")?.addEventListener("click", showResetModal);
+  document.getElementById("sendResetBtn")?.addEventListener("click", sendResetLink);
   
-  document.getElementById("checkoutBtn")?.addEventListener("click", async () => {
-    if (cart.length === 0) { alert("Cart is empty"); return; }
-    if (isOnlyDigitalMixtape()) {
-      if (!currentUser) { showAuthModal(); return; }
-      await proceedToPayment();
-    } else {
-      showStoreFinderPage();
-    }
+  verifySession().then(() => {
+    renderGrid(tshirts, "tshirtsGrid");
+    renderGrid(sweaters, "sweatersGrid");
+    renderGrid(hoodies, "hoodiesGrid");
+    setupNav();
+    checkForSuccessfulPayment();
   });
-
-  async function proceedToPayment(){
-    if(!currentUser){ showAuthModal(); return; }
-    if(cart.length===0){ alert("Cart empty"); return; }
-    const hasPhysical = cart.some(i=>i.id!==99);
-    if(hasPhysical && !selectedPaxiStore && !isKingWilliamsTown){ showStoreFinderPage(); return; }
-    let total = cart.reduce((s,i)=>s+(i.price*i.qty),0);
-    if(hasPhysical && deliveryAmount>0) total+=deliveryAmount;
-    const orderId = "ORDER_"+Date.now()+"_"+Math.random().toString(36).substr(2,6);
-    try{
-      let saveRes=await fetch(`${API_URL}/api/save-order`,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ sessionToken, orderId, items:cart, total, customerEmail:currentUser.email, paxi_store_name:document.getElementById('paxi_store_name').value, paxi_store_address:document.getElementById('paxi_store_address').value, paxi_store_code:document.getElementById('paxi_store_code').value, delivery_amount:deliveryAmount, delivery_type:document.getElementById('delivery_type').value })});
-      let saveData=await saveRes.json();
-      if(!saveData.success){ alert("Order save failed"); return; }
-      let payRes=await fetch(`${API_URL}/create-payment`,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ amount:total, orderId })});
-      let payData=await payRes.json();
-      if(payData.success && payData.paymentUrl) window.location.href=payData.paymentUrl;
-      else alert("Payment error");
-    }catch(e){ alert("Connection error"); }
-  }
-
-  document.getElementById('closeFinderPageBtn')?.addEventListener('click', hideStoreFinderPage);
-  document.getElementById('finderSearchBtn')?.addEventListener('click', searchFinderStores);
-  document.getElementById('finderManualStoreBtn')?.addEventListener('click', manualFinderStore);
-  
-  function showAuthModal(){ document.getElementById('authModal').classList.add('show'); window.isLoginMode=true; document.getElementById('authTitle').innerText='LOGIN'; document.getElementById('authSubmitBtn').innerText='LOGIN'; document.getElementById('authToggleText').innerText='Create an account'; }
-  function closeAuthModal(){ document.getElementById('authModal').classList.remove('show'); }
-  document.getElementById('closeAuthBtn')?.addEventListener('click',closeAuthModal);
-  document.getElementById('globalAuthIconBtn')?.addEventListener('click', showAuthModal);
-  
-  // Password visibility toggle
-  const togglePwdBtn = document.getElementById('togglePasswordBtn');
-  const pwdInput = document.getElementById('authPassword');
-  const pwdIcon = document.getElementById('passwordIcon');
-  if(togglePwdBtn && pwdInput && pwdIcon){
-    togglePwdBtn.addEventListener('click', () => {
-      const type = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      pwdInput.setAttribute('type', type);
-      pwdIcon.classList.toggle('fa-eye');
-      pwdIcon.classList.toggle('fa-eye-slash');
-    });
-  }
-  
-  document.getElementById('authSubmitBtn')?.addEventListener('click',async()=>{ let em=document.getElementById('authEmail').value.trim(), pw=document.getElementById('authPassword').value.trim(); if(!em||!pw){ showWhiteAlert("Please enter both email and password.", "Missing Information"); return; } await login(em,pw); });
-  document.getElementById('authToggleText')?.addEventListener('click',()=>{ window.isLoginMode=!window.isLoginMode; document.getElementById('authTitle').innerText=window.isLoginMode?'LOGIN':'SIGN UP'; document.getElementById('authSubmitBtn').innerText=window.isLoginMode?'LOGIN':'SIGN UP'; document.getElementById('authToggleText').innerText=window.isLoginMode?'Create an account':'Back to login'; });
-  document.getElementById('forgotPasswordBtn')?.addEventListener('click',()=>document.getElementById('resetModal').classList.add('show'));
-  document.getElementById('closeResetBtn')?.addEventListener('click',()=>document.getElementById('resetModal').classList.remove('show'));
-  document.getElementById('sendResetBtn')?.addEventListener('click',async()=>{ let em=document.getElementById('resetEmail').value.trim(); if(!em){ alert("Enter email"); return; } let res=await apiCall('/forgot-password',{email:em}); alert(res.success?"Reset link sent!":"Error"); if(res.success) document.getElementById('resetModal').classList.remove('show'); });
-  
-  document.getElementById("cartIcon")?.addEventListener("click",()=>document.getElementById("cartSidebar").classList.add("open"));
-  document.getElementById("stickyCartIcon")?.addEventListener("click",()=>document.getElementById("cartSidebar").classList.add("open"));
-  document.getElementById("closeCartBtn")?.addEventListener("click",()=>document.getElementById("cartSidebar").classList.remove("open"));
-  document.getElementById("modalConfirmBtn")?.addEventListener("click",()=>{ if(!selectedSize){ showWhiteAlert("Please select a size.", "Size Required"); return; } if(!selectedColor){ showWhiteAlert("Please select a color.", "Color Required"); return; } addToCart(currentProduct,selectedSize,selectedColor); closeModal(); });
-  document.getElementById("modalCloseBtn")?.addEventListener("click",()=>document.getElementById("sizeColorModal").classList.remove("show"));
-  function closeModal(){ document.getElementById("sizeColorModal").classList.remove("show"); }
-  window.addEventListener("scroll",()=>{ if(window.scrollY>60) document.getElementById("stickyNav").classList.add("show"); else document.getElementById("stickyNav").classList.remove("show"); });
-  
-  verifySession();
 </script>
 </body>
 </html>
