@@ -36,13 +36,63 @@
       pointer-events: none;
     }
 
-    .site-header, .hero, .container, .mixtape-section, footer, .cart-overlay, .modal, .auth-modal, .reset-modal, .music-footer-btn, .delivery-modal, .store-finder-page, .legal-modal {
+    .site-header, .hero, .container, .mixtape-section, footer, .cart-overlay, .modal, .auth-modal, .reset-modal, .music-footer-btn, .delivery-modal, .store-finder-page, .legal-modal, .white-alert-modal {
       position: relative;
       z-index: 10;
     }
 
     :root { --purple: #7f2aeb; --green: #10b981; --red: #e11d2c; --blue: #3b82f6; }
     .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+    /* White Alert Modal */
+    .white-alert-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 30000;
+      align-items: center;
+      justify-content: center;
+    }
+    .white-alert-modal.show { display: flex; }
+    .white-alert-content {
+      background: white;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 320px;
+      padding: 28px 24px;
+      text-align: center;
+      color: #1a1a2e;
+      position: relative;
+    }
+    .white-alert-content i { font-size: 48px; color: #f59e0b; margin-bottom: 16px; }
+    .white-alert-content h4 { font-size: 1.2rem; margin-bottom: 12px; font-weight: 700; }
+    .white-alert-content p { font-size: 0.9rem; margin: 8px 0; line-height: 1.4; }
+    .white-alert-close {
+      background: #3b82f6;
+      margin-top: 20px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 40px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+    }
+    .close-white-alert {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: #999;
+    }
+    .close-white-alert:hover { color: #e11d2c; }
 
     /* Legal Modal Styles - White Popup */
     .legal-modal {
@@ -570,10 +620,26 @@
     }
     .close-delivery:hover, .close-notification:hover { color: #e11d2c; }
     .auth-modal-content h2, .reset-modal-content h2 { color: white; font-size: 1.2rem; margin-bottom: 20px; }
+    .input-group {
+      position: relative;
+      margin: 8px 0;
+    }
     .auth-modal-content input, .reset-modal-content input {
-      width: 100%; padding: 12px; margin: 8px 0; background: rgba(255,255,255,0.1);
+      width: 100%; padding: 12px; padding-right: 40px; background: rgba(255,255,255,0.1);
       border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: white; font-size: 0.8rem;
     }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #aaa;
+      font-size: 1rem;
+    }
+    .toggle-password:hover { color: white; }
+    .forgot-link { text-align: right; margin-top: 5px; font-size: 0.6rem; }
+    .forgot-link span { color: var(--blue); cursor: pointer; text-decoration: underline; }
     .auth-btn {
       background: var(--blue); border: none; color: white; padding: 12px; width: 100%;
       border-radius: 40px; font-weight: 600; margin-top: 15px; cursor: pointer;
@@ -592,6 +658,17 @@
   </style>
 </head>
 <body>
+
+<!-- White Alert Modal (replaces browser alert) -->
+<div id="whiteAlertModal" class="white-alert-modal">
+  <div class="white-alert-content">
+    <button class="close-white-alert" id="closeWhiteAlertBtn">&times;</button>
+    <i class="fas fa-exclamation-triangle"></i>
+    <h4>Mixtape already in cart</h4>
+    <p>You can only add one mixtape to your cart.</p>
+    <button class="white-alert-close" id="whiteAlertConfirmBtn">OK</button>
+  </div>
+</div>
 
 <!-- Legal Modals (White Popups) -->
 <div id="termsModal" class="legal-modal">
@@ -691,9 +768,23 @@
     <button class="close-auth" id="closeAuthBtn">&times;</button>
     <h2 id="authTitle">LOGIN</h2>
     <input type="text" id="authEmail" placeholder="Email">
-    <input type="password" id="authPassword" placeholder="Password">
+    <div class="input-group">
+      <input type="password" id="authPassword" placeholder="Password">
+      <span class="toggle-password" id="togglePasswordBtn"><i class="fas fa-eye-slash" id="passwordIcon"></i></span>
+    </div>
     <button class="auth-btn" id="authSubmitBtn">LOGIN</button>
+    <div class="forgot-link"><span id="forgotPasswordBtn">Forgot password?</span></div>
     <div class="auth-toggle"><span id="authToggleText">Create an account</span></div>
+  </div>
+</div>
+
+<div id="resetModal" class="reset-modal">
+  <div class="reset-modal-content">
+    <button class="close-reset" id="closeResetBtn">&times;</button>
+    <h2>RESET PASSWORD</h2>
+    <input type="email" id="resetEmail" placeholder="Enter your email">
+    <button class="auth-btn" id="sendResetBtn">SEND RESET LINK</button>
+    <div id="resetMessage" style="font-size:0.7rem; margin-top:10px; color:#aaa;"></div>
   </div>
 </div>
 
@@ -788,6 +879,18 @@
   let deliveryAmount = 0, selectedPaxiStore = null, isKingWilliamsTown = false, selectedDelivery = null;
   let finderMap = null, finderMarkers = [], currentStores = [];
 
+  function showWhiteAlert(message, title = "Notice") {
+    const modal = document.getElementById('whiteAlertModal');
+    const titleEl = modal.querySelector('h4');
+    const msgEl = modal.querySelector('p');
+    titleEl.innerText = title;
+    msgEl.innerText = message;
+    modal.classList.add('show');
+  }
+  function closeWhiteAlert() { document.getElementById('whiteAlertModal').classList.remove('show'); }
+  document.getElementById('closeWhiteAlertBtn')?.addEventListener('click', closeWhiteAlert);
+  document.getElementById('whiteAlertConfirmBtn')?.addEventListener('click', closeWhiteAlert);
+
   function showLegalModal(id) { document.getElementById(id).classList.add('show'); }
   function closeLegalModal(id) { document.getElementById(id).classList.remove('show'); }
   window.showLegalModal = showLegalModal;
@@ -825,7 +928,7 @@
       updateCartUI(); updateUserUI(); updateMixtapeButtons();
       closeAuthModal();
       return true;
-    } else { alert(result.error || 'Login failed'); return false; }
+    } else { showWhiteAlert(result.error || 'Login failed', 'Login Error'); return false; }
   }
 
   async function logout() {
@@ -847,7 +950,7 @@
     } else {
       container.innerHTML = `<button class="buy-btn" id="addToCartMixtapeBtn"><i class="fas fa-cart-plus"></i> ADD TO CART (R50)</button><a href="#" id="mixtapeListenBtn" class="listen-btn-mix"><i class="fab fa-youtube"></i> LISTEN NOW</a>`;
       document.getElementById('addToCartMixtapeBtn')?.addEventListener('click', () => {
-        if (cart.some(i => i.id === 99)) { alert("Mixtape already in cart."); return; }
+        if (cart.some(i => i.id === 99)) { showWhiteAlert("You can only add one mixtape to your cart.", "Mixtape already in cart"); return; }
         cart.push({ id: 99, name: "DUETS Mixtape (Digital ZIP)", price: 50, size: "Digital", color: "N/A", qty: 1 });
         saveCartToLocal();
         document.getElementById("cartSidebar").classList.add("open");
@@ -904,9 +1007,9 @@
   let currentProduct=null, selectedSize=null, selectedColor=null;
 
   function addToCart(product,size,color) {
-    if(!size){alert("Select size"); return false;}
-    if(!color && product.id!==99){alert("Select color"); return false;}
-    if(product.id===99 && cart.some(i=>i.id===99)){ alert("Mixtape already in cart"); return false; }
+    if(!size){ showWhiteAlert("Please select a size.", "Size Required"); return false; }
+    if(!color && product.id!==99){ showWhiteAlert("Please select a color.", "Color Required"); return false; }
+    if(product.id===99 && cart.some(i=>i.id===99)){ showWhiteAlert("You can only add one mixtape to your cart.", "Mixtape already in cart"); return false; }
     const existing = cart.find(i=>i.id===product.id && i.size===size && i.color===color);
     if(existing) existing.qty++;
     else cart.push({ id:product.id, name:product.name, price:product.price, size:size||'Digital', color:color||'N/A', qty:1 });
@@ -1086,13 +1189,30 @@
   function closeAuthModal(){ document.getElementById('authModal').classList.remove('show'); }
   document.getElementById('closeAuthBtn')?.addEventListener('click',closeAuthModal);
   document.getElementById('globalAuthIconBtn')?.addEventListener('click', showAuthModal);
-  document.getElementById('authSubmitBtn')?.addEventListener('click',async()=>{ let em=document.getElementById('authEmail').value.trim(), pw=document.getElementById('authPassword').value.trim(); if(!em||!pw){ alert("Enter credentials"); return; } await login(em,pw); });
+  
+  // Password visibility toggle
+  const togglePwdBtn = document.getElementById('togglePasswordBtn');
+  const pwdInput = document.getElementById('authPassword');
+  const pwdIcon = document.getElementById('passwordIcon');
+  if(togglePwdBtn && pwdInput && pwdIcon){
+    togglePwdBtn.addEventListener('click', () => {
+      const type = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      pwdInput.setAttribute('type', type);
+      pwdIcon.classList.toggle('fa-eye');
+      pwdIcon.classList.toggle('fa-eye-slash');
+    });
+  }
+  
+  document.getElementById('authSubmitBtn')?.addEventListener('click',async()=>{ let em=document.getElementById('authEmail').value.trim(), pw=document.getElementById('authPassword').value.trim(); if(!em||!pw){ showWhiteAlert("Please enter both email and password.", "Missing Information"); return; } await login(em,pw); });
   document.getElementById('authToggleText')?.addEventListener('click',()=>{ window.isLoginMode=!window.isLoginMode; document.getElementById('authTitle').innerText=window.isLoginMode?'LOGIN':'SIGN UP'; document.getElementById('authSubmitBtn').innerText=window.isLoginMode?'LOGIN':'SIGN UP'; document.getElementById('authToggleText').innerText=window.isLoginMode?'Create an account':'Back to login'; });
+  document.getElementById('forgotPasswordBtn')?.addEventListener('click',()=>document.getElementById('resetModal').classList.add('show'));
+  document.getElementById('closeResetBtn')?.addEventListener('click',()=>document.getElementById('resetModal').classList.remove('show'));
+  document.getElementById('sendResetBtn')?.addEventListener('click',async()=>{ let em=document.getElementById('resetEmail').value.trim(); if(!em){ alert("Enter email"); return; } let res=await apiCall('/forgot-password',{email:em}); alert(res.success?"Reset link sent!":"Error"); if(res.success) document.getElementById('resetModal').classList.remove('show'); });
   
   document.getElementById("cartIcon")?.addEventListener("click",()=>document.getElementById("cartSidebar").classList.add("open"));
   document.getElementById("stickyCartIcon")?.addEventListener("click",()=>document.getElementById("cartSidebar").classList.add("open"));
   document.getElementById("closeCartBtn")?.addEventListener("click",()=>document.getElementById("cartSidebar").classList.remove("open"));
-  document.getElementById("modalConfirmBtn")?.addEventListener("click",()=>{ if(!selectedSize){ alert("Select size"); return; } if(!selectedColor){ alert("Select color"); return; } addToCart(currentProduct,selectedSize,selectedColor); closeModal(); });
+  document.getElementById("modalConfirmBtn")?.addEventListener("click",()=>{ if(!selectedSize){ showWhiteAlert("Please select a size.", "Size Required"); return; } if(!selectedColor){ showWhiteAlert("Please select a color.", "Color Required"); return; } addToCart(currentProduct,selectedSize,selectedColor); closeModal(); });
   document.getElementById("modalCloseBtn")?.addEventListener("click",()=>document.getElementById("sizeColorModal").classList.remove("show"));
   function closeModal(){ document.getElementById("sizeColorModal").classList.remove("show"); }
   window.addEventListener("scroll",()=>{ if(window.scrollY>60) document.getElementById("stickyNav").classList.add("show"); else document.getElementById("stickyNav").classList.remove("show"); });
